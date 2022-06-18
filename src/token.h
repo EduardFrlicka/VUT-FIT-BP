@@ -5,11 +5,11 @@
 #include "messages.h"
 
 typedef enum {
-
+    tokenTypeNone = 0,
 } eTokenType;
 
 typedef enum {
-
+    tokenPayloadTypeNone = 0,
 } eTokenPayloadType;
 
 union uTokenPayload {};
@@ -21,7 +21,15 @@ class cToken {
     cToken *next;
 
     eTokenPayloadType payloadType;
-    uTokenPayload payload;
+    uTokenPayload *payload;
+
+    /* DEBUG data */
+    const char *filename;
+    const unsigned line;
+    const unsigned col;
+
+    cToken(char *_filename, unsigned _line, unsigned _col);
+    ~cToken();
 };
 
 class cTokenStack {
