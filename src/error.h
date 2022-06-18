@@ -16,6 +16,7 @@
 #define ERR_ARGUMENT 11
 #define ERR_PERMISSION 12
 #define ERR_ALLOC 13
+#define ERR_FILE 14
 #define ERR_INTERNAL 15
 
 #define _ASCII_COLORS
