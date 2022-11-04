@@ -14,4 +14,4 @@
  */
 int lex_analyze_file(cFile *file);
 
-#endif
+#endif /* LEXICAL_H */

@@ -1,3 +1,6 @@
+#ifndef MESSAGES_H
+#define MESSAGES_H
+
 
 #define __TOKEN_PLACE_FMT "%s:%u:%u:"
 #define __TOKEN_PLACE_ARG token->filename, token->line, token->col
@@ -14,3 +17,4 @@
 #define MSG_LEX_UNEXPECTED_CHAR __TOKEN_PLACE("Unexpected character")
 #define MSG_LEX_UNEXPECTED_EOF __TOKEN_PLACE("Unexpected end of file")
 
+#endif /* MESSAGES_H */
