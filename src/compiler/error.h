@@ -9,16 +9,6 @@
 #include <unistd.h>
 #endif
 
-#define ERR 2
-#define FAILURE 1
-#define SUCCESS 0
-
-#define ERR_ARGUMENT 11
-#define ERR_PERMISSION 12
-#define ERR_ALLOC 13
-#define ERR_FILE 14
-#define ERR_INTERNAL 15
-
 #define _ASCII_COLORS
 
 #ifdef _ASCII_COLORS
@@ -56,7 +46,7 @@
         fprintf(stderr, "[" ASCII_BOLD ASCII_RED "  ERROR  " ASCII_RESET "] %s: ", __func__);                                                                                                          \
         fprintf(stderr, __VA_ARGS__);                                                                                                                                                                  \
         fprintf(stderr, "\n");                                                                                                                                                                         \
-        exit(code);                                                                                                                                                                                    \
+        return (code);                                                                                                                                                                                 \
     } while (0)
 
 #ifndef LOG_LEVEL_ERROR
@@ -92,4 +82,11 @@
             ERROR(ERR_INTERNAL, #ptr " is NULL");                                                                                                                                                      \
     } while (0)
 
-#endif
+#define ASSERT(expr)                                                                                                                                                                                   \
+    do {                                                                                                                                                                                               \
+        int res = (expr);                                                                                                                                                                              \
+        if (res)                                                                                                                                                                                       \
+            return res;                                                                                                                                                                                \
+    } while (0)
+
+#endif /* ERROR_H */

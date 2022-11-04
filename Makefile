@@ -1,12 +1,16 @@
 
-TRANSLATOR_DIR:= src
+COMPILER_DIR:= src/compiler
 
-.PHONY: translator help
+.PHONY: all translator help
+
+all: translator
 
 translator:
-	@cd $(TRANSLATOR_DIR) && $(MAKE) --no-print-directory
+	@cd $(COMPILER_DIR) && $(MAKE) --no-print-directory
 
 help:
-	@cd $(TRANSLATOR_DIR) && $(MAKE) --no-print-directory help
+	@cd $(COMPILER_DIR) && $(MAKE) --no-print-directory help
 
+%:
+	@cd $(COMPILER_DIR) && $(MAKE) --no-print-directory $@
 

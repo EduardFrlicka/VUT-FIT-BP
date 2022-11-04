@@ -1,19 +1,50 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
+#include <string>
 #include "error.h"
 #include "messages.h"
 
+
 typedef enum {
-    tokenTypeNone = 0,
+    tokenNone = 0,
 } eTokenType;
 
 typedef enum {
-    tokenPayloadTypeNone = 0,
+    tokenPayloadNone = 0,
+    tokenPayloadNum,
+    tokenPayloadStr,
+    tokenPayloadChar,
+    tokenPayloadSym,
+    tokenPayloadBool,
+    tokenPayloadNil,
 } eTokenPayloadType;
 
 union uTokenPayload {};
 
+class cNumLiteral {
+  private:
+    double value;
+    
+  public:
+    void appendChar();
+    void convert();
+    
+    cNumLiteral();
+    ~cNumLiteral();
+};
+
+class cStrLiteral {
+  private:
+};
+
+class cCharLiteral {};
+
+class cSymLiteral {};
+
+class cBoolLiteral {};
+
+class cNilLiteral {};
 class cToken {
   public:
     eTokenType type;
@@ -28,7 +59,7 @@ class cToken {
     const unsigned line;
     const unsigned col;
 
-    cToken(char *_filename, unsigned _line, unsigned _col);
+    cToken(const char *_filename, unsigned _line, unsigned _col);
     ~cToken();
 };
 

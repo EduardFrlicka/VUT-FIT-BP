@@ -1,6 +1,8 @@
 #include "file.h"
+#include "error.h"
+#include "return_values.h"
 
-cFile::cFile(char *filename) {
+cFile::cFile(const char *filename) {
     this->filename = filename;
     this->ptr = nullptr;
 
@@ -10,12 +12,12 @@ cFile::cFile(char *filename) {
 }
 
 int cFile::init() {
-    this->ptr = fopen(filename, "r");
+    this->ptr = fopen(this->filename, "r");
     if (!this->ptr)
-        return ERR_FILE;
+        ERROR(ERR_FILE, "file \"%s\" cannot be opened.", this->filename);
 
     this->c = getc(this->ptr);
-    this->col = 1;
+    this->col = 0;
     this->line = 1;
 
     return SUCCESS;
@@ -36,10 +38,10 @@ int cFile::getchar() {
     int c = this->c;
     if (c != EOF)
         this->c = getc(this->ptr);
-    
-    if(c=='\n'){
+
+    if (c == '\n') {
         this->line++;
-        this->col=0;
+        this->col = 0;
     }
 
     this->col++;

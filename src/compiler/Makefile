@@ -5,15 +5,15 @@
 # Names and Directories
 
 # Flags for compiling
-CFLAGS:=-std=c++11 -Wall -Wextra -pedantic -ggdb3# -Wno-unused-parameter
+CFLAGS:=-std=c++17 -Wall -Wextra -pedantic -ggdb3# -Wno-unused-parameter
 
 LFLAGS:=
 
 # Name of target binary file
-BINARY_PATH:=../bin/translate
+BINARY_PATH:=../../bin/translate
 
 # Name / Path to folder, where .o files will be stored
-OBJ:=../obj
+OBJ:=../../obj
 
 # Name / Path to folder, where .dep files will be stored
 DEP:=$(OBJ)
