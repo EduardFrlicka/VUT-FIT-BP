@@ -1,14 +1,13 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-#include <string>
 #include "error.h"
 #include "messages.h"
-
+#include <string>
 
 typedef enum {
     tokenNone = 0,
-} eTokenType;
+} TokenType;
 
 typedef enum {
     tokenPayloadNone = 0,
@@ -18,69 +17,47 @@ typedef enum {
     tokenPayloadSym,
     tokenPayloadBool,
     tokenPayloadNil,
-} eTokenPayloadType;
+} TokenPayloadType;
 
-union uTokenPayload {};
-
-class cNumLiteral {
-  private:
-    double value;
+class TokenPayload {
+    TokenPayloadType type;
     
-  public:
-    void appendChar();
-    void convert();
-    
-    cNumLiteral();
-    ~cNumLiteral();
 };
-
-class cStrLiteral {
-  private:
-};
-
-class cCharLiteral {};
-
-class cSymLiteral {};
-
-class cBoolLiteral {};
-
-class cNilLiteral {};
-class cToken {
+class Token {
   public:
-    eTokenType type;
-    cToken *prev;
-    cToken *next;
+    TokenType type;
+    Token *prev;
+    Token *next;
 
-    eTokenPayloadType payloadType;
-    uTokenPayload *payload;
+    TokenPayload payload;
 
     /* DEBUG data */
     const char *filename;
     const unsigned line;
     const unsigned col;
 
-    cToken(const char *_filename, unsigned _line, unsigned _col);
-    ~cToken();
+    Token(const char *_filename, unsigned _line, unsigned _col);
+    ~Token();
 };
 
-class cTokenStack {
+class TokenStack {
   private:
-    cToken *head;
-    cToken *tail;
-    cToken *ptr;
+    Token *head;
+    Token *tail;
+    Token *ptr;
     void pop();
 
   public:
-    void append(cToken *newToken);
-    cToken *peak();
-    cToken *next();
-    cToken *prev();
+    void append(Token *newToken);
+    Token *peak();
+    Token *next();
+    Token *prev();
 
     void ptrHead();
     void ptrTail();
 
-    cTokenStack();
-    ~cTokenStack();
+    TokenStack();
+    ~TokenStack();
 };
 
 #endif /* TOKEN_H */

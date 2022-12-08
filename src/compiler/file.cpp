@@ -2,7 +2,7 @@
 #include "error.h"
 #include "return_values.h"
 
-cFile::cFile(const char *filename) {
+File::File(const char *filename) {
     this->filename = filename;
     this->ptr = nullptr;
 
@@ -11,7 +11,7 @@ cFile::cFile(const char *filename) {
     this->line = 0;
 }
 
-int cFile::init() {
+int File::init() {
     this->ptr = fopen(this->filename, "r");
     if (!this->ptr)
         ERROR(ERR_FILE, "file \"%s\" cannot be opened.", this->filename);
@@ -23,18 +23,18 @@ int cFile::init() {
     return SUCCESS;
 }
 
-cFile::~cFile() {
+File::~File() {
     if (this->ptr)
         fclose(this->ptr);
 }
 
-cToken *cFile::newToken() {
-    cToken *newToken = new cToken(this->filename, this->line, this->col);
+Token *File::newToken() {
+    Token *newToken = new Token(this->filename, this->line, this->col);
     this->tokenStack.append(newToken);
     return newToken;
 }
 
-int cFile::getchar() {
+int File::getchar() {
     int c = this->c;
     if (c != EOF)
         this->c = getc(this->ptr);
@@ -49,6 +49,6 @@ int cFile::getchar() {
     return c;
 }
 
-int cFile::peakchar() {
+int File::peakchar() {
     return this->c;
 };

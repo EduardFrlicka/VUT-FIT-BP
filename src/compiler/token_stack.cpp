@@ -1,24 +1,24 @@
 #include "token.h"
 
-cTokenStack::cTokenStack() {
+TokenStack::TokenStack() {
     this->ptr = nullptr;
     this->head = nullptr;
     this->tail = nullptr;
 }
 
-cTokenStack::~cTokenStack() {
+TokenStack::~TokenStack() {
     while (this->head) {
         this->pop();
     }
 }
 
-void cTokenStack::pop() {
+void TokenStack::pop() {
     if (!this->head) {
         WARNING(MSG_TOKEN_STACK_EMPTY);
         return;
     }
 
-    cToken *tmp = this->head;
+    Token *tmp = this->head;
 
     if (this->head == this->tail)
         this->tail = nullptr;
@@ -31,7 +31,7 @@ void cTokenStack::pop() {
     delete tmp;
 }
 
-void cTokenStack::append(cToken *newToken) {
+void TokenStack::append(Token *newToken) {
     if (!this->tail) {
         newToken->next = this->tail;
         newToken->prev = this->head;
@@ -47,13 +47,13 @@ void cTokenStack::append(cToken *newToken) {
     this->tail = newToken;
 }
 
-cToken *cTokenStack::peak() {
+Token *TokenStack::peak() {
     if (this->ptr)
         WARNING(MSG_TOKEN_STACK_PTR_NULL);
     return this->ptr ? this->ptr->next : nullptr;
 }
 
-cToken *cTokenStack::prev() {
+Token *TokenStack::prev() {
     if (this->ptr)
         this->ptr = this->ptr->prev;
     else
@@ -61,7 +61,7 @@ cToken *cTokenStack::prev() {
     return this->ptr;
 }
 
-cToken *cTokenStack::next() {
+Token *TokenStack::next() {
     if (this->ptr)
         this->ptr = this->ptr->next;
     else
@@ -69,10 +69,10 @@ cToken *cTokenStack::next() {
     return this->ptr;
 }
 
-void cTokenStack::ptrHead() {
+void TokenStack::ptrHead() {
     this->ptr = this->head;
 }
 
-void cTokenStack::ptrTail() {
+void TokenStack::ptrTail() {
     this->ptr = this->tail;
 }

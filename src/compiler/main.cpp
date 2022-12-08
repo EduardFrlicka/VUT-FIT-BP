@@ -8,7 +8,7 @@
 
 void print_usage(char *binary);
 void print_help(char *binary);
-int process_path(std::vector<cFile *> &input_files, std::filesystem::path path);
+int process_path(std::vector<File *> &input_files, std::filesystem::path path);
 
 int main(int argc, char *argv[]) {
 
@@ -19,12 +19,12 @@ int main(int argc, char *argv[]) {
         return SUCCESS;
     }
 
-    std::vector<cFile *> input_files;
+    std::vector<File *> input_files;
 
     for (char **source = args.sources; *source; source++) {
         ASSERT(process_path(input_files, *source));
 
-        // cFile file = cFile(*source);
+        // File file = File(*source);
         // ASSERT(file.init());
         // lex_analyze_file(&file);
     }
@@ -40,7 +40,7 @@ void print_help(char *binary) {
     printf("Usage: %s [OPTIONS]\n", binary);
 }
 
-int process_path(std::vector<cFile *> &input_files, std::filesystem::path path) {
+int process_path(std::vector<File *> &input_files, std::filesystem::path path) {
     using namespace std::filesystem;
     DEBUG("processing %s", path.c_str());
     switch (status(path).type()) {
@@ -58,7 +58,7 @@ int process_path(std::vector<cFile *> &input_files, std::filesystem::path path) 
 
     case file_type::regular: {
         const char *path_str = path.c_str();
-        cFile *newFile = new cFile(path_str);
+        File *newFile = new File(path_str);
         ASSERT(newFile->init());
         input_files.push_back(newFile);
         break;

@@ -15,10 +15,10 @@ typedef enum {
     stateString,
 } lex_state;
 
-int readToken(cFile *file);
+int readToken(File *file);
 
 
-int lex_analyze_file(cFile *file) {
+int lex_analyze_file(File *file) {
     int res = SUCCESS;
 
     while (res == SUCCESS)
@@ -27,10 +27,10 @@ int lex_analyze_file(cFile *file) {
     return res == EOF ? SUCCESS : res;
 }
 
-int readToken(cFile *file) {
+int readToken(File *file) {
     lex_state state;
     lex_state nextState;
-    cToken *token = file->newToken();
+    Token *token = file->newToken();
     int c;
 
     for (state = stateStart; state != stateError || state != stateFinish; state = nextState) {

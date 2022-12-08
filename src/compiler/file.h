@@ -4,7 +4,7 @@
 #include "token.h"
 #include <stdio.h>
 
-class cFile {
+class File {
   private:
     const char *filename;
     FILE *ptr;
@@ -14,7 +14,7 @@ class cFile {
     unsigned col;
 
   public:
-    cTokenStack tokenStack;
+    TokenStack tokenStack;
     
     /**
      * @brief return current character, read next one
@@ -33,12 +33,12 @@ class cFile {
     /**
      * @brief allocate new token, append to tokenstack
      * 
-     * @return cToken* new token
+     * @return Token* new token
      */
-    cToken *newToken();
+    Token *newToken();
 
 
-    cFile(const char *filename);
+    File(const char *filename);
     
     /**
      * @brief initializaion of class, open file, initialize debug values
@@ -46,7 +46,7 @@ class cFile {
      * @return int 
      */
     int init();
-    ~cFile();
+    ~File();
 };
 
 #endif /* FILE_H */

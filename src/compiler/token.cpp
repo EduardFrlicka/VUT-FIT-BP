@@ -1,6 +1,6 @@
 #include "token.h"
 
-cToken::cToken(const char *_filename, unsigned _line, unsigned _col) : filename(_filename), line(_line), col(_col) {
+Token::Token(const char *_filename, unsigned _line, unsigned _col) : filename(_filename), line(_line), col(_col) {
     this->type = tokenNone;
     this->next = nullptr;
     this->prev = nullptr;
@@ -9,5 +9,5 @@ cToken::cToken(const char *_filename, unsigned _line, unsigned _col) : filename(
     this->payload = nullptr;
 }
 
-cToken::~cToken() {
+Token::~Token() {
 }
