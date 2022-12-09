@@ -1,5 +1,6 @@
 #pragma once
 
+#include "token.h"
 #include <stdio.h>
 #include <string>
 
@@ -25,7 +26,7 @@ class LoggerColors {
     /* attributes */
     std::string _reset;
     std::string _bold;
-    
+
     /* colors */
     std::string _black;
     std::string _red;
@@ -42,14 +43,19 @@ class Logger {
     Logger();
     ~Logger();
 
+    void print_location(Token &);
+
     void error(const char *, ...);
-    void error(const char *, va_list args);
+    void error_at(Token &, const char *, ...);
+    void error(const char *, va_list);
 
     void warning(const char *, ...);
-    void warning(const char *, va_list args);
+    void warning_at(Token &, const char *, ...);
+    void warning(const char *, va_list);
 
     void note(const char *, ...);
-    void note(const char *, va_list args);
+    void note_at(Token &, const char *, ...);
+    void note(const char *, va_list);
 
   private:
     FILE *filePtr;

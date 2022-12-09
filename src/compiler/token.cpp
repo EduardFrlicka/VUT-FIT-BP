@@ -4,9 +4,6 @@ Token::Token(const char *_filename, unsigned _line, unsigned _col) : filename(_f
     this->type = tokenNone;
     this->next = nullptr;
     this->prev = nullptr;
-
-    this->payloadType = tokenPayloadNone;
-    this->payload = nullptr;
 }
 
 Token::~Token() {
