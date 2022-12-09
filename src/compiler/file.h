@@ -28,7 +28,7 @@ class File {
      * 
      * @return int 
      */
-    int peakchar();
+    int peekchar();
 
     /**
      * @brief allocate new token, append to tokenstack

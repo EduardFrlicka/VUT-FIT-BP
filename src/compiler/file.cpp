@@ -49,6 +49,6 @@ int File::getchar() {
     return c;
 }
 
-int File::peakchar() {
+int File::peekchar() {
     return this->c;
 };

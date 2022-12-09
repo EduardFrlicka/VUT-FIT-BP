@@ -7,6 +7,9 @@
 
 typedef enum {
     tokenNone = 0,
+    tokenWhiteSpace,
+    tokenEOL,
+    tokenEOF,
 } TokenType;
 
 typedef enum {
@@ -21,13 +24,14 @@ typedef enum {
 
 class TokenPayload {
     TokenPayloadType type;
-    
 };
 class Token {
   public:
     TokenType type;
     Token *prev;
     Token *next;
+
+    std::string text;
 
     TokenPayload payload;
 

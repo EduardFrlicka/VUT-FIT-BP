@@ -1,17 +1,27 @@
-#ifndef LEXICAL_H
-#define LEXICAL_H
+#pragma once
 
 #include "file.h"
+#include "logger.h"
 #include "token.h"
 
-/**
- * @brief Lexical analysis of file
- *
- * Calls function readToken until EOF is returned
- *
- * @param file pointer to File class. Analyzed tokens will be in tokenstack of this class
- * @return 0 if successfull, error code in case of some lexical error
- */
-int lex_analyze_file(File *file);
+class LexicalAnalyzer {
+  public:
+    LexicalAnalyzer(Logger &);
 
-#endif /* LEXICAL_H */
+    int analyze_file(File *file);
+
+  private:
+    int analyze_token();
+    int start(int);
+    int end(int);
+
+    Token *token;
+
+    int (LexicalAnalyzer::*currState)(int);
+    int (LexicalAnalyzer::*nextState)(int);
+
+    File *file;
+    Logger &logger;
+};
+
+typedef int (LexicalAnalyzer::*state)(void);

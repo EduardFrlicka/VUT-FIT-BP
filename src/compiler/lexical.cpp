@@ -1,98 +1,35 @@
 #include "lexical.h"
 #include "return_values.h"
 
-typedef enum {
-    stateStart,
-    stateError,
-    // stateInternalErr,
-    stateFinish,
-    stateEOF,
-
-    stateDollar,
-    stateChar,
-
-    stateStringOpen,
-    stateString,
-} lex_state;
-
-int readToken(File *file);
-
-
-int lex_analyze_file(File *file) {
-    int res = SUCCESS;
-
-    while (res == SUCCESS)
-        res = readToken(file);
-
-    return res == EOF ? SUCCESS : res;
+LexicalAnalyzer::LexicalAnalyzer(Logger &_logger) : logger(_logger) {
 }
 
-int readToken(File *file) {
-    lex_state state;
-    lex_state nextState;
-    Token *token = file->newToken();
-    int c;
+int LexicalAnalyzer::analyze_token() {
+    int res;
 
-    for (state = stateStart; state != stateError || state != stateFinish; state = nextState) {
-        switch (state) {
+    currState = &LexicalAnalyzer::start;
+    nextState = &LexicalAnalyzer::start;
 
-        case stateStart:
-            c = file->getchar();
-            switch (c) {
-            case EOF:
-                nextState = stateEOF;
-                break;
+    token = file->newToken();
 
-            case '$':
-                nextState = stateDollar;
-                break;
+    while (currState != &LexicalAnalyzer::end) {
+        res = (this->*currState)(file->peekchar());
 
-            case '\'':
-                nextState = stateStringOpen;
-                break;
+        if (res)
+            return res;
 
-            default:
-                nextState = stateError;
-            }
-            break;
+        if (nextState != &LexicalAnalyzer::end)
+            token->text += file->getchar();
 
-        case stateStringOpen:
-            c = file->getchar();
-            switch (c) {
-            case '\'':
-                nextState = stateString;
-                break;
-            case EOF:
-                WARNING(MSG_LEX_UNEXPECTED_EOF);
-                nextState = stateError;
-                break;
-            default:
-                nextState = stateStringOpen;
-                break;
-            }
-            break;
-
-        case stateString:
-            c = file->peakchar();
-            if (c == '\'') {
-                nextState = stateStringOpen;
-            }
-            break;
-
-        case stateFinish:
-            return SUCCESS;
-
-        case stateError:
-            // WARNING(MSG_LEX_UNEXPECTED_CHAR);
-            return ERR_LEXICAL;
-
-        default:
-            ERROR(ERR_INTERNAL,"Not Implemented");
-            // DEBUG("Not implemented");
-            // return ERR_INTERNAL;+-
-            // nextState = stateError;
-            // break;
-        }
+        currState = nextState;
     }
+    return SUCCESS;
+}
+
+int LexicalAnalyzer::start(int c) {
+    return SUCCESS;
+}
+
+int LexicalAnalyzer::end(int c) {
     return SUCCESS;
 }
