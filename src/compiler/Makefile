@@ -4,17 +4,19 @@
 # =========================================================================
 # Names and Directories
 
+ROOT:=../..
+
 # Name of target binary file
-BINARY_PATH:=../../bin/compiler
+BINARY_PATH=$(ROOT)/bin/compiler
 
 # Name / Path to folder, where source files are (.h .c .cpp ...)
-SRC:=.
+SRC=.
 
 # Name / Path to folder, where .o files will be stored
-OBJ:=../../obj/compiler
+OBJ=$(ROOT)/obj/compiler
 
 # Name / Path to folder, where .dep files will be stored
-DEP:=$(OBJ)
+DEP=$(ROOT)/dep/compiler
 
 
 # =========================================================================
