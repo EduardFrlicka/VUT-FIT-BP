@@ -27,6 +27,15 @@ int LexicalAnalyzer::analyze_token() {
 }
 
 int LexicalAnalyzer::start(int c) {
+    switch (c) {
+    case:
+        /* code */
+        break;
+
+    default:
+        break;
+    }
+
     return SUCCESS;
 }
 
