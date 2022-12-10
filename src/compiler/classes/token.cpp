@@ -1,6 +1,6 @@
 #include "token.h"
 
-Token::Token(const char *_filename, unsigned _line, unsigned _col) : filename(_filename), line(_line), col(_col) {
+Token::Token(FilePosition &_pos) : pos(_pos) {
     this->type = tokenNone;
     this->next = nullptr;
     this->prev = nullptr;

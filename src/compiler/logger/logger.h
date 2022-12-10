@@ -1,5 +1,6 @@
 #pragma once
 
+#include "file_position.h"
 #include "token.h"
 #include <stdio.h>
 #include <string>
@@ -43,7 +44,8 @@ class Logger {
     Logger();
     ~Logger();
 
-    void print_location(Token &);
+    void print_position(const Token &);
+    void print_position(const FilePosition &);
 
     void error(const char *, ...);
     void error_at(Token &, const char *, ...);

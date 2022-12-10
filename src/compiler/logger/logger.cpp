@@ -8,11 +8,14 @@ Logger::Logger() : colors() {
 Logger::~Logger() {
 }
 
-void Logger::print_location(Token &token) {
+void Logger::print_position(const Token &token) {
+    print_position(token.pos);
+}
+
+void Logger::print_position(const FilePosition &pos) {
     colors.reset();
     colors.bold();
-
-    fprintf(stderr, "%s:%u:%u: ", token.filename, token.line, token.col);
+    fprintf(stderr, "%s:%u:%u: ", pos.filename, pos.line, pos.col);
 }
 
 void Logger::error(const char *fmt, ...) {
@@ -23,7 +26,7 @@ void Logger::error(const char *fmt, ...) {
 }
 
 void Logger::error_at(Token &token, const char *fmt, ...) {
-    print_location(token);
+    print_position(token);
 
     va_list args;
     va_start(args, fmt);
@@ -53,7 +56,7 @@ void Logger::warning(const char *fmt, ...) {
 }
 
 void Logger::warning_at(Token &token, const char *fmt, ...) {
-    print_location(token);
+    print_position(token);
 
     va_list args;
     va_start(args, fmt);
@@ -84,7 +87,7 @@ void Logger::note(const char *fmt, ...) {
 }
 
 void Logger::note_at(Token &token, const char *fmt, ...) {
-    print_location(token);
+    print_position(token);
 
     va_list args;
     va_start(args, fmt);

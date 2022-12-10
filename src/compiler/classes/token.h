@@ -1,7 +1,7 @@
-#ifndef TOKEN_H
-#define TOKEN_H
+#pragma once
 
 #include "error.h"
+#include "file_position.h"
 #include "messages.h"
 #include <string>
 
@@ -35,12 +35,9 @@ class Token {
 
     TokenPayload payload;
 
-    /* DEBUG data */
-    const char *filename;
-    const unsigned line;
-    const unsigned col;
+    const FilePosition pos;
 
-    Token(const char *_filename, unsigned _line, unsigned _col);
+    Token(FilePosition &);
     ~Token();
 };
 
@@ -63,5 +60,3 @@ class TokenStack {
     TokenStack();
     ~TokenStack();
 };
-
-#endif /* TOKEN_H */

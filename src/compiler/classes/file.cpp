@@ -1,24 +1,20 @@
 #include "file.h"
 #include "error.h"
 #include "return_values.h"
+#include <errno.h>
+#include <string.h>
 
-File::File(const char *filename) {
-    this->filename = filename;
+File::File(const char *_filename) : filename(_filename), pos(_filename) {
     this->ptr = nullptr;
-
     this->c = 0;
-    this->col = 0;
-    this->line = 0;
 }
 
 int File::init() {
     this->ptr = fopen(this->filename, "r");
     if (!this->ptr)
-        ERROR(ERR_FILE, "file \"%s\" cannot be opened.", this->filename);
+        ERROR(ERR_FILE, "file \"%s\" cannot be opened: %s", this->filename, strerror(errno));
 
     this->c = getc(this->ptr);
-    this->col = 0;
-    this->line = 1;
 
     return SUCCESS;
 }
@@ -29,7 +25,7 @@ File::~File() {
 }
 
 Token *File::newToken() {
-    Token *newToken = new Token(this->filename, this->line, this->col);
+    Token *newToken = new Token(this->pos);
     this->tokenStack.append(newToken);
     return newToken;
 }
@@ -39,12 +35,10 @@ int File::getchar() {
     if (c != EOF)
         this->c = getc(this->ptr);
 
-    if (c == '\n') {
-        this->line++;
-        this->col = 0;
-    }
+    if (c == '\n')
+        pos.inc_line();
 
-    this->col++;
+    pos.inc_col();
 
     return c;
 }
