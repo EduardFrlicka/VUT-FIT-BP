@@ -1,13 +1,16 @@
 #pragma once
 
-#include "error.h"
 #include "file_position.h"
-#include "messages.h"
 #include <string>
 
 typedef enum {
     tokenNone = 0,
     tokenWhiteSpace,
+    tokenChar,
+    tokenNumber,
+    tokenIdentifier,
+    tokenSymbol,
+    tokenString,
     tokenEOL,
     tokenEOF,
 } TokenType;
@@ -50,12 +53,14 @@ class TokenStack {
 
   public:
     void append(Token *newToken);
-    Token *peak();
+    Token *peek();
     Token *next();
     Token *prev();
 
     void ptrHead();
     void ptrTail();
+
+    void printStack();
 
     TokenStack();
     ~TokenStack();

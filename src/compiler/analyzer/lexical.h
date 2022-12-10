@@ -11,10 +11,6 @@ class LexicalAnalyzer {
     int analyze_file(File *file);
 
   private:
-    int analyze_token();
-    int start(int);
-    int end(int);
-
     Token *token;
 
     int (LexicalAnalyzer::*currState)(int);
@@ -22,6 +18,18 @@ class LexicalAnalyzer {
 
     File *file;
     Logger &logger;
+
+    int analyze_token();
+    int start(int);
+    int number(int);
+    int dollar(int);
+    int character(int);
+    int identifier(int);
+    int minus(int);
+    int stropen(int);
+    int str(int);
+    int whitespace(int);
+    int end(int);
 };
 
 typedef int (LexicalAnalyzer::*state)(void);

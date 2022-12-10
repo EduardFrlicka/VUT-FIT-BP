@@ -1,3 +1,5 @@
+#include "error.h"
+#include "messages.h"
 #include "token.h"
 
 TokenStack::TokenStack() {
@@ -47,7 +49,7 @@ void TokenStack::append(Token *newToken) {
     this->tail = newToken;
 }
 
-Token *TokenStack::peak() {
+Token *TokenStack::peek() {
     if (this->ptr)
         WARNING(MSG_TOKEN_STACK_PTR_NULL);
     return this->ptr ? this->ptr->next : nullptr;
@@ -75,4 +77,31 @@ void TokenStack::ptrHead() {
 
 void TokenStack::ptrTail() {
     this->ptr = this->tail;
+}
+
+void TokenStack::printStack() {
+    Token *savePtr;
+    std::string typeString;
+    savePtr = ptr;
+
+#define CASE(type)                                                                                                                                                                                     \
+    case type:                                                                                                                                                                                         \
+        typeString = #type;                                                                                                                                                                            \
+        break
+
+    for (ptrHead(); ptr; next()) {
+        switch (ptr->type) {
+            CASE(tokenNone);
+            CASE(tokenWhiteSpace);
+            CASE(tokenEOL);
+            CASE(tokenEOF);
+        default:
+            break;
+        }
+
+        printf("%s:%u:%u: type: %20s text: %s\n", ptr->pos.filename, ptr->pos.line, ptr->pos.col, typeString.c_str(), ptr->text.c_str());
+    }
+#undef CASE
+
+    ptr = savePtr;
 }

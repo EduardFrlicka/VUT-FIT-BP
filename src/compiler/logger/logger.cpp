@@ -25,6 +25,14 @@ void Logger::error(const char *fmt, ...) {
     va_end(args);
 }
 
+void Logger::error_at(FilePosition &pos, const char *fmt, ...) {
+    print_position(pos);
+
+    va_list args;
+    va_start(args, fmt);
+    error(fmt, args);
+    va_end(args);
+}
 void Logger::error_at(Token &token, const char *fmt, ...) {
     print_position(token);
 
@@ -49,6 +57,15 @@ void Logger::error(const char *fmt, va_list args) {
 }
 
 void Logger::warning(const char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    warning(fmt, args);
+    va_end(args);
+}
+
+void Logger::warning_at(FilePosition &pos, const char *fmt, ...) {
+    print_position(pos);
+
     va_list args;
     va_start(args, fmt);
     warning(fmt, args);
@@ -80,6 +97,15 @@ void Logger::warning(const char *fmt, va_list args) {
 }
 
 void Logger::note(const char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    note(fmt, args);
+    va_end(args);
+}
+
+void Logger::note_at(FilePosition &pos, const char *fmt, ...) {
+    print_position(pos);
+
     va_list args;
     va_start(args, fmt);
     note(fmt, args);

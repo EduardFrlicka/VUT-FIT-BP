@@ -46,3 +46,7 @@ int File::getchar() {
 int File::peekchar() {
     return this->c;
 };
+
+FilePosition &File::getPos() {
+    return pos;
+}

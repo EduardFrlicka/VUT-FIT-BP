@@ -29,6 +29,13 @@ int main(int argc, char *argv[]) {
         // lex_analyze_file(&file);
     }
 
+    auto logger = Logger();
+    auto lexxer = LexicalAnalyzer(logger);
+    for (auto file : input_files) {
+        lexxer.analyze_file(file);
+        file->tokenStack.printStack();
+    }
+
     return SUCCESS;
 }
 

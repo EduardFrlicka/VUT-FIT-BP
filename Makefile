@@ -1,16 +1,18 @@
-
 COMPILER_DIR:= src/compiler
 
-.PHONY: all translator help
+.PHONY: all translator help run clean
 
-all: translator
+all: compiler
 
-translator:
-	@cd $(COMPILER_DIR) && $(MAKE) --no-print-directory
+compiler:
+	@$(MAKE) -C $(COMPILER_DIR) --no-print-directory
 
-help:
-	@cd $(COMPILER_DIR) && $(MAKE) --no-print-directory help
+run: compiler
+	./bin/compiler tests/sample.pn
 
-%:
-	@cd $(COMPILER_DIR) && $(MAKE) --no-print-directory $@
+clean: 
+	@$(MAKE) -C $(COMPILER_DIR) --no-print-directory clean
+
+# %:
+#  	@cd $(COMPILER_DIR) && $(MAKE) --no-print-directory $@
 

@@ -48,14 +48,17 @@ class Logger {
     void print_position(const FilePosition &);
 
     void error(const char *, ...);
+    void error_at(FilePosition &, const char *, ...);
     void error_at(Token &, const char *, ...);
     void error(const char *, va_list);
 
     void warning(const char *, ...);
+    void warning_at(FilePosition &, const char *, ...);
     void warning_at(Token &, const char *, ...);
     void warning(const char *, va_list);
 
     void note(const char *, ...);
+    void note_at(FilePosition &, const char *, ...);
     void note_at(Token &, const char *, ...);
     void note(const char *, va_list);
 
