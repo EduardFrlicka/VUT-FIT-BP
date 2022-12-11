@@ -27,3 +27,9 @@ int LexicalAnalyzer::stateAssign(int) {
     token->type = tokenAssign;
     return SUCCESS;
 }
+
+int LexicalAnalyzer::stateBacktick(int) {
+    nextState = &LexicalAnalyzer::end;
+    token->type = tokenBacktick;
+    return SUCCESS;
+}

@@ -32,14 +32,6 @@ int LexicalAnalyzer::stateString(int c) {
     return SUCCESS;
 }
 
-int LexicalAnalyzer::stateWhitespace(int c) {
-    nextState = &LexicalAnalyzer::end;
-    token->type = tokenWhiteSpace;
-    if (isspace(c))
-        nextState = &LexicalAnalyzer::stateWhitespace;
-    return SUCCESS;
-}
-
 int LexicalAnalyzer::stateSymbol(int c) {
     nextState = &LexicalAnalyzer::end;
     token->type = tokenSymbol;

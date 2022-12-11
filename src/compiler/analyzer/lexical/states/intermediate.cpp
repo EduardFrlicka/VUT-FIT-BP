@@ -24,6 +24,8 @@ int LexicalAnalyzer::stateBackslash(int c) {
         return SUCCESS;
     }
 
+    EOLCHECK(c);
+    EOFCHECK(c);
     logger.error_at(file->getPos(), MSG_LEX_UNEXPECTED_CHAR);
     return ERR_LEXICAL;
 }
@@ -34,6 +36,8 @@ int LexicalAnalyzer::stateTilde(int c) {
         return SUCCESS;
     }
 
+    EOLCHECK(c);
+    EOFCHECK(c);
     logger.error_at(file->getPos(), MSG_LEX_UNEXPECTED_CHAR);
     return ERR_LEXICAL;
 }

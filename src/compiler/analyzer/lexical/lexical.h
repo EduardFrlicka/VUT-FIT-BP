@@ -21,7 +21,14 @@ class LexicalAnalyzer {
 
     int analyze_token();
     int start(int);
+    int end(int);
+
+    void checkKeyword();
+
+    /* specials */
+
     int stateWhitespace(int);
+    int stateEOL(int);
 
     /* literals */
 
@@ -92,6 +99,8 @@ class LexicalAnalyzer {
     int stateColon(int);
     /* := */
     int stateAssign(int);
+    /* ` */
+    int stateBacktick(int);
 
     /* intermediate states */
 
@@ -103,8 +112,4 @@ class LexicalAnalyzer {
     int stateDollar(int);
     /* # */
     int stateHash(int);
-
-    int end(int);
 };
-
-typedef int (LexicalAnalyzer::*state)(void);

@@ -8,8 +8,9 @@ typedef enum {
     tokenWhiteSpace,
     tokenEOL,
     tokenEOF,
-    
+
     /* literals */
+
     tokenChar,
     tokenNumber,
     tokenIdentifier,
@@ -17,6 +18,7 @@ typedef enum {
     tokenString,
 
     /* brackets */
+
     tokenLeftRoundBracket,
     tokenRightRoundBracket,
     tokenLeftCurlyBracket,
@@ -25,6 +27,7 @@ typedef enum {
     tokenRightSquareBracket,
 
     /* operators */
+
     tokenAdd,
     tokenSub,
     tokenIDiv,
@@ -43,11 +46,30 @@ typedef enum {
     tokenDiv,
 
     /* Symbols */
+
     tokenDot,
     tokenComma,
     tokenColon,
     tokenAssign,
+    tokenBacktick,
 
+    /* Keywords */
+
+    tokenMain,
+    tokenClass,
+    tokenIs_a,
+    tokenObject,
+    tokenMethod,
+    tokenConstructor,
+    tokenSync,
+    tokenPlace,
+    tokenInit,
+    tokenTrans,
+    tokenCond,
+    tokenPrecond,
+    tokenPostcond,
+    tokenGuard,
+    tokenAction,
 
 } TokenType;
 

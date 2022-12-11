@@ -57,7 +57,7 @@ int LexicalAnalyzer::start(int c) {
         return SUCCESS;
     }
 
-    if (isspace(c)) {
+    if (isblank(c)) {
         nextState = &LexicalAnalyzer::stateWhitespace;
         return SUCCESS;
     }
@@ -155,6 +155,14 @@ int LexicalAnalyzer::start(int c) {
         nextState = &LexicalAnalyzer::stateHash;
         break;
 
+    case '`':
+        nextState = &LexicalAnalyzer::stateBacktick;
+        break;
+
+    case '\n':
+        nextState = &LexicalAnalyzer::stateEOL;
+        break;
+
     default:
         logger.error_at(file->getPos(), MSG_LEX_UNEXPECTED_CHAR);
         return ERR_LEXICAL;
@@ -165,6 +173,14 @@ int LexicalAnalyzer::start(int c) {
 }
 
 int LexicalAnalyzer::end(int c) {
+    switch (token->type) {
+    case tokenIdentifier:
+        checkKeyword();
+        break;
+    default:
+        break;
+    }
+
     if (c == EOF)
         return EOF;
     return SUCCESS;

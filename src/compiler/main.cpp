@@ -22,7 +22,10 @@ int main(int argc, char *argv[]) {
     std::vector<File *> input_files;
 
     for (char **source = args.sources; *source; source++) {
-        ASSERT(process_path(input_files, *source));
+        File *newFile = new File(*source);
+        ASSERT(newFile->init());
+        input_files.push_back(newFile);
+        // ASSERT(process_path(input_files, *source));
 
         // File file = File(*source);
         // ASSERT(file.init());

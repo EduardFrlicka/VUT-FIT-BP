@@ -10,17 +10,24 @@ Token::~Token() {
 }
 
 void Token::print() {
-    std::string typeString;
+    std::string printType;
+    std::string printText;
+    printText = text;
 
 #define CASE(type)                                                                                                                                                                                     \
     case type:                                                                                                                                                                                         \
-        typeString = #type;                                                                                                                                                                            \
+        printType = #type;                                                                                                                                                                             \
         break
 
     switch (type) {
         CASE(tokenNone);
         CASE(tokenWhiteSpace);
-        CASE(tokenEOL);
+
+    case tokenEOL:
+        printType = "tokenEOL";
+        printText = "";
+        break;
+
         CASE(tokenEOF);
         CASE(tokenChar);
         CASE(tokenNumber);
@@ -53,12 +60,28 @@ void Token::print() {
         CASE(tokenComma);
         CASE(tokenColon);
         CASE(tokenAssign);
+        CASE(tokenBacktick);
+        CASE(tokenMain);
+        CASE(tokenClass);
+        CASE(tokenIs_a);
+        CASE(tokenObject);
+        CASE(tokenMethod);
+        CASE(tokenConstructor);
+        CASE(tokenSync);
+        CASE(tokenPlace);
+        CASE(tokenInit);
+        CASE(tokenTrans);
+        CASE(tokenCond);
+        CASE(tokenPrecond);
+        CASE(tokenPostcond);
+        CASE(tokenGuard);
+        CASE(tokenAction);
     default:
-        typeString = "unknown";
+        printType = "unknown";
         break;
     }
 
-    printf("%s:%u:%u: type: %-25s text: %s\n", pos.filename, pos.line, pos.col, typeString.c_str(), text.c_str());
+    printf("%s:%u:%u: type: %-25s text: %s\n", pos.filename, pos.line, pos.col, printType.c_str(), printText.c_str());
 
 #undef CASE
 }
