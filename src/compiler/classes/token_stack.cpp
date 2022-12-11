@@ -81,27 +81,11 @@ void TokenStack::ptrTail() {
 
 void TokenStack::printStack() {
     Token *savePtr;
-    std::string typeString;
     savePtr = ptr;
 
-#define CASE(type)                                                                                                                                                                                     \
-    case type:                                                                                                                                                                                         \
-        typeString = #type;                                                                                                                                                                            \
-        break
-
     for (ptrHead(); ptr; next()) {
-        switch (ptr->type) {
-            CASE(tokenNone);
-            CASE(tokenWhiteSpace);
-            CASE(tokenEOL);
-            CASE(tokenEOF);
-        default:
-            break;
-        }
-
-        printf("%s:%u:%u: type: %20s text: %s\n", ptr->pos.filename, ptr->pos.line, ptr->pos.col, typeString.c_str(), ptr->text.c_str());
+        ptr->print();
     }
-#undef CASE
 
     ptr = savePtr;
 }

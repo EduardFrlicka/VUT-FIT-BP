@@ -1,5 +1,4 @@
 #include "lexical.h"
-#include "error.h"
 #include "messages.h"
 #include "return_values.h"
 
@@ -19,149 +18,54 @@
         }                                                                                                                                                                                              \
     } while (0)
 
-LexicalAnalyzer::LexicalAnalyzer(Logger &_logger) : logger(_logger) {
-}
-
-int LexicalAnalyzer::analyze_file(File *_file) {
-    int res;
-    file = _file;
-
-    do {
-        res = analyze_token();
-    } while (!res);
-
-    file = nullptr;
-
-    if (res != EOF)
-        return res;
-
-    return SUCCESS;
-}
-
-int LexicalAnalyzer::analyze_token() {
-    int res;
-
-    if (!file)
-        ERROR(ERR_INTERNAL, "File not initialized");
-
-    currState = &LexicalAnalyzer::start;
-    nextState = &LexicalAnalyzer::start;
-
-    token = file->newToken();
-    DEBUG("%s:%u:%u", token->pos.filename, token->pos.line, token->pos.col);
-
-    while (currState != &LexicalAnalyzer::end) {
-        currState = nextState;
-        res = (this->*currState)(file->peekchar());
-
-        if (res)
-            return res;
-
-        if (nextState != &LexicalAnalyzer::end)
-            token->text += file->getchar();
-    }
-    return SUCCESS;
-}
-
-int LexicalAnalyzer::start(int c) {
-    if (isdigit(c)) {
-        nextState = &LexicalAnalyzer::end;
+int LexicalAnalyzer::stateBackslash(int c) {
+    if (c == '\\') {
+        nextState = &LexicalAnalyzer::stateMod;
         return SUCCESS;
     }
 
-    if (isalpha(c)) {
-        nextState = &LexicalAnalyzer::identifier;
+    logger.error_at(file->getPos(), MSG_LEX_UNEXPECTED_CHAR);
+    return ERR_LEXICAL;
+}
+
+int LexicalAnalyzer::stateTilde(int c) {
+    if (c == '~') {
+        nextState = &LexicalAnalyzer::stateNotEq;
         return SUCCESS;
     }
 
-    if (isspace(c)) {
-        nextState = &LexicalAnalyzer::whitespace;
-        return SUCCESS;
-    }
-
-    switch (c) {
-    case '$':
-        nextState = &LexicalAnalyzer::dollar;
-        break;
-
-    case '\'':
-        nextState = &LexicalAnalyzer::stropen;
-        break;
-
-    default:
-        logger.error_at(file->getPos(), MSG_LEX_UNEXPECTED_CHAR);
-        return ERR_LEXICAL;
-        break;
-    }
-
-    return SUCCESS;
+    logger.error_at(file->getPos(), MSG_LEX_UNEXPECTED_CHAR);
+    return ERR_LEXICAL;
 }
 
-int LexicalAnalyzer::number(int c) {
-    nextState = &LexicalAnalyzer::end;
-    token->type = tokenNumber;
-    if (isdigit(c))
-        nextState = &LexicalAnalyzer::number;
-
-    return SUCCESS;
-}
-int LexicalAnalyzer::dollar(int c) {
+int LexicalAnalyzer::stateDollar(int c) {
     EOFCHECK(c);
     EOLCHECK(c);
     if (isspace(c)) {
         logger.error_at(file->getPos(), MSG_LEX_UNEXPECTED_CHAR);
         return ERR_LEXICAL;
     }
-    nextState = &LexicalAnalyzer::character;
-    return SUCCESS;
-}
-int LexicalAnalyzer::character(int c) {
-    nextState = &LexicalAnalyzer::end;
-    token->type = tokenChar;
+    nextState = &LexicalAnalyzer::stateCharacter;
     return SUCCESS;
 }
 
-int LexicalAnalyzer::identifier(int c) {
-    nextState = &LexicalAnalyzer::end;
-    token->type = tokenIdentifier;
-    if (isalnum(c) || c == '_')
-        nextState = &LexicalAnalyzer::identifier;
-    return SUCCESS;
-}
-
-int LexicalAnalyzer::minus(int c) {
-    nextState = &LexicalAnalyzer::end;
-    return SUCCESS;
-}
-
-int LexicalAnalyzer::stropen(int c) {
+int LexicalAnalyzer::stateHash(int c) {
     EOFCHECK(c);
     EOLCHECK(c);
-    nextState = &LexicalAnalyzer::stropen;
+    if (isspace(c)) {
+        logger.error_at(file->getPos(), MSG_LEX_UNEXPECTED_CHAR);
+        return ERR_LEXICAL;
+    }
+    nextState = &LexicalAnalyzer::stateCharacter;
+    return SUCCESS;
+}
+
+int LexicalAnalyzer::stateStringOpen(int c) {
+    EOFCHECK(c);
+    EOLCHECK(c);
+    nextState = &LexicalAnalyzer::stateStringOpen;
     if (c == '\'')
-        nextState = &LexicalAnalyzer::str;
+        nextState = &LexicalAnalyzer::stateString;
 
-    return SUCCESS;
-}
-
-int LexicalAnalyzer::str(int c) {
-    nextState = &LexicalAnalyzer::end;
-    token->type = tokenString;
-    if (c == '\'')
-        nextState = &LexicalAnalyzer::stropen;
-    return SUCCESS;
-}
-
-int LexicalAnalyzer::whitespace(int c) {
-    nextState = &LexicalAnalyzer::end;
-    token->type = tokenWhiteSpace;
-    if (isspace(c))
-        nextState = &LexicalAnalyzer::whitespace;
-    return SUCCESS;
-}
-
-int LexicalAnalyzer::end(int c) {
-    if (c == EOF)
-        return EOF;
     return SUCCESS;
 }

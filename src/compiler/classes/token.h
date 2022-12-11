@@ -6,13 +6,49 @@
 typedef enum {
     tokenNone = 0,
     tokenWhiteSpace,
+    tokenEOL,
+    tokenEOF,
+    
+    /* literals */
     tokenChar,
     tokenNumber,
     tokenIdentifier,
     tokenSymbol,
     tokenString,
-    tokenEOL,
-    tokenEOF,
+
+    /* brackets */
+    tokenLeftRoundBracket,
+    tokenRightRoundBracket,
+    tokenLeftCurlyBracket,
+    tokenRightCurlyBracket,
+    tokenLeftSquareBracket,
+    tokenRightSquareBracket,
+
+    /* operators */
+    tokenAdd,
+    tokenSub,
+    tokenIDiv,
+    tokenMul,
+    tokenEq,
+    tokenNotEq,
+    tokenEqIdentity,
+    tokenNotEqIdentity,
+    tokenLess,
+    tokenGreater,
+    tokenLessEq,
+    tokenGreaterEq,
+    tokenAnd,
+    tokenOr,
+    tokenMod,
+    tokenDiv,
+
+    /* Symbols */
+    tokenDot,
+    tokenComma,
+    tokenColon,
+    tokenAssign,
+
+
 } TokenType;
 
 typedef enum {
@@ -42,6 +78,8 @@ class Token {
 
     Token(FilePosition &);
     ~Token();
+
+    void print();
 };
 
 class TokenStack {
