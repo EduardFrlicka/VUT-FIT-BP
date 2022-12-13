@@ -10,7 +10,7 @@ int LexicalAnalyzer::stateNumber(int c) {
     return SUCCESS;
 }
 
-int LexicalAnalyzer::stateCharacter(int c) {
+int LexicalAnalyzer::stateCharacter(int) {
     nextState = &LexicalAnalyzer::end;
     token->type = tokenChar;
     return SUCCESS;

@@ -18,6 +18,62 @@ void Logger::print_position(const FilePosition &pos) {
     fprintf(stderr, "%s:%u:%u: ", pos.filename, pos.line, pos.col);
 }
 
+void Logger::print_line(const Token &token, void (LoggerColors::*colorFunc)(void)) {
+    const Token *ptr;
+    const Token *start;
+    size_t size;
+    std::string underline;
+
+    /* find first token in line */
+    for (ptr = &token; ptr->prev && ptr->prev->type != tokenEOL; ptr = ptr->prev) {
+    }
+    start = ptr;
+
+    /* print left margin */
+    fprintf(stderr, "%5u |", token.pos.col);
+
+    /* print all tokens from line before "token" */
+    for (ptr = start; ptr && ptr != &token; ptr = ptr->next)
+        fprintf(stderr, "%s", ptr->text.c_str());
+
+    /* colored print of "token" */
+    colors.bold();
+    (colors.*colorFunc)();
+    size = fprintf(stderr, "%s", token.text.c_str());
+    colors.reset();
+
+    /* pritn all tokens in line after "token" */
+    if (token.type != tokenEOL) {
+        for (ptr = token.next; ptr && ptr->type != tokenEOL; ptr = ptr->next) {
+            fprintf(stderr, "%s", ptr->text.c_str());
+        }
+        fprintf(stderr, "\n");
+    }
+
+    /* construct underline */
+    underline = "^";
+    size = size ? size : 1;
+    underline.append(std::string(size - 1, '~'));
+
+    /* print left margin */
+    fprintf(stderr, "      |");
+
+    /* print whitespace until "token" position */
+    for (ptr = start; ptr && ptr != &token; ptr = ptr->next)
+        if (ptr->type != tokenWhiteSpace)
+            fprintf(stderr, "%*.s", (int)ptr->text.length(), "");
+        else
+            fprintf(stderr, "%s", ptr->text.c_str());
+
+    /* print colored underline */
+    colors.bold();
+    (colors.*colorFunc)();
+    fprintf(stderr, "%s", underline.c_str());
+    colors.reset();
+
+    fprintf(stderr, "\n");
+}
+
 void Logger::error(const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
@@ -33,6 +89,7 @@ void Logger::error_at(FilePosition &pos, const char *fmt, ...) {
     error(fmt, args);
     va_end(args);
 }
+
 void Logger::error_at(Token &token, const char *fmt, ...) {
     print_position(token);
 
@@ -40,7 +97,10 @@ void Logger::error_at(Token &token, const char *fmt, ...) {
     va_start(args, fmt);
     error(fmt, args);
     va_end(args);
+
+    print_line(token, &LoggerColors::red);
 }
+
 void Logger::error(const char *fmt, va_list args) {
     colors.reset();
     colors.bold();

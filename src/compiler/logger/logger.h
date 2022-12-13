@@ -47,6 +47,8 @@ class Logger {
     void print_position(const Token &);
     void print_position(const FilePosition &);
 
+    void print_line(const Token &token, void (LoggerColors::*colorFunc)(void));
+
     void error(const char *, ...);
     void error_at(FilePosition &, const char *, ...);
     void error_at(Token &, const char *, ...);
