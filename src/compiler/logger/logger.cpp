@@ -30,7 +30,7 @@ void Logger::print_line(const Token &token, void (LoggerColors::*colorFunc)(void
     start = ptr;
 
     /* print left margin */
-    fprintf(stderr, "%5u |", token.pos.col);
+    fprintf(stderr, "%5u |", token.pos.line);
 
     /* print all tokens from line before "token" */
     for (ptr = start; ptr && ptr != &token; ptr = ptr->next)
