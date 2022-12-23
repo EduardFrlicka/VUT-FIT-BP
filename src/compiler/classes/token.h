@@ -113,6 +113,7 @@ class TokenStack {
 
   public:
     void append(Token *newToken);
+    Token *curr();
     Token *peek();
     Token *next();
     Token *prev();

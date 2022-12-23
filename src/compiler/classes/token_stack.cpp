@@ -49,6 +49,10 @@ void TokenStack::append(Token *newToken) {
     this->tail = newToken;
 }
 
+Token *TokenStack::curr() {
+    return this->ptr;
+}
+
 Token *TokenStack::peek() {
     if (this->ptr)
         WARNING(MSG_TOKEN_STACK_PTR_NULL);
