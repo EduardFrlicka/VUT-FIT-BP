@@ -3,8 +3,12 @@
 #include "lexical.h"
 #include "return_values.h"
 #include <filesystem>
+#include <map>
 #include <stdio.h>
+#include <string>
 #include <vector>
+
+#include "template.h"
 
 void print_usage(char *binary);
 void print_help(char *binary);
@@ -14,30 +18,51 @@ int main(int argc, char *argv[]) {
 
     cArguments args = cArguments(argc, argv);
 
-    if (args.help) {
-        print_help(argv[0]);
-        return SUCCESS;
-    }
+    // if (args.help) {
+    //     print_help(argv[0]);
+    //     return SUCCESS;
+    // }
 
-    std::vector<File *> input_files;
+    // std::vector<File *> input_files;
 
-    for (char **source = args.sources; *source; source++) {
-        File *newFile = new File(*source);
-        ASSERT(newFile->init());
-        input_files.push_back(newFile);
-        // ASSERT(process_path(input_files, *source));
+    // for (char **source = args.sources; *source; source++) {
+    //     File *newFile = new File(*source);
+    //     ASSERT(newFile->init());
+    //     input_files.push_back(newFile);
+    //     // ASSERT(process_path(input_files, *source));
 
-        // File file = File(*source);
-        // ASSERT(file.init());
-        // lex_analyze_file(&file);
-    }
+    //     // File file = File(*source);
+    //     // ASSERT(file.init());
+    //     // lex_analyze_file(&file);
+    // }
 
-    auto logger = Logger();
-    auto lexxer = LexicalAnalyzer(logger);
-    for (auto file : input_files) {
-        lexxer.analyze_file(file);
-        file->tokenStack.printStack();
-    }
+    // auto logger = Logger();
+    // auto lexxer = LexicalAnalyzer(logger);
+    // for (auto file : input_files) {
+    //     lexxer.analyze_file(file);
+    //     file->tokenStack.printStack();
+    // }
+
+    CodeTemplate templ("class __name__ {\n"
+                       "  private:\n"
+                       "    /* __data__ */\n"
+                       "    /* __data_opt__ */\n"
+                       "  public:\n"
+                       "    __name__(/* args */);\n"
+                       "    ~__name__();\n"
+                       "};\n"
+                       "\n"
+                       "__name__::__name__(/* args */) {\n"
+                       "}\n"
+                       "\n"
+                       "__name__::~__name__() {\n"
+                       "}\n");
+
+    std::map<std::string, std::string> map = {{"name", "Name"}, {"data", "int s;"}};
+    std::map<std::string, std::string> map2 = {{"name", "Name2"}};
+
+    printf("%s", templ.apply(map).c_str());
+    printf("%s", templ.apply(map2).c_str());
 
     return SUCCESS;
 }
