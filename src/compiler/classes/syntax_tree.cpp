@@ -2,8 +2,21 @@
 
 using namespace ast;
 
-BaseNode::BaseNode(Token &_token) : token(_token) {
+#define NULLCHECK(ptr, error)                                                                                                                                                                          \
+    do {                                                                                                                                                                                               \
+        if ((ptr) == nullptr) {                                                                                                                                                                        \
+            error;                                                                                                                                                                                     \
+        }                                                                                                                                                                                              \
+                                                                                                                                                                                                       \
+    } while (0)
+
+
+void ast::print_tree(Class _class) {
+    NULLCHECK(_class.head, "error msg");
 }
 
-ClassesNode::ClassesNode(Token &_token) : BaseNode(_token) {
+void ast::print_tree(Classes _classes) {
+    for (auto i : _classes.classes)
+        print_tree(*i);
 }
+
