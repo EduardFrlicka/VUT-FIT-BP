@@ -4,8 +4,82 @@
 int LexicalAnalyzer::stateNumber(int c) {
     nextState = &LexicalAnalyzer::end;
     token->type = tokenNumber;
-    if (isdigit(c))
+
+    if (c == 'r') {
+        token->payload.number.convertRadix();
+        nextState = &LexicalAnalyzer::stateNumberR;
+        return SUCCESS;
+    }
+
+    if (c == 'e')
+        nextState = &LexicalAnalyzer::stateNumberE;
+
+    if (c == '.')
+        stateNumberDot(c);
+
+    if (token->payload.number.isdigit(c)) {
         nextState = &LexicalAnalyzer::stateNumber;
+    }
+
+    if (nextState != &LexicalAnalyzer::end)
+        token->payload.number.append(c);
+
+    return SUCCESS;
+}
+
+int LexicalAnalyzer::stateNumberR(int c) {
+    nextState = &LexicalAnalyzer::end;
+    token->type = tokenNumber;
+
+    if (c == 'e')
+        nextState = &LexicalAnalyzer::stateNumberE;
+
+    if (c == '.')
+        stateNumberDot(c);
+
+    if (token->payload.number.isdigit(c)) {
+        nextState = &LexicalAnalyzer::stateNumberR;
+    }
+
+    if (nextState != &LexicalAnalyzer::end)
+        token->payload.number.append(c);
+
+    return SUCCESS;
+}
+
+int LexicalAnalyzer::stateNumberDot(int c) {
+    int c2;
+    nextState = &LexicalAnalyzer::end;
+
+    if (c == '.') {
+        c2 = file->peek2char();
+        if (token->payload.number.isdigit(c2))
+            nextState = &LexicalAnalyzer::stateNumberDot;
+        return SUCCESS;
+    }
+
+    if (c == 'e')
+        nextState = &LexicalAnalyzer::stateNumberE;
+
+    if (token->payload.number.isdigit(c)) {
+        nextState = &LexicalAnalyzer::stateNumberDot;
+    }
+
+    if (nextState != &LexicalAnalyzer::end)
+        token->payload.number.append(c);
+
+    return SUCCESS;
+}
+
+int LexicalAnalyzer::stateNumberE(int c) {
+    nextState = &LexicalAnalyzer::end;
+
+    if (isdigit(c)) {
+        nextState = &LexicalAnalyzer::stateNumberE;
+    }
+
+    if (nextState != &LexicalAnalyzer::end)
+        token->payload.number.append(c);
 
     return SUCCESS;
 }

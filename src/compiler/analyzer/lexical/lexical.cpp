@@ -48,7 +48,9 @@ int LexicalAnalyzer::analyze_token() {
 
 int LexicalAnalyzer::start(int c) {
     if (isdigit(c)) {
-        nextState = &LexicalAnalyzer::stateNumber;
+        
+        token->payload.numberInit();
+        stateNumber(c);
         return SUCCESS;
     }
 
@@ -164,6 +166,7 @@ int LexicalAnalyzer::start(int c) {
         break;
 
     default:
+        printf("ahoj %d\n",c);
         logger.error_at(file->getPos(), MSG_LEX_UNEXPECTED_CHAR);
         return ERR_LEXICAL;
         break;
@@ -176,6 +179,10 @@ int LexicalAnalyzer::end(int c) {
     switch (token->type) {
     case tokenIdentifier:
         checkKeyword();
+        break;
+
+    case tokenNumber:
+        token->payload.number.convert();
         break;
     default:
         break;

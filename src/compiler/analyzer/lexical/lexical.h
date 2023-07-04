@@ -33,6 +33,10 @@ class LexicalAnalyzer {
     /* literals */
 
     int stateNumber(int);
+    int stateNumberR(int);
+    int stateNumberDot(int);
+    int stateNumberE(int);
+
     int stateCharacter(int);
     int stateIdentifier(int);
     int stateStringOpen(int);
