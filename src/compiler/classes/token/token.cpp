@@ -9,25 +9,33 @@ Token::Token(FilePosition &_pos) : pos(_pos) {
 Token::~Token() {
 }
 
-void Token::print() {
-    std::string printType;
-    std::string printText;
-    printText = text;
+bool Token::isspace() {
+    switch (type) {
+    case tokenWhiteSpace:
+    case tokenEOL:
+        return true;
+
+    default:
+        return false;
+    }
+}
+
+std::string Token::type_string() {
+    return type_string(type);
+}
+
+std::string Token::type_string(TokenType type) {
+    std::string res;
 
 #define CASE(type)                                                                                                                                                                                     \
     case type:                                                                                                                                                                                         \
-        printType = #type;                                                                                                                                                                             \
+        res = #type;                                                                                                                                                                                   \
         break
 
     switch (type) {
         CASE(tokenNone);
         CASE(tokenWhiteSpace);
-
-    case tokenEOL:
-        printType = "tokenEOL";
-        printText = "";
-        break;
-
+        CASE(tokenEOL);
         CASE(tokenEOF);
         CASE(tokenChar);
         CASE(tokenNumber);
@@ -76,10 +84,15 @@ void Token::print() {
         CASE(tokenPostcond);
         CASE(tokenGuard);
         CASE(tokenAction);
-    default:
-        printType = "unknown";
-        break;
     }
+    return res;
+}
+
+void Token::print() {
+    std::string printType;
+    std::string printText;
+    printText = text;
+    printType = type_string();
 
     printf("%s:%u:%u: type: %-25s text: %s\n", pos.filename, pos.line, pos.col, printType.c_str(), printText.c_str());
 

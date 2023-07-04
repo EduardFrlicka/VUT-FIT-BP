@@ -83,7 +83,27 @@ typedef enum {
     tokenPayloadNil,
 } TokenPayloadType;
 
+class TokenPayloadNumber {
+  public:
+    std::string data = "";
+    int radix = 10;
+    long integer = -1, exponent = -1;
+    double number;
+
+    bool isdigit(int);
+    void append(int);
+    void convertRadix();
+    void convert();
+    std::string toString();
+};
+
 class TokenPayload {
+  public:
+    TokenPayloadNumber number;
+
+    void numberInit();
+
+  private:
     TokenPayloadType type;
 };
 class Token {
@@ -100,6 +120,10 @@ class Token {
 
     Token(FilePosition &);
     ~Token();
+
+    std::string type_string();
+    static std::string type_string(TokenType);
+    bool isspace();
 
     void print();
 };

@@ -28,7 +28,8 @@ void TokenStack::pop() {
         this->ptr = nullptr;
 
     this->head = this->head->next;
-    this->head->prev = nullptr;
+    if (this->head)
+        this->head->prev = nullptr;
 
     delete tmp;
 }

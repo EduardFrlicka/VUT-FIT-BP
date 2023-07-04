@@ -9,7 +9,7 @@ class File {
     const char *filename;
     FILE *ptr;
     int c;
-
+    int c2;
     FilePosition pos;
 
   public:
@@ -30,6 +30,9 @@ class File {
      * @return int
      */
     int peekchar();
+
+
+    int peek2char();
 
     /**
      * @brief allocate new token, append to tokenstack
