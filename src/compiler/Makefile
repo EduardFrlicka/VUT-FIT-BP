@@ -4,26 +4,26 @@
 # =========================================================================
 # Names and Directories
 
-ROOT:=../../
+ROOT:=../..
 
 # Name of target binary file
-BINARY_PATH=$(ROOT)bin/compiler
+BINARY_PATH=$(ROOT)/bin/compiler
 
 # Name / Path to folder, where source files are (.h .c .cpp ...)
 SRC=.
 
 # Name / Path to folder, where .o files will be stored
-OBJ=$(ROOT)obj/compiler
+OBJ=$(ROOT)/obj/compiler
 
 # Name / Path to folder, where .dep files will be stored
-DEP=$(ROOT)dep/compiler
+DEP=$(ROOT)/dep/compiler
 
 
 # =========================================================================
 # Commands and Flags
 
 # Flags for compiling
-CFLAGS:=-std=c++17 -Wall -Wextra -pedantic -ggdb3
+CFLAGS:=-std=c++17 -Wall -Wextra -pedantic -ggdb3 -Wno-unused-parameter
 
 LFLAGS:=
 
