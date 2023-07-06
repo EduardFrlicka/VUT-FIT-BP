@@ -2,7 +2,6 @@
 
 class FilePosition {
   public:
-    FilePosition(FilePosition &);
     FilePosition(const char *);
     FilePosition(const char *, unsigned, unsigned);
 

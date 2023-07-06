@@ -116,9 +116,11 @@ class Token {
 
     TokenPayload payload;
 
-    const FilePosition pos;
+    FilePosition pos;
 
-    Token(FilePosition &);
+    Token(const FilePosition &);
+    Token(const Token &);
+
     ~Token();
 
     std::string type_string();

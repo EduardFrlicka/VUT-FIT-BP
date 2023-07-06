@@ -1,9 +1,13 @@
 #include "token.h"
+#include <iostream>
 
-Token::Token(FilePosition &_pos) : pos(_pos) {
+Token::Token(const FilePosition &_pos) : pos(_pos) {
     this->type = tokenNone;
     this->next = nullptr;
     this->prev = nullptr;
+}
+
+Token::Token(const Token &_token) : type(_token.type), prev(_token.prev), next(_token.next), text(_token.text), payload(_token.payload), pos(_token.pos) {
 }
 
 Token::~Token() {
@@ -86,15 +90,10 @@ std::string Token::type_string(TokenType type) {
         CASE(tokenAction);
     }
     return res;
+
+#undef CASE
 }
 
 void Token::print() {
-    std::string printType;
-    std::string printText;
-    printText = text;
-    printType = type_string();
-
-    printf("%s:%u:%u: type: %-25s text: %s\n", pos.filename, pos.line, pos.col, printType.c_str(), printText.c_str());
-
-#undef CASE
+    std::cout << "<Token>: " << (text == "\n" ? "EOL" : text) << std::endl;
 }
