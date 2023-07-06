@@ -3,9 +3,6 @@
 #include "messages.h"
 #include "return_values.h"
 
-LexicalAnalyzer::LexicalAnalyzer(Logger &_logger) : logger(_logger) {
-}
-
 int LexicalAnalyzer::analyze_file(File *_file) {
     int res;
     file = _file;
@@ -48,7 +45,7 @@ int LexicalAnalyzer::analyze_token() {
 
 int LexicalAnalyzer::start(int c) {
     if (isdigit(c)) {
-        
+
         token->payload.numberInit();
         stateNumber(c);
         return SUCCESS;
@@ -166,8 +163,8 @@ int LexicalAnalyzer::start(int c) {
         break;
 
     default:
-        printf("ahoj %d\n",c);
-        logger.error_at(file->getPos(), MSG_LEX_UNEXPECTED_CHAR);
+        printf("ahoj %d\n", c);
+        logger.error(file->getPos(), MSG_LEX_UNEXPECTED_CHAR);
         return ERR_LEXICAL;
         break;
     }

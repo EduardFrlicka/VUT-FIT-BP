@@ -6,8 +6,6 @@
 
 class LexicalAnalyzer {
   public:
-    LexicalAnalyzer(Logger &);
-
     int analyze_file(File *file);
 
   private:
@@ -17,7 +15,6 @@ class LexicalAnalyzer {
     int (LexicalAnalyzer::*nextState)(int);
 
     File *file;
-    Logger &logger;
 
     int analyze_token();
     int start(int);

@@ -2,6 +2,7 @@
 
 #include "file_position.h"
 #include "token.h"
+#include <filesystem>
 #include <stdio.h>
 #include <string>
 
@@ -44,27 +45,30 @@ class Logger {
     Logger();
     ~Logger();
 
-    void print_position(const Token &);
-    void print_position(const FilePosition &);
-
-    void print_line(const Token &token, void (LoggerColors::*colorFunc)(void));
-
     void error(const char *, ...);
-    void error_at(FilePosition &, const char *, ...);
-    void error_at(Token &, const char *, ...);
+    void error(const FilePosition &, const char *, ...);
+    void error(const Token &, const char *, ...);
     void error(const char *, va_list);
 
     void warning(const char *, ...);
-    void warning_at(FilePosition &, const char *, ...);
-    void warning_at(Token &, const char *, ...);
+    void warning(const FilePosition &, const char *, ...);
+    void warning(const Token &, const char *, ...);
     void warning(const char *, va_list);
 
     void note(const char *, ...);
-    void note_at(FilePosition &, const char *, ...);
-    void note_at(Token &, const char *, ...);
+    void note(const FilePosition &, const char *, ...);
+    void note(const Token &, const char *, ...);
+    void note(const std::filesystem::path &, const char *, ...);
     void note(const char *, va_list);
 
   private:
+    void print_position(const Token &);
+    void print_position(const FilePosition &);
+    void print_position(const std::filesystem::path &);
+
+    void print_line(const Token &token, void (LoggerColors::*colorFunc)(void));
     FILE *filePtr;
     LoggerColors colors;
 };
+
+extern Logger logger;

@@ -2,6 +2,8 @@
 #include <errno.h>
 #include <stdarg.h>
 
+Logger logger;
+
 Logger::Logger() : colors() {
 }
 
@@ -16,6 +18,14 @@ void Logger::print_position(const FilePosition &pos) {
     colors.reset();
     colors.bold();
     fprintf(stderr, "%s:%u:%u: ", pos.filename, pos.line, pos.col);
+    colors.reset();
+}
+
+void Logger::print_position(const std::filesystem::path &filepath) {
+    colors.reset();
+    colors.bold();
+    fprintf(stderr, "%s: ", filepath.c_str());
+    colors.reset();
 }
 
 void Logger::print_line(const Token &token, void (LoggerColors::*colorFunc)(void)) {
@@ -81,7 +91,7 @@ void Logger::error(const char *fmt, ...) {
     va_end(args);
 }
 
-void Logger::error_at(FilePosition &pos, const char *fmt, ...) {
+void Logger::error(const FilePosition &pos, const char *fmt, ...) {
     print_position(pos);
 
     va_list args;
@@ -90,7 +100,7 @@ void Logger::error_at(FilePosition &pos, const char *fmt, ...) {
     va_end(args);
 }
 
-void Logger::error_at(Token &token, const char *fmt, ...) {
+void Logger::error(const Token &token, const char *fmt, ...) {
     print_position(token);
 
     va_list args;
@@ -123,7 +133,7 @@ void Logger::warning(const char *fmt, ...) {
     va_end(args);
 }
 
-void Logger::warning_at(FilePosition &pos, const char *fmt, ...) {
+void Logger::warning(const FilePosition &pos, const char *fmt, ...) {
     print_position(pos);
 
     va_list args;
@@ -132,7 +142,7 @@ void Logger::warning_at(FilePosition &pos, const char *fmt, ...) {
     va_end(args);
 }
 
-void Logger::warning_at(Token &token, const char *fmt, ...) {
+void Logger::warning(const Token &token, const char *fmt, ...) {
     print_position(token);
 
     va_list args;
@@ -163,7 +173,7 @@ void Logger::note(const char *fmt, ...) {
     va_end(args);
 }
 
-void Logger::note_at(FilePosition &pos, const char *fmt, ...) {
+void Logger::note(const FilePosition &pos, const char *fmt, ...) {
     print_position(pos);
 
     va_list args;
@@ -172,8 +182,17 @@ void Logger::note_at(FilePosition &pos, const char *fmt, ...) {
     va_end(args);
 }
 
-void Logger::note_at(Token &token, const char *fmt, ...) {
+void Logger::note(const Token &token, const char *fmt, ...) {
     print_position(token);
+
+    va_list args;
+    va_start(args, fmt);
+    note(fmt, args);
+    va_end(args);
+}
+
+void Logger::note(const std::filesystem::path &filepath, const char *fmt, ...) {
+    print_position(filepath);
 
     va_list args;
     va_start(args, fmt);

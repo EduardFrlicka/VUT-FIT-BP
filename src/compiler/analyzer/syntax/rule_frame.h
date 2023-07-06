@@ -21,7 +21,7 @@
     do {                                                                                                                                                                                               \
         Token *token = file->tokenStack.curr();                                                                                                                                                        \
         if (token->type != (token_type)) {                                                                                                                                                             \
-            logger.error_at(*token, MSG_SYN_UNEXPECTED_TOKEN_EXPECTED, token->type_string().c_str(), Token::type_string(token_type).c_str());                                                                  \
+            logger.error(*token, MSG_SYN_UNEXPECTED_TOKEN_EXPECTED, token->type_string().c_str(), Token::type_string(token_type).c_str());                                                             \
             return ERR_SYNTAX;                                                                                                                                                                         \
         }                                                                                                                                                                                              \
     } while (0)
