@@ -5,7 +5,7 @@
 #define EOFCHECK(c)                                                                                                                                                                                    \
     do {                                                                                                                                                                                               \
         if ((c) == EOF) {                                                                                                                                                                              \
-            logger.error(file->getPos(), MSG_LEX_UNEXPECTED_EOF);                                                                                                                                   \
+            logger.error(file->getPos(), MSG_LEX_UNEXPECTED_EOF);                                                                                                                                      \
             return ERR_LEXICAL;                                                                                                                                                                        \
         }                                                                                                                                                                                              \
     } while (0)
@@ -13,7 +13,7 @@
 #define EOLCHECK(c)                                                                                                                                                                                    \
     do {                                                                                                                                                                                               \
         if ((c) == '\n') {                                                                                                                                                                             \
-            logger.error(file->getPos(), MSG_LEX_UNEXPECTED_EOL);                                                                                                                                   \
+            logger.error(file->getPos(), MSG_LEX_UNEXPECTED_EOL);                                                                                                                                      \
             return ERR_LEXICAL;                                                                                                                                                                        \
         }                                                                                                                                                                                              \
     } while (0)
@@ -56,11 +56,11 @@ int LexicalAnalyzer::stateDollar(int c) {
 int LexicalAnalyzer::stateHash(int c) {
     EOFCHECK(c);
     EOLCHECK(c);
-    if (isspace(c)) {
-        logger.error(file->getPos(), MSG_LEX_UNEXPECTED_CHAR);
-        return ERR_LEXICAL;
+
+    if (!isalpha(c)) {
+        logger.error(*token, MSG_LEX_UNEXPECTED_CHAR, c);
     }
-    nextState = &LexicalAnalyzer::stateCharacter;
+    nextState = &LexicalAnalyzer::stateSymbol;
     return SUCCESS;
 }
 
