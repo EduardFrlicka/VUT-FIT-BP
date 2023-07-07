@@ -13,13 +13,16 @@
         for (auto func : [__VA_ARGS__])                                                                                                                                                                \
     } while (0)
 
-#define terminal(token_type) (file->tokenStack.curr()->type == (token_type))
+#define current_token *(tokenStack->curr())
 
-#define terminal_switch() switch (file->tokenStack.curr()->type)
+#define any_terminal(...) any_terminal_fun({__VA_ARGS__})
+#define forward_check(...) forward_check_fun({__VA_ARGS__})
+
+#define terminal_switch() switch (tokenStack->curr()->type)
 
 #define assert_terminal(token_type)                                                                                                                                                                    \
     do {                                                                                                                                                                                               \
-        Token *token = file->tokenStack.curr();                                                                                                                                                        \
+        Token *token = tokenStack->curr();                                                                                                                                                             \
         if (token->type != (token_type)) {                                                                                                                                                             \
             logger.error(*token, MSG_SYN_UNEXPECTED_TOKEN_EXPECTED, token->type_string().c_str(), Token::type_string(token_type).c_str());                                                             \
             return ERR_SYNTAX;                                                                                                                                                                         \
@@ -32,10 +35,29 @@
         next_token();                                                                                                                                                                                  \
     } while (0)
 
-#define assert_non_terminal(rule_func)                                                                                                                                                                 \
+#define assert_rule(rule_func)                                                                                                                                                                         \
     do {                                                                                                                                                                                               \
         int res = (rule_func);                                                                                                                                                                         \
         if (res) {                                                                                                                                                                                     \
             return res;                                                                                                                                                                                \
         }                                                                                                                                                                                              \
+    } while (0)
+
+#define emplace_and_assert_rule(optional, rule_func)                                                                                                                                                   \
+    do {                                                                                                                                                                                               \
+        (optional).emplace();                                                                                                                                                                          \
+        assert_rule(rule_func(*(optional)));                                                                                                                                                           \
+    } while (0);
+
+#define emplace_back_and_assert_rule(vector, rule_func)                                                                                                                                                \
+    do {                                                                                                                                                                                               \
+        (vector).emplace_back();                                                                                                                                                                       \
+        assert_rule(rule_func(*(vector).rbegin()));                                                                                                                                                    \
+    } while (0);
+
+#define assert_and_save_identifier(dest)                                                                                                                                                               \
+    do {                                                                                                                                                                                               \
+        assert_terminal(tokenIdentifier);                                                                                                                                                              \
+        (dest) = *(tokenStack->curr());                                                                                                                                                                  \
+        next_token();                                                                                                                                                                                  \
     } while (0)

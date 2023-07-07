@@ -1,11 +1,8 @@
 #include "arguments.h"
-#include "file.h"
 #include "lexical.h"
 #include "return_values.h"
-#include <filesystem>
+#include "syntax.h"
 #include <stdio.h>
-#include <string>
-#include <vector>
 
 void print_usage(char *binary);
 void print_help(char *binary);
@@ -22,9 +19,14 @@ int main(int argc, char *argv[]) {
         return SUCCESS;
     }
 
-    auto lexxer = LexicalAnalyzer();
+    auto lex_analyzer = LexicalAnalyzer();
+    auto syn_analyzer = SyntaxAnalyzer();
 
-    TokenStack &tokenstack = lexxer.analyze(args.sources);
+    TokenStack &tokenstack = lex_analyzer.analyze(args.sources);
+
+    auto syn_tree = syn_analyzer.analyze(tokenstack);
+
+    syn_tree.print();
 
     return SUCCESS;
 }

@@ -80,6 +80,10 @@ void TokenStack::ptrHead() {
     this->ptr = this->head;
 }
 
+void TokenStack::ptrSet(Token *_ptr) {
+    ptr = _ptr;
+}
+
 void TokenStack::ptrTail() {
     this->ptr = this->tail;
 }

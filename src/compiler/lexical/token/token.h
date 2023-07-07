@@ -145,6 +145,7 @@ class TokenStack {
     Token *prev();
 
     void ptrHead();
+    void ptrSet(Token *);
     void ptrTail();
 
     void printStack();
