@@ -1,19 +1,18 @@
-#ifndef ARGUMENTS_H
-#define ARGUMENTS_H
+#pragma once
+#include <string>
+#include <vector>
 
-#include "error.h"
-#include <getopt.h>
-
-class cArguments {
+class Arguments {
   public:
-    char *target_dir = "build";
-    char *target_bin = "binary";
+    std::string target_dir = "build";
+    std::string target_bin = "binary";
 
-    char **sources = nullptr;
+    std::vector<std::string> sources;
 
     bool help = false;
 
-    cArguments(int argc, char *argv[]);
+    Arguments();
+    Arguments(int argc, char *argv[]);
 };
 
-#endif /* ARGUMENTS_H */
+extern Arguments args;
