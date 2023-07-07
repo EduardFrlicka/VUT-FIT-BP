@@ -17,7 +17,7 @@ void Logger::print_position(const Token &token) {
 void Logger::print_position(const FilePosition &pos) {
     colors.reset();
     colors.bold();
-    fprintf(stderr, "%s:%u:%u: ", pos.filename, pos.line, pos.col);
+    fprintf(stderr, "%s:%u:%u: ", pos.filename.c_str(), pos.line, pos.col);
     colors.reset();
 }
 

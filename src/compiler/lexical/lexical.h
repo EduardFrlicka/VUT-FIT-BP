@@ -3,18 +3,22 @@
 #include "file.h"
 #include "logger.h"
 #include "token.h"
+#include <optional>
+#include <vector>
 
 class LexicalAnalyzer {
   public:
-    int analyze_file(File *file);
+    TokenStack &analyze(const std::vector<std::string> &);
 
   private:
+    int analyze(const std::string &);
     Token *token;
 
     int (LexicalAnalyzer::*currState)(int);
     int (LexicalAnalyzer::*nextState)(int);
 
-    File *file;
+    std::optional<FileReader> file;
+    TokenStack tokenStack;
 
     int analyze_token();
     int start(int);

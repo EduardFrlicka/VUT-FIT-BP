@@ -3,15 +3,29 @@
 #include "messages.h"
 #include "return_values.h"
 
-int LexicalAnalyzer::analyze_file(File *_file) {
+TokenStack &LexicalAnalyzer::analyze(const std::vector<std::string> &filenames) {
+    int res = SUCCESS;
+    for (auto file : filenames) {
+        if (!res)
+            res = analyze(file);
+        else
+            analyze(file);
+    }
+
+    if (res)
+        throw "Lexical analysis failed";
+
+    return tokenStack;
+}
+
+int LexicalAnalyzer::analyze(const std::string &filename) {
     int res;
-    file = _file;
+
+    file.emplace(filename);
 
     do {
         res = analyze_token();
     } while (!res);
-
-    file = nullptr;
 
     if (res != EOF)
         return res;
@@ -28,17 +42,18 @@ int LexicalAnalyzer::analyze_token() {
     currState = &LexicalAnalyzer::start;
     nextState = &LexicalAnalyzer::start;
 
-    token = file->newToken();
+    token = new Token(file->getPos());
+    tokenStack.append(token);
 
     while (currState != &LexicalAnalyzer::end) {
         currState = nextState;
-        res = (this->*currState)(file->peekchar());
+        res = (this->*currState)(file->peek());
 
         if (res)
             return res;
 
         if (nextState != &LexicalAnalyzer::end)
-            token->text += file->getchar();
+            token->text += file->get();
     }
     return SUCCESS;
 }

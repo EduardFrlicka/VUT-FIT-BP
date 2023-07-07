@@ -52,7 +52,7 @@ int LexicalAnalyzer::stateNumberDot(int c) {
     nextState = &LexicalAnalyzer::end;
 
     if (c == '.') {
-        c2 = file->peek2char();
+        c2 = file->peek2();
         if (token->payload.number.isdigit(c2))
             nextState = &LexicalAnalyzer::stateNumberDot;
         return SUCCESS;
