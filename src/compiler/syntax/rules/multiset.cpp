@@ -10,14 +10,13 @@ int SyntaxAnalyzer::rule_multiset(ast::MultiSet &node) {
         emplace_back_and_assert_rule(node.elements, rule_multiset_elem);
     }
 
-
     return SUCCESS;
 }
 
 int SyntaxAnalyzer::rule_multiset_elem(ast::MultiSetElem &node) {
     if (forward_check(tokenNumber, tokenBacktick) || forward_check(tokenIdentifier, tokenBacktick)) {
         node.count = current_token;
-        next_token(); /* skipping ( number | identifier )*/
+        tokenStack.succ(); /* skipping ( number | identifier )*/
         assert_terminal_succ(tokenBacktick);
     }
     assert_rule(rule_multiset_term(node.term));
@@ -34,7 +33,7 @@ int SyntaxAnalyzer::rule_multiset_term(ast::MultiSetTerm &node) {
         assert_terminal(tokenIdentifier); /* asserting one of checked, to raise error */
 
     node.value = current_token;
-    next_token();
+    tokenStack.succ();
 
     return SUCCESS;
 }
@@ -64,3 +63,4 @@ int SyntaxAnalyzer::rule_multiset_list(ast::MultiSetTerm::MultiSetList &node) {
 
     return SUCCESS;
 }
+

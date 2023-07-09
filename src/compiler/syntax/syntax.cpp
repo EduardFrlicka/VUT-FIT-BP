@@ -3,24 +3,17 @@
 #include "return_values.h"
 #include <cstdarg>
 
-SyntaxAnalyzer::SyntaxAnalyzer() {
+SyntaxAnalyzer::SyntaxAnalyzer(TokenStackIterator &_tokenStack) : tokenStack(_tokenStack), expressionAnalyzer(_tokenStack) {
+    int res;
+
+    if ((res = rule_classes(tree))) {
+        tree.print();
+        exit(res);
+    }
 }
 
-ast::Classes SyntaxAnalyzer::analyze(TokenStack &_tokenStack) {
-    ast::Classes res;
-
-    tokenStack = &_tokenStack;
-    tokenStack->ptrHead();
-
-    rule_classes(res);
-
-    return res;
-}
-
-void SyntaxAnalyzer::next_token() {
-    do {
-        tokenStack->next();
-    } while (tokenStack->curr()->isspace());
+ast::Classes &SyntaxAnalyzer::root() {
+    return tree;
 }
 
 bool SyntaxAnalyzer::any_terminal_fun(const std::vector<TokenType> &types) {
@@ -31,19 +24,21 @@ bool SyntaxAnalyzer::any_terminal_fun(const std::vector<TokenType> &types) {
     return false;
 }
 bool SyntaxAnalyzer::terminal(TokenType type) {
-    return tokenStack->curr()->type == type;
+    if (tokenStack.end())
+        return false;
+    return tokenStack.get().type == type;
 }
 
 bool SyntaxAnalyzer::forward_check_fun(const std::vector<TokenType> &types) {
     std::vector<TokenType>::const_iterator type;
-    Token *save = tokenStack->curr();
+    tokenStack.stash_push();
     type = types.begin();
 
     while (type != types.end() && terminal(*type)) {
-        next_token();
+        tokenStack.succ();
         type++;
     }
-    tokenStack->ptrSet(save);
+    tokenStack.stash_pop();
 
     return type == types.end();
 }

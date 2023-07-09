@@ -4,7 +4,7 @@
 
 using namespace std;
 
-CodeFiles::CodeFiles(const std::map<std::string, Code> &input_map) {
+CodeFiles::CodeFiles(const std::map<std::string, Code> &input_map, const Code &_free_code) : free_code(_free_code) {
     code_files.insert(input_map.begin(), input_map.end());
 }
 
@@ -24,19 +24,31 @@ CodeFiles CodeFiles::combine(const std::string &key, const CodeFiles &replacemen
 }
 
 void CodeFiles::replace(const std::string &key, const CodeFiles &replacement) {
-    map<string, Code>::iterator file;
+    map<string, Code>::const_iterator file;
+    bool free_code_used = false;
 
-    for (auto kv : replacement.code_files) {
-        file = code_files.find(kv.first);
+    for (auto kv : code_files) {
+        file = replacement.code_files.find(kv.first);
 
-        if (file != code_files.end()) {
+        if (file != replacement.code_files.end()) {
             /* uncommenting (optional replacements) and replacing corresponding code */
-            file->second.uncomment(key);
-            file->second.replace(key, kv.second);
+            kv.second.uncomment(key);
+            kv.second.replace(key, file->second);
         } else {
-            /* moving file to result */
-            code_files.insert(make_pair(kv.first, kv.second));
+            /* using free code */
+            free_code_used = true;
+            kv.second.uncomment(key);
+            kv.second.replace(key, replacement.free_code);
         }
+    }
+
+    for (auto kv : replacement.code_files)
+        if (code_files.find(kv.first) == code_files.end())
+            code_files.insert(kv);
+
+    if (!free_code_used) {
+        free_code.uncomment(key);
+        free_code.replace(key, replacement.free_code);
     }
 }
 

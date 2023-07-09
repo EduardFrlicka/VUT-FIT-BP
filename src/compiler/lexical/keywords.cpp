@@ -17,8 +17,8 @@ void LexicalAnalyzer::checkKeyword() {
     };
 
     /* check if token text is in keywords map (if token is a keyword) */
-    if (keywords.find(token->text) == keywords.end())
+    if (keywords.find(token.text) == keywords.end())
         return;
 
-    token->type = keywords[token->text];
+    token.type = keywords[token.text];
 }

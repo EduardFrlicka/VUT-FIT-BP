@@ -7,6 +7,9 @@
 
 using namespace std;
 
+Code::Code() {
+}
+
 Code::Code(const string &_code) {
     include = set<string>();
     string tmp(_code);

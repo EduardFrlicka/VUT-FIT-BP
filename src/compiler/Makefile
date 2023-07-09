@@ -23,16 +23,9 @@ DEP=$(ROOT)/dep/compiler
 # Commands and Flags
 
 # Flags for compiling
-CFLAGS:=-std=c++17 -Wall -Wextra -pedantic -ggdb3 -Wno-unused-parameter
+CXXFLAGS:=-std=c++20 -Wall -Wextra -pedantic -ggdb3 -Wno-unused-parameter -DDEBUG_PRINT
 
 LFLAGS:=
-
-# Compiler
-CXX:=g++
-
-# rm command
-RM:=rm
-
 
 # =========================================================================
 # initializing global variables
@@ -75,7 +68,7 @@ $(BINARY_PATH): $(OBJS)
 # Compiling object
 $(OBJ)/%.o: %
 	@mkdir -p $(@D)
-	$(CXX) $< -c -o $@ $(CFLAGS) $(INCLUDE)
+	$(CXX) $< -c -o $@ $(CXXFLAGS) $(INCLUDE)
 
 # creating dep file
 $(DEP)/%.dep: %

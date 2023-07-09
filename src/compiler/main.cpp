@@ -19,12 +19,13 @@ int main(int argc, char *argv[]) {
         return SUCCESS;
     }
 
-    auto lex_analyzer = LexicalAnalyzer();
-    auto syn_analyzer = SyntaxAnalyzer();
+    auto lex_analyzer = LexicalAnalyzer(args.sources);
 
-    TokenStack &tokenstack = lex_analyzer.analyze(args.sources);
+    auto tokenstack = lex_analyzer.begin();
 
-    auto syn_tree = syn_analyzer.analyze(tokenstack);
+    auto syn_analyzer = SyntaxAnalyzer(tokenstack);
+
+    ast::Classes &syn_tree = syn_analyzer.root();
 
     syn_tree.print();
 

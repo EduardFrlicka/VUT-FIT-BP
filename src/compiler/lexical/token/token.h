@@ -1,6 +1,8 @@
 #pragma once
 
 #include "file_position.h"
+#include <deque>
+#include <stack>
 #include <string>
 
 typedef enum {
@@ -50,6 +52,7 @@ typedef enum {
     tokenDot,
     tokenComma,
     tokenColon,
+    tokenSemicolon,
     tokenAssign,
     tokenBacktick,
 
@@ -106,20 +109,44 @@ class TokenPayload {
   private:
     TokenPayloadType type;
 };
+
+class Token;
+class TokenStackIterator {
+  private:
+    std::stack<std::deque<Token>::iterator> stash;
+
+  public:
+    TokenStackIterator();
+    TokenStackIterator(std::deque<Token>&);
+
+    std::deque<Token>::iterator it;
+    std::deque<Token>::iterator _begin;
+    std::deque<Token>::iterator _end;
+
+    Token &get();
+    Token &get(int);
+    Token &succ();
+
+    void set(std::deque<Token>::iterator);
+    void set(std::deque<Token>::iterator, std::deque<Token>::iterator, std::deque<Token>::iterator);
+
+    void stash_push();
+
+    void stash_pop();
+    bool end();
+};
 class Token {
   public:
     TokenType type;
-    Token *prev;
-    Token *next;
-
-    std::string text;
+    FilePosition pos;
+    TokenStackIterator it;
 
     TokenPayload payload;
+    std::string text;
 
-    FilePosition pos;
-
+    // Token();
     Token(const FilePosition &);
-    Token(const Token &);
+    // Token(const Token &);
 
     ~Token();
 
@@ -130,26 +157,3 @@ class Token {
     void print();
 };
 
-class TokenStack {
-  private:
-    Token *head;
-    Token *tail;
-    Token *ptr;
-    void pop();
-
-  public:
-    void append(Token *newToken);
-    Token *curr();
-    Token *peek();
-    Token *next();
-    Token *prev();
-
-    void ptrHead();
-    void ptrSet(Token *);
-    void ptrTail();
-
-    void printStack();
-
-    TokenStack();
-    ~TokenStack();
-};

@@ -1,110 +1,15 @@
 #pragma once
 
+#include "expressions_tree.h"
+#include "syntax_tree_base.h"
 #include "token.h"
+#include <memory>
 #include <optional>
 #include <string>
+#include <variant>
 #include <vector>
 
-/*
 namespace AbstractSyntaxTree {
-
-enum Types {
-    typeIdentifier,
-    typeSymbol,
-    typeChar,
-    typeString,
-    typeNumber,
-    typeArray,
-};
-
-typedef std::string Identifier;
-typedef std::string Symbol;
-typedef char Character;
-typedef std::string String;
-
-struct Number {
-    std::string *base;
-    std::string *decimal;
-    int *radix;
-    int *exponent;
-};
-
-struct Array;
-struct ArrayConst;
-
-struct Elem {
-    union {
-        Identifier *identifier;
-        Symbol *symbol;
-        Character *character;
-        String *string;
-        Number *number;
-        Array *array;
-        ArrayConst *array_const;
-    } elem;
-
-    enum {
-        elemIdentifier,
-        elemSymbol,
-        elemCharacter,
-        elemString,
-        elemNumber,
-        elemArray,
-    } type;
-};
-
-struct Array {
-    std::vector<Elem *> elements;
-};
-
-struct ArrayConst {
-    std::vector<Elem *> elements;
-};
-
-struct MultisetElem {
-    enum {
-        list,
-    };
-};
-struct Multiset {};
-
-struct Transition {};
-struct Place {};
-struct Net {};
-struct ObjectNet {
-    Net *net;
-};
-struct ClassHead {
-    Token *token_name;
-    Token *token_type;
-    Identifier *name;
-    Identifier *type;
-};
-
-struct Class {
-    Token *token;
-    ClassHead *head;
-};
-
-struct Classes {
-    std::vector<Class *> classes;
-};
-
-void print_tree(Classes);
-void print_tree(Class);
-
-}; // namespace AbstractSyntaxTree
-*/
-
-namespace AbstractSyntaxTree {
-
-class Base {
-  public:
-    virtual void print(int indent = 0);
-
-  protected:
-    void print_indent(int);
-};
 
 class TokenPair : public Base, public std::pair<std::optional<Token>, std::optional<Token>> {
   public:
@@ -146,16 +51,21 @@ class ConditionPair : public Base, public std::pair<std::optional<Token>, MultiS
 
 class InitAction : public Base {
   public:
+    std::vector<Token> temporaries;
+    Expression expr;
     void print(int indent = 0);
 };
 
 class Action : public Base {
   public:
+    std::vector<Token> temporaries;
+    Expression expr;
     void print(int indent = 0);
 };
 
 class Guard : public Base {
   public:
+    Expression expr;
     void print(int indent = 0);
 };
 
@@ -220,6 +130,12 @@ class Net : public Base {
 class SynPort : public Base {
   public:
     Message message;
+
+    std::optional<Condition> conditions;
+    std::optional<PreCondition> pre_conditions;
+    std::optional<Guard> guard;
+    std::optional<PostCondition> post_contitions;
+
     void print(int indent = 0);
 };
 
@@ -270,5 +186,3 @@ class Classes : public Base {
 };
 
 } // namespace AbstractSyntaxTree
-
-namespace ast = AbstractSyntaxTree;

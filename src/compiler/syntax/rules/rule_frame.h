@@ -13,18 +13,28 @@
         for (auto func : [__VA_ARGS__])                                                                                                                                                                \
     } while (0)
 
-#define current_token *(tokenStack->curr())
+#define current_token tokenStack.get()
 
 #define any_terminal(...) any_terminal_fun({__VA_ARGS__})
 #define forward_check(...) forward_check_fun({__VA_ARGS__})
 
-#define terminal_switch() switch (tokenStack->curr()->type)
+#define terminal_switch() switch (tokenStack.get().type)
+
+#define assert_terminal_neg(token_type)                                                                                                                                                                \
+    do {                                                                                                                                                                                               \
+        if (terminal(token_type)) {                                                                                                                                                                    \
+            logger.c_error(tokenStack.get(), MSG_SYN_UNEXPECTED_TOKEN_EXPECTED, tokenStack.get().type_string().c_str(), Token::type_string(token_type).c_str());                                       \
+            return ERR_SYNTAX;                                                                                                                                                                         \
+        }                                                                                                                                                                                              \
+    } while (0)
 
 #define assert_terminal(token_type)                                                                                                                                                                    \
     do {                                                                                                                                                                                               \
-        Token *token = tokenStack->curr();                                                                                                                                                             \
-        if (token->type != (token_type)) {                                                                                                                                                             \
-            logger.error(*token, MSG_SYN_UNEXPECTED_TOKEN_EXPECTED, token->type_string().c_str(), Token::type_string(token_type).c_str());                                                             \
+        if (!terminal(token_type)) {                                                                                                                                                                   \
+            if (tokenStack.end())                                                                                                                                                                      \
+                logger.c_error(MSG_LEX_UNEXPECTED_EOF);                                                                                                                                                \
+            else                                                                                                                                                                                       \
+                logger.c_error(tokenStack.get(), MSG_SYN_UNEXPECTED_TOKEN_EXPECTED, tokenStack.get().type_string().c_str(), Token::type_string(token_type).c_str());                                   \
             return ERR_SYNTAX;                                                                                                                                                                         \
         }                                                                                                                                                                                              \
     } while (0)
@@ -32,7 +42,8 @@
 #define assert_terminal_succ(token_type)                                                                                                                                                               \
     do {                                                                                                                                                                                               \
         assert_terminal(token_type);                                                                                                                                                                   \
-        next_token();                                                                                                                                                                                  \
+        if (!tokenStack.end())                                                                                                                                                                         \
+            tokenStack.succ();                                                                                                                                                                         \
     } while (0)
 
 #define assert_rule(rule_func)                                                                                                                                                                         \
@@ -58,6 +69,6 @@
 #define assert_and_save_identifier(dest)                                                                                                                                                               \
     do {                                                                                                                                                                                               \
         assert_terminal(tokenIdentifier);                                                                                                                                                              \
-        (dest) = *(tokenStack->curr());                                                                                                                                                                  \
-        next_token();                                                                                                                                                                                  \
+        (dest) = tokenStack.get();                                                                                                                                                                     \
+        tokenStack.succ();                                                                                                                                                                             \
     } while (0)

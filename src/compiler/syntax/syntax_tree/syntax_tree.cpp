@@ -104,6 +104,11 @@ void Constructor::print(int indent) {
 void SynPort::print(int indent) {
     print_header(SynPort);
     print_attribute(message);
+
+    print_optional(conditions);
+    print_optional(pre_conditions);
+    print_optional(guard);
+    print_optional(post_contitions);
 }
 
 void Net::print(int indent) {
@@ -163,10 +168,32 @@ void Guard::print(int indent) {
 
 void Action::print(int indent) {
     print_header(Action);
+
+    if (temporaries.size() > 0) {
+        print_indent(indent + INDENT_INCREMENT);
+        std::cout << "Temporaries: " << std::endl;
+    }
+    for (auto i : (temporaries)) {
+        print_indent(indent + 2 * INDENT_INCREMENT);
+        i.print();
+    }
+
+    print_attribute(expr);
 }
 
 void InitAction::print(int indent) {
     print_header(InitAction);
+
+    if (temporaries.size() > 0) {
+        print_indent(indent + INDENT_INCREMENT);
+        std::cout << "Temporaries: " << std::endl;
+    }
+    for (auto i : (temporaries)) {
+        print_indent(indent + 2 * INDENT_INCREMENT);
+        i.print();
+    }
+
+    print_attribute(expr);
 }
 
 void ConditionPair::print(int indent) {

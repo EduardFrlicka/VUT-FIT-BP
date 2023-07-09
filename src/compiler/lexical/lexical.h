@@ -3,24 +3,27 @@
 #include "file.h"
 #include "logger.h"
 #include "token.h"
+#include <deque>
 #include <optional>
 #include <vector>
 
 class LexicalAnalyzer {
   public:
-    TokenStack &analyze(const std::vector<std::string> &);
+    LexicalAnalyzer(const std::vector<std::string> &);
+    TokenStackIterator begin();
 
   private:
-    int analyze(const std::string &);
-    Token *token;
-
     int (LexicalAnalyzer::*currState)(int);
     int (LexicalAnalyzer::*nextState)(int);
 
     std::optional<FileReader> file;
-    TokenStack tokenStack;
+    std::deque<Token> tokenStack;
+    Token token;
+
+    int analyze(const std::string &);
 
     int analyze_token();
+    void push_eof();
     int start(int);
     int end(int);
 
@@ -102,6 +105,8 @@ class LexicalAnalyzer {
     int stateComma(int);
     /* : */
     int stateColon(int);
+    /* ; */
+    int stateSemicolon(int);
     /* := */
     int stateAssign(int);
     /* ` */

@@ -1,3 +1,4 @@
+#include "error.h"
 #include "logger.h"
 #include "template.h"
 #include <iostream>
@@ -24,7 +25,7 @@ CodeTemplateManager::CodeTemplateManager(const char *path_str) {
 CodeTemplate CodeTemplateManager::get(const std::string name) {
     std::map<std::string, CodeTemplate>::iterator res = raw_templates.find(name);
     if (res == raw_templates.end())
-        throw std::invalid_argument("Unknown template: " + name);
+        internal_error("Unknown template: %s", name.c_str());
 
     return (*res).second;
 }
@@ -39,12 +40,12 @@ void CodeTemplateManager::initialize(const std::filesystem::path &dir_path) {
             continue;
 
         if (!file.is_regular_file()) {
-            logger.note(file.path(), "when parsing templates: unexpected file type, skipping this file");
+            logger.c_warning(file.path(), "when parsing templates: unexpected file type, skipping file");
             continue;
         }
 
         if (file.path().extension() != ".t") {
-            logger.note(file.path(), "when parsing templates: unexpected file extension, skipping this file");
+            logger.c_warning(file.path(), "when parsing templates: unexpected file extension, skipping this file");
             continue;
         }
 
@@ -63,7 +64,7 @@ path CodeTemplateManager::template_name(const std::filesystem::path &template_pa
         tmp /= *i;
 
     if (tmp != root_path)
-        throw std::invalid_argument("root path is not prefix of template path");
+        internal_error("root path is not prefix of template path");
 
     tmp = path();
 

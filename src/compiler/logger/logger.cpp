@@ -29,22 +29,22 @@ void Logger::print_position(const std::filesystem::path &filepath) {
 }
 
 void Logger::print_line(const Token &token, void (LoggerColors::*colorFunc)(void)) {
-    const Token *ptr;
-    const Token *start;
+    std::deque<Token>::iterator start = token.it.it;
+    std::deque<Token>::iterator it;
     size_t size;
     std::string underline;
 
     /* find first token in line */
-    for (ptr = &token; ptr->prev && ptr->prev->type != tokenEOL; ptr = ptr->prev) {
-    }
-    start = ptr;
+    while (start->type != tokenEOL && start > token.it._begin)
+        start--;
+    start++;
 
     /* print left margin */
     fprintf(stderr, "%5u |", token.pos.line);
 
     /* print all tokens from line before "token" */
-    for (ptr = start; ptr && ptr != &token; ptr = ptr->next)
-        fprintf(stderr, "%s", ptr->text.c_str());
+    for (it = start; it < token.it.it; it++)
+        fprintf(stderr, "%s", it->text.c_str());
 
     /* colored print of "token" */
     colors.bold();
@@ -53,10 +53,10 @@ void Logger::print_line(const Token &token, void (LoggerColors::*colorFunc)(void
     colors.reset();
 
     /* pritn all tokens in line after "token" */
+
     if (token.type != tokenEOL) {
-        for (ptr = token.next; ptr && ptr->type != tokenEOL; ptr = ptr->next) {
-            fprintf(stderr, "%s", ptr->text.c_str());
-        }
+        for (it = token.it.it + 1; it < token.it._end && it->type != tokenEOL; it++)
+            fprintf(stderr, "%s", it->text.c_str());
         fprintf(stderr, "\n");
     }
 
@@ -69,11 +69,11 @@ void Logger::print_line(const Token &token, void (LoggerColors::*colorFunc)(void
     fprintf(stderr, "      |");
 
     /* print whitespace until "token" position */
-    for (ptr = start; ptr && ptr != &token; ptr = ptr->next)
-        if (ptr->type != tokenWhiteSpace)
-            fprintf(stderr, "%*.s", (int)ptr->text.length(), "");
+    for (it = start; it < token.it.it; it++)
+        if (it->type != tokenWhiteSpace)
+            fprintf(stderr, "%*.s", (int)it->text.length(), "");
         else
-            fprintf(stderr, "%s", ptr->text.c_str());
+            fprintf(stderr, "%s", it->text.c_str());
 
     /* print colored underline */
     colors.bold();
@@ -82,36 +82,46 @@ void Logger::print_line(const Token &token, void (LoggerColors::*colorFunc)(void
     colors.reset();
 
     fprintf(stderr, "\n");
+    fflush(stderr);
 }
 
-void Logger::error(const char *fmt, ...) {
+void Logger::c_error(const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    error(fmt, args);
+    c_error(fmt, args);
     va_end(args);
 }
 
-void Logger::error(const FilePosition &pos, const char *fmt, ...) {
+void Logger::c_error(const FilePosition &pos, const char *fmt, ...) {
     print_position(pos);
 
     va_list args;
     va_start(args, fmt);
-    error(fmt, args);
+    c_error(fmt, args);
     va_end(args);
 }
 
-void Logger::error(const Token &token, const char *fmt, ...) {
+void Logger::c_error(const Token &token, const char *fmt, ...) {
     print_position(token);
 
     va_list args;
     va_start(args, fmt);
-    error(fmt, args);
+    c_error(fmt, args);
     va_end(args);
 
     print_line(token, &LoggerColors::red);
 }
 
-void Logger::error(const char *fmt, va_list args) {
+void Logger::c_error(const std::filesystem::path &filepath, const char *fmt, ...) {
+    print_position(filepath);
+
+    va_list args;
+    va_start(args, fmt);
+    c_error(fmt, args);
+    va_end(args);
+}
+
+void Logger::c_error(const char *fmt, va_list args) {
     colors.reset();
     colors.bold();
     colors.red();
@@ -124,34 +134,46 @@ void Logger::error(const char *fmt, va_list args) {
 
     fprintf(stderr, "\n");
     colors.reset();
+    fflush(stderr);
 }
 
-void Logger::warning(const char *fmt, ...) {
+void Logger::c_warning(const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    warning(fmt, args);
+    c_warning(fmt, args);
     va_end(args);
 }
 
-void Logger::warning(const FilePosition &pos, const char *fmt, ...) {
+void Logger::c_warning(const FilePosition &pos, const char *fmt, ...) {
     print_position(pos);
 
     va_list args;
     va_start(args, fmt);
-    warning(fmt, args);
+    c_warning(fmt, args);
     va_end(args);
 }
 
-void Logger::warning(const Token &token, const char *fmt, ...) {
+void Logger::c_warning(const Token &token, const char *fmt, ...) {
     print_position(token);
 
     va_list args;
     va_start(args, fmt);
-    warning(fmt, args);
+    c_warning(fmt, args);
+    va_end(args);
+
+    print_line(token, &LoggerColors::magenta);
+}
+
+void Logger::c_warning(const std::filesystem::path &filepath, const char *fmt, ...) {
+    print_position(filepath);
+
+    va_list args;
+    va_start(args, fmt);
+    c_warning(fmt, args);
     va_end(args);
 }
 
-void Logger::warning(const char *fmt, va_list args) {
+void Logger::c_warning(const char *fmt, va_list args) {
     colors.reset();
     colors.bold();
     colors.magenta();
@@ -164,43 +186,46 @@ void Logger::warning(const char *fmt, va_list args) {
 
     fprintf(stderr, "\n");
     colors.reset();
+    fflush(stderr);
 }
 
-void Logger::note(const char *fmt, ...) {
+void Logger::c_note(const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    note(fmt, args);
+    c_note(fmt, args);
     va_end(args);
 }
 
-void Logger::note(const FilePosition &pos, const char *fmt, ...) {
+void Logger::c_note(const FilePosition &pos, const char *fmt, ...) {
     print_position(pos);
 
     va_list args;
     va_start(args, fmt);
-    note(fmt, args);
+    c_note(fmt, args);
     va_end(args);
 }
 
-void Logger::note(const Token &token, const char *fmt, ...) {
+void Logger::c_note(const Token &token, const char *fmt, ...) {
     print_position(token);
 
     va_list args;
     va_start(args, fmt);
-    note(fmt, args);
+    c_note(fmt, args);
     va_end(args);
+
+    print_line(token, &LoggerColors::cyan);
 }
 
-void Logger::note(const std::filesystem::path &filepath, const char *fmt, ...) {
+void Logger::c_note(const std::filesystem::path &filepath, const char *fmt, ...) {
     print_position(filepath);
 
     va_list args;
     va_start(args, fmt);
-    note(fmt, args);
+    c_note(fmt, args);
     va_end(args);
 }
 
-void Logger::note(const char *fmt, va_list args) {
+void Logger::c_note(const char *fmt, va_list args) {
     colors.reset();
     colors.bold();
     colors.cyan();
@@ -213,4 +238,5 @@ void Logger::note(const char *fmt, va_list args) {
 
     fprintf(stderr, "\n");
     colors.reset();
+    fflush(stderr);
 }

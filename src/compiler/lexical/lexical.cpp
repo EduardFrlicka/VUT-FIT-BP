@@ -2,9 +2,11 @@
 #include "error.h"
 #include "messages.h"
 #include "return_values.h"
+#include <iostream>
 
-TokenStack &LexicalAnalyzer::analyze(const std::vector<std::string> &filenames) {
+LexicalAnalyzer::LexicalAnalyzer(const std::vector<std::string> &filenames) : tokenStack(), token(FilePosition("")) {
     int res = SUCCESS;
+
     for (auto file : filenames) {
         if (!res)
             res = analyze(file);
@@ -13,9 +15,17 @@ TokenStack &LexicalAnalyzer::analyze(const std::vector<std::string> &filenames) 
     }
 
     if (res)
-        throw "Lexical analysis failed";
+        exit(res);
 
-    return tokenStack;
+    push_eof();
+
+    for (auto i = tokenStack.begin(); i < tokenStack.end(); i++) {
+        i->it.set(i, tokenStack.begin(), tokenStack.end());
+    }
+}
+
+TokenStackIterator LexicalAnalyzer::begin() {
+    return TokenStackIterator(tokenStack);
 }
 
 int LexicalAnalyzer::analyze(const std::string &filename) {
@@ -37,13 +47,12 @@ int LexicalAnalyzer::analyze_token() {
     int res;
 
     if (!file)
-        ERROR(ERR_INTERNAL, "File not initialized");
+        internal_error("File not initialized");
 
     currState = &LexicalAnalyzer::start;
     nextState = &LexicalAnalyzer::start;
 
-    token = new Token(file->getPos());
-    tokenStack.append(token);
+    token = Token(file->getPos());
 
     while (currState != &LexicalAnalyzer::end) {
         currState = nextState;
@@ -53,15 +62,23 @@ int LexicalAnalyzer::analyze_token() {
             return res;
 
         if (nextState != &LexicalAnalyzer::end)
-            token->text += file->get();
+            token.text += file->get();
     }
+    tokenStack.push_back(token);
     return SUCCESS;
+}
+
+void LexicalAnalyzer::push_eof() {
+    token = Token(file->getPos());
+    token.type = tokenEOF;
+
+    tokenStack.push_back(token);
 }
 
 int LexicalAnalyzer::start(int c) {
     if (isdigit(c)) {
 
-        token->payload.numberInit();
+        token.payload.numberInit();
         stateNumber(c);
         return SUCCESS;
     }
@@ -98,7 +115,7 @@ int LexicalAnalyzer::start(int c) {
         break;
 
     case '}':
-        nextState = &LexicalAnalyzer::stateLeftCurlyBracket;
+        nextState = &LexicalAnalyzer::stateRightCurlyBracket;
         break;
 
     case '[':
@@ -165,6 +182,10 @@ int LexicalAnalyzer::start(int c) {
         nextState = &LexicalAnalyzer::stateColon;
         break;
 
+    case ';':
+        nextState = &LexicalAnalyzer::stateSemicolon;
+        break;
+
     case '#':
         nextState = &LexicalAnalyzer::stateHash;
         break;
@@ -178,8 +199,7 @@ int LexicalAnalyzer::start(int c) {
         break;
 
     default:
-        printf("ahoj %d\n", c);
-        logger.error(file->getPos(), MSG_LEX_UNEXPECTED_CHAR);
+        logger.c_error(file->getPos(), MSG_LEX_UNEXPECTED_CHAR);
         return ERR_LEXICAL;
         break;
     }
@@ -188,13 +208,13 @@ int LexicalAnalyzer::start(int c) {
 }
 
 int LexicalAnalyzer::end(int c) {
-    switch (token->type) {
+    switch (token.type) {
     case tokenIdentifier:
         checkKeyword();
         break;
 
     case tokenNumber:
-        token->payload.number.convert();
+        token.payload.number.convert();
         break;
     default:
         break;

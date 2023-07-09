@@ -45,21 +45,23 @@ class Logger {
     Logger();
     ~Logger();
 
-    void error(const char *, ...);
-    void error(const FilePosition &, const char *, ...);
-    void error(const Token &, const char *, ...);
-    void error(const char *, va_list);
+    void c_error(const char *, ...);
+    void c_error(const FilePosition &, const char *, ...);
+    void c_error(const Token &, const char *, ...);
+    void c_error(const std::filesystem::path &, const char *, ...);
+    void c_error(const char *, va_list);
 
-    void warning(const char *, ...);
-    void warning(const FilePosition &, const char *, ...);
-    void warning(const Token &, const char *, ...);
-    void warning(const char *, va_list);
+    void c_warning(const char *, ...);
+    void c_warning(const FilePosition &, const char *, ...);
+    void c_warning(const Token &, const char *, ...);
+    void c_warning(const std::filesystem::path &, const char *, ...);
+    void c_warning(const char *, va_list);
 
-    void note(const char *, ...);
-    void note(const FilePosition &, const char *, ...);
-    void note(const Token &, const char *, ...);
-    void note(const std::filesystem::path &, const char *, ...);
-    void note(const char *, va_list);
+    void c_note(const char *, ...);
+    void c_note(const FilePosition &, const char *, ...);
+    void c_note(const Token &, const char *, ...);
+    void c_note(const std::filesystem::path &, const char *, ...);
+    void c_note(const char *, va_list);
 
   private:
     void print_position(const Token &);

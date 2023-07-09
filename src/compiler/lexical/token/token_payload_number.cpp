@@ -51,8 +51,6 @@ void TokenPayloadNumber::convert() {
         number += pow(radix, -(long)idx) * decimal;
         tmp = tmp.substr(idx);
     }
-    
-    std::cout << tmp << std::endl;
 
     if (*tmp.cbegin() == 'e') {
         tmp = tmp.substr(1);

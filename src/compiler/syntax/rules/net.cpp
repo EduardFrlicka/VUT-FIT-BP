@@ -1,28 +1,20 @@
+#include "error.h"
 #include "rule_frame.h"
 #include "syntax.h"
 
 #include <iostream>
 
 int SyntaxAnalyzer::rule_classes(ast::Classes &node) {
-    ast::Class new_class;
-
-    while (terminal(tokenClass)) {
-        assert_rule(rule_class(new_class));
-        node.classes.push_back(new_class);
-        new_class.~Class();
-    }
+    while (terminal(tokenClass))
+        emplace_back_and_assert_rule(node.classes, rule_class);
 
     assert_terminal_succ(tokenMain);
-    assert_terminal(tokenIdentifier);
-    node.main = current_token;
-    next_token();
+    assert_and_save_identifier(node.main);
 
-    while (terminal(tokenClass)) {
-        assert_rule(rule_class(new_class));
-        node.classes.push_back(new_class);
-        new_class.~Class();
-    }
+    while (terminal(tokenClass))
+        emplace_back_and_assert_rule(node.classes, rule_class);
 
+    assert_terminal(tokenEOF);
     return SUCCESS;
 }
 
@@ -33,6 +25,7 @@ int SyntaxAnalyzer::rule_class(ast::Class &node) {
     if (terminal(tokenObject)) {
         emplace_and_assert_rule(node.object, rule_objectnet)
     }
+    assert_terminal_neg(tokenObject);
 
     while (any_terminal(tokenMethod, tokenConstructor, tokenSync)) {
         terminal_switch() {
@@ -87,6 +80,23 @@ int SyntaxAnalyzer::rule_constructor(ast::Constructor &node) {
 int SyntaxAnalyzer::rule_sync(ast::SynPort &node) {
     assert_terminal_succ(tokenSync);
     assert_rule(rule_message(node.message));
+
+    if (terminal(tokenCond))
+        emplace_and_assert_rule(node.conditions, rule_cond);
+    assert_terminal_neg(tokenCond);
+
+    if (terminal(tokenPrecond))
+        emplace_and_assert_rule(node.pre_conditions, rule_precond);
+    assert_terminal_neg(tokenPrecond);
+
+    if (terminal(tokenGuard))
+        emplace_and_assert_rule(node.guard, rule_guard);
+    assert_terminal_neg(tokenGuard);
+
+    if (terminal(tokenPostcond))
+        emplace_and_assert_rule(node.post_contitions, rule_postcond);
+    assert_terminal_neg(tokenPostcond);
+
     return SUCCESS;
 }
 
@@ -99,16 +109,17 @@ int SyntaxAnalyzer::rule_message(ast::Message &node) {
         return SUCCESS;
     }
 
-    if (forward_check(tokenIdentifier, tokenIdentifier)) {
-        while (forward_check(tokenIdentifier, tokenIdentifier)) {
-            node.keys.emplace_back();
-            assert_and_save_identifier(node.keys.rbegin()->first);
-            assert_and_save_identifier(node.keys.rbegin()->second);
-        }
+    if (!forward_check(tokenIdentifier, tokenColon, tokenIdentifier)) {
+        assert_and_save_identifier(node.method);
         return SUCCESS;
     }
 
-    assert_and_save_identifier(node.method);
+    while (forward_check(tokenIdentifier, tokenColon, tokenIdentifier)) {
+        node.keys.emplace_back();
+        assert_and_save_identifier(node.keys.rbegin()->first);
+        assert_terminal_succ(tokenColon);
+        assert_and_save_identifier(node.keys.rbegin()->second);
+    }
     return SUCCESS;
 }
 
@@ -152,7 +163,12 @@ int SyntaxAnalyzer::rule_init(ast::Init &node) {
 }
 
 int SyntaxAnalyzer::rule_initaction(ast::InitAction &node) {
-    /*TODO*/
+
+    if (terminal(tokenOr))
+        assert_rule(rule_temps(node.temporaries));
+
+    assert_rule(expressionAnalyzer.analyze_expression(node.expr));
+
     return SUCCESS;
 }
 
@@ -162,14 +178,23 @@ int SyntaxAnalyzer::rule_transition(ast::Transition &node) {
 
     if (terminal(tokenCond))
         emplace_and_assert_rule(node.conditions, rule_cond);
+    assert_terminal_neg(tokenCond);
+
     if (terminal(tokenPrecond))
         emplace_and_assert_rule(node.pre_conditions, rule_precond);
+    assert_terminal_neg(tokenPrecond);
+
     if (terminal(tokenGuard))
         emplace_and_assert_rule(node.guard, rule_guard);
+    assert_terminal_neg(tokenGuard);
+
     if (terminal(tokenAction))
         emplace_and_assert_rule(node.action, rule_action);
+    assert_terminal_neg(tokenAction);
+
     if (terminal(tokenPostcond))
         emplace_and_assert_rule(node.post_contitions, rule_postcond);
+    assert_terminal_neg(tokenPostcond);
 
     return SUCCESS;
 }
@@ -224,21 +249,33 @@ int SyntaxAnalyzer::rule_postcond(ast::PostCondition &node) {
 }
 
 int SyntaxAnalyzer::rule_guard(ast::Guard &node) {
-    return SUCCESS;
     assert_terminal_succ(tokenGuard);
 
     assert_terminal_succ(tokenLeftCurlyBracket);
-    /*TODO*/
+    assert_rule(expressionAnalyzer.analyze_expression(node.expr));
     assert_terminal_succ(tokenRightCurlyBracket);
     return SUCCESS;
 }
 
 int SyntaxAnalyzer::rule_action(ast::Action &node) {
-    return SUCCESS;
     assert_terminal_succ(tokenAction);
 
     assert_terminal_succ(tokenLeftCurlyBracket);
-    /*TODO*/
+    if (terminal(tokenOr))
+        assert_rule(rule_temps(node.temporaries));
+    assert_rule(expressionAnalyzer.analyze_expression(node.expr));
     assert_terminal_succ(tokenRightCurlyBracket);
+    return SUCCESS;
+}
+
+int SyntaxAnalyzer::rule_temps(std::vector<Token> &array) {
+    assert_terminal_succ(tokenOr);
+
+    while (terminal(tokenIdentifier)) {
+        array.push_back(tokenStack.get());
+        assert_terminal_succ(tokenIdentifier);
+    }
+
+    assert_terminal_succ(tokenOr);
     return SUCCESS;
 }

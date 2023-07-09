@@ -1,19 +1,20 @@
 #pragma once
 
+#include "expressions.h"
 #include "file.h"
 #include "logger.h"
 #include "syntax_tree.h"
 
 class SyntaxAnalyzer {
   public:
-    SyntaxAnalyzer();
+    SyntaxAnalyzer(TokenStackIterator &);
 
-    ast::Classes analyze(TokenStack &);
+    ast::Classes &root();
 
   private:
-    // File *file;
-    TokenStack *tokenStack;
-    void next_token();
+    ast::Classes tree;
+    TokenStackIterator &tokenStack;
+    ExpressionSyntaxAnalyzer expressionAnalyzer;
 
     bool terminal(TokenType);
     bool any_terminal_fun(const std::vector<TokenType> &first);
@@ -46,31 +47,5 @@ class SyntaxAnalyzer {
     int rule_multiset_term(ast::MultiSetTerm &);
     int rule_multiset_list(ast::MultiSetTerm::MultiSetList &);
 
-    int rule_n();
-    int rule_c();
-    int rule_list();
-    int rule_temps();
-    int rule_unit();
-    int rule_unaryexpr();
-    int rule_primary();
-    int rule_exprs();
-    int rule_expr();
-    int rule_expr2();
-    int rule_expr3();
-    int rule_keymsg();
-    int rule_keysel();
-    int rule_literal();
-    int rule_arrayconst();
-    int rule_array();
-    int rule_number();
-    int rule_string();
-    int rule_charconst();
-    int rule_symconst();
-    int rule_symbol();
-    int rule_id();
-    int rule_selchar();
-    int rule_hexDig();
-    int rule_dig();
-    int rule_letter();
-    int rule_char();
+    int rule_temps(std::vector<Token> &);
 };

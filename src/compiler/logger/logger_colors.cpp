@@ -14,6 +14,7 @@ std::string command(std::string command) {
         fgets(buffer, BUFSIZ, out);
         result.append(buffer);
     }
+    pclose(out);
 
     return result;
 }

@@ -2,12 +2,6 @@
 #include <iostream>
 
 Token::Token(const FilePosition &_pos) : pos(_pos) {
-    this->type = tokenNone;
-    this->next = nullptr;
-    this->prev = nullptr;
-}
-
-Token::Token(const Token &_token) : type(_token.type), prev(_token.prev), next(_token.next), text(_token.text), payload(_token.payload), pos(_token.pos) {
 }
 
 Token::~Token() {
@@ -71,6 +65,7 @@ std::string Token::type_string(TokenType type) {
         CASE(tokenDot);
         CASE(tokenComma);
         CASE(tokenColon);
+        CASE(tokenSemicolon);
         CASE(tokenAssign);
         CASE(tokenBacktick);
         CASE(tokenMain);
