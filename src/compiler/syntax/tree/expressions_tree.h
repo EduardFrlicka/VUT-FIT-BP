@@ -17,26 +17,36 @@ class ExpressionUnary;
 class ExpressionBinary;
 class ExpressionKeyWord;
 class Assgiment;
+class Bracket;
+class CodeBlock;
+class ConstArray;
 
-typedef std::variant<ExpressionPair, CascadeUnary, CascadeBinary, CascadeKeyWord, ExpressionIdentifier, ExpressionValue, ExpressionUnary, ExpressionBinary, ExpressionKeyWord, Assgiment> ExprVal;
+typedef std::variant<ExpressionPair, CascadeUnary, CascadeBinary, CascadeKeyWord, ExpressionIdentifier, ExpressionValue, ExpressionUnary, ExpressionBinary, ExpressionKeyWord, Assgiment, Bracket,
+                     CodeBlock, ConstArray>
+    ExprVal;
 
 class Expression : public Base {
   public:
     Expression();
     // Expression(const Expression &);
-    Expression(const ExpressionPair &);
-    Expression(const CascadeUnary &);
-    Expression(const CascadeBinary &);
-    Expression(const CascadeKeyWord &);
-    Expression(const ExpressionIdentifier &);
-    Expression(const ExpressionValue &);
-    Expression(const ExpressionUnary &);
-    Expression(const ExpressionBinary &);
-    Expression(const ExpressionKeyWord &);
-    Expression(const Assgiment &);
+    Expression(const ExpressionPair &, TokenStackIterator, TokenStackIterator);
+    Expression(const CascadeUnary &, TokenStackIterator, TokenStackIterator);
+    Expression(const CascadeBinary &, TokenStackIterator, TokenStackIterator);
+    Expression(const CascadeKeyWord &, TokenStackIterator, TokenStackIterator);
+    Expression(const ExpressionIdentifier &, TokenStackIterator);
+    Expression(const ExpressionValue &, TokenStackIterator);
+    Expression(const ExpressionUnary &, TokenStackIterator, TokenStackIterator);
+    Expression(const ExpressionBinary &, TokenStackIterator, TokenStackIterator);
+    Expression(const ExpressionKeyWord &, TokenStackIterator, TokenStackIterator);
+    Expression(const Assgiment &, TokenStackIterator, TokenStackIterator);
+    Expression(const Bracket &, TokenStackIterator, TokenStackIterator);
+    Expression(const CodeBlock &, TokenStackIterator, TokenStackIterator);
+    Expression(const ConstArray &, TokenStackIterator, TokenStackIterator);
 
     std::shared_ptr<ExprVal> value;
-    void print(int indent = 0);
+    bool isprimary() const;
+    bool issecundary() const;
+    void print(int indent = 0) const;
 };
 
 class ExpressionPair : public Base {
@@ -118,6 +128,32 @@ class Assgiment : public Base {
     Assgiment(const Token &, const Expression &);
     Token target;
     Expression value;
+    void print(int indent = 0);
+};
+
+class Bracket : public Base {
+  public:
+    Bracket(const Expression &);
+    Expression expr;
+    void print(int indent = 0);
+};
+
+class CodeBlock : public Base {
+  public:
+    CodeBlock(const std::deque<Token> &, const std::deque<Token> &, const Expression &);
+
+    std::deque<Token> arguments;
+    std::deque<Token> temps;
+    Expression expr;
+
+    void print(int indent = 0);
+};
+
+class ConstArray : public Base {
+  public:
+    ConstArray(const std::deque<Token>&);
+
+    std::deque<Token> elements;
     void print(int indent = 0);
 };
 

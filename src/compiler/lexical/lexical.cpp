@@ -1,5 +1,5 @@
 #include "lexical.h"
-#include "error.h"
+#include "error_printer.h"
 #include "messages.h"
 #include "return_values.h"
 #include <iostream>
@@ -78,7 +78,6 @@ void LexicalAnalyzer::push_eof() {
 int LexicalAnalyzer::start(int c) {
     if (isdigit(c)) {
 
-        token.payload.numberInit();
         stateNumber(c);
         return SUCCESS;
     }
@@ -211,9 +210,14 @@ int LexicalAnalyzer::end(int c) {
     switch (token.type) {
     case tokenIdentifier:
         checkKeyword();
+        if (token.type == tokenIdentifier)
+            token.payload.id = BasicIdentifier(token.text);
         break;
 
-    case tokenNumber:
+    case tokenInteger:
+        token.payload.number.convert();
+        break;
+    case tokenFloat:
         token.payload.number.convert();
         break;
     default:

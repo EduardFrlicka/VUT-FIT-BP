@@ -1,5 +1,5 @@
-#include "rule_frame.h"
 #include "syntax.h"
+#include "syntax_rule_frame.h"
 #include <iostream>
 
 int SyntaxAnalyzer::rule_multiset(ast::MultiSet &node) {
@@ -14,7 +14,7 @@ int SyntaxAnalyzer::rule_multiset(ast::MultiSet &node) {
 }
 
 int SyntaxAnalyzer::rule_multiset_elem(ast::MultiSetElem &node) {
-    if (forward_check(tokenNumber, tokenBacktick) || forward_check(tokenIdentifier, tokenBacktick)) {
+    if (forward_check(tokenInteger, tokenBacktick) || forward_check(tokenIdentifier, tokenBacktick)) {
         node.count = current_token;
         tokenStack.succ(); /* skipping ( number | identifier )*/
         assert_terminal_succ(tokenBacktick);
@@ -29,7 +29,7 @@ int SyntaxAnalyzer::rule_multiset_term(ast::MultiSetTerm &node) {
         return SUCCESS;
     }
 
-    if (!any_terminal(tokenIdentifier, tokenChar, tokenNumber, tokenIdentifier, tokenSymbol, tokenString, ))
+    if (!terminal(tokenIdentifier) && !tokenStack.get().isliteral())
         assert_terminal(tokenIdentifier); /* asserting one of checked, to raise error */
 
     node.value = current_token;
@@ -58,9 +58,7 @@ int SyntaxAnalyzer::rule_multiset_list(ast::MultiSetTerm::MultiSetList &node) {
         assert_terminal_succ(tokenOr);
         assert_and_save_identifier(node.tail);
     }
-
     assert_terminal_succ(tokenRightRoundBracket);
 
     return SUCCESS;
 }
-

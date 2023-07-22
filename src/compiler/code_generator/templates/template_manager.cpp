@@ -1,4 +1,4 @@
-#include "error.h"
+#include "error_printer.h"
 #include "logger.h"
 #include "template.h"
 #include <iostream>
@@ -9,28 +9,6 @@ using std::string;
 using namespace std::filesystem;
 
 CodeTemplateManager::CodeTemplateManager(const std::filesystem::path &dir_path) {
-    initialize(dir_path);
-}
-
-CodeTemplateManager::CodeTemplateManager(string const &path_str) {
-    path dir_path(path_str);
-    initialize(dir_path);
-}
-
-CodeTemplateManager::CodeTemplateManager(const char *path_str) {
-    path dir_path(path_str);
-    initialize(dir_path);
-}
-
-CodeTemplate CodeTemplateManager::get(const std::string name) {
-    std::map<std::string, CodeTemplate>::iterator res = raw_templates.find(name);
-    if (res == raw_templates.end())
-        internal_error("Unknown template: %s", name.c_str());
-
-    return (*res).second;
-}
-
-void CodeTemplateManager::initialize(const std::filesystem::path &dir_path) {
     recursive_directory_iterator dir_contents(dir_path);
     string templ_name;
     CodeTemplate templ;
@@ -52,8 +30,19 @@ void CodeTemplateManager::initialize(const std::filesystem::path &dir_path) {
         templ_name = template_name(file.path(), dir_path);
         templ = CodeTemplate(file);
 
-        raw_templates.insert(std::pair<string, CodeTemplate>(templ_name, templ));
+        templates.insert(std::pair<string, CodeTemplate>(templ_name, templ));
     }
+}
+
+CodeTemplate CodeTemplateManager::get(const std::string name) {
+    std::map<std::string, CodeTemplate>::iterator res = templates.find(name);
+    if (res == templates.end())
+        internal_error("Missing template: %s", name.c_str());
+
+    return (*res).second;
+}
+
+void CodeTemplateManager::initialize(const std::filesystem::path &dir_path) {
 }
 
 path CodeTemplateManager::template_name(const std::filesystem::path &template_path, const std::filesystem::path &root_path) {

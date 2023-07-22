@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fstream>
+#include <iostream>
 #include <regex>
 #include <set>
 #include <string>
@@ -12,6 +14,7 @@ class Code {
   public:
     Code();
     Code(const std::string &);
+    Code(std::ifstream);
     Code(const std::string &, const std::set<std::string> &);
     // ~Code();
 
@@ -27,6 +30,8 @@ class Code {
     void append(Code);
     void append(std::vector<Code>);
 
+    bool isEmpty();
+
   private:
 };
 
@@ -38,6 +43,8 @@ class CodeFiles {
     bool contain_file(const std::string &);
 
   public:
+    CodeFiles();
+    CodeFiles(const std::map<std::string, Code> &);
     CodeFiles(const std::map<std::string, Code> &, const Code &);
     CodeFiles combine(const std::map<std::string, CodeFiles> &);
     CodeFiles combine(const std::string &, const CodeFiles &);

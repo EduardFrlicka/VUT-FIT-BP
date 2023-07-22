@@ -1,3 +1,4 @@
+#pragma once
 #include "code.h"
 #include <filesystem>
 #include <map>
@@ -8,12 +9,10 @@ class CodeTemplate;
 
 class CodeTemplateManager {
   private:
-    std::map<std::string, CodeTemplate> raw_templates;
+    std::map<std::string, CodeTemplate> templates;
 
   public:
     CodeTemplateManager(const std::filesystem::path &);
-    CodeTemplateManager(const std::string &);
-    CodeTemplateManager(const char *);
 
     CodeTemplate get(const std::string);
 

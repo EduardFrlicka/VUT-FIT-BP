@@ -1,4 +1,4 @@
-#include "error.h"
+#include "error_printer.h"
 #include "expressions.h"
 #include <iostream>
 
@@ -14,14 +14,19 @@ PrecedenceTable::PrecedenceTable() {
 
 ExprType from_token(const Token &token) {
     switch (token.type) {
-
     case tokenIdentifier:
         return ExprType::_id;
-    case tokenNumber:
-    case tokenString:
+
     case tokenChar:
+    case tokenFloat:
+    case tokenInteger:
     case tokenSymbol:
+    case tokenString:
+    case tokenTrue:
+    case tokenFalse:
+    case tokenNil:
         return ExprType::_literal;
+
     case tokenLeftRoundBracket:
         return ExprType::_leftBracket;
     case tokenRightRoundBracket:
@@ -34,6 +39,10 @@ ExprType from_token(const Token &token) {
         return ExprType::_assigment;
     case tokenColon:
         return ExprType::_colom;
+    case tokenLeftSquareBracket:
+        return ExprType::_leftBlock;
+    case tokenHash:
+        return ExprType::_hash;
     case tokenAdd:
         return ExprType::_add;
     case tokenSub:

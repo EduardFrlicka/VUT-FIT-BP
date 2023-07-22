@@ -13,5 +13,6 @@
 
 #define ERR_LEXICAL 20
 #define ERR_SYNTAX 30
+#define ERR_SEMANTIC 40
 
 #endif /* RETURN_VALUES_H */

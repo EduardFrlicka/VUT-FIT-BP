@@ -4,8 +4,11 @@
 
 class Arguments {
   public:
-    std::string target_dir = "build";
-    std::string target_bin = "binary";
+    std::string target_dir;
+    std::string target_bin;
+
+    std::string compiler_templates_path;
+    std::string static_templates_path;
 
     std::vector<std::string> sources;
 

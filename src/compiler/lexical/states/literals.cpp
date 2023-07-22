@@ -3,7 +3,7 @@
 
 int LexicalAnalyzer::stateNumber(int c) {
     nextState = &LexicalAnalyzer::end;
-    token.type = tokenNumber;
+    token.type = tokenInteger;
 
     if (c == 'r') {
         token.payload.number.convertRadix();
@@ -29,7 +29,7 @@ int LexicalAnalyzer::stateNumber(int c) {
 
 int LexicalAnalyzer::stateNumberR(int c) {
     nextState = &LexicalAnalyzer::end;
-    token.type = tokenNumber;
+    token.type = tokenInteger;
 
     if (c == 'e')
         nextState = &LexicalAnalyzer::stateNumberE;
@@ -49,6 +49,7 @@ int LexicalAnalyzer::stateNumberR(int c) {
 
 int LexicalAnalyzer::stateNumberDot(int c) {
     int c2;
+    token.type = tokenFloat;
     nextState = &LexicalAnalyzer::end;
 
     if (c == '.') {
@@ -72,6 +73,7 @@ int LexicalAnalyzer::stateNumberDot(int c) {
 }
 
 int LexicalAnalyzer::stateNumberE(int c) {
+    token.type = tokenFloat;
     nextState = &LexicalAnalyzer::end;
 
     if (isdigit(c)) {

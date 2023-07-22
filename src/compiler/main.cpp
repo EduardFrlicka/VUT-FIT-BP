@@ -1,6 +1,8 @@
 #include "arguments.h"
+#include "generator.h"
 #include "lexical.h"
 #include "return_values.h"
+#include "semantic.h"
 #include "syntax.h"
 #include <stdio.h>
 
@@ -21,13 +23,13 @@ int main(int argc, char *argv[]) {
 
     auto lex_analyzer = LexicalAnalyzer(args.sources);
 
-    auto tokenstack = lex_analyzer.begin();
+    auto syn_analyzer = SyntaxAnalyzer(lex_analyzer.begin());
 
-    auto syn_analyzer = SyntaxAnalyzer(tokenstack);
+    auto sem_analyzer = SemanticAnalyzer(syn_analyzer.root());
 
-    ast::Classes &syn_tree = syn_analyzer.root();
+    auto code_generator = CodeGenerator(syn_analyzer.root());
 
-    syn_tree.print();
+    // syn_analyzer.root().print();
 
     return SUCCESS;
 }

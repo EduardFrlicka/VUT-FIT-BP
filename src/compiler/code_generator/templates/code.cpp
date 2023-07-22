@@ -1,9 +1,8 @@
 #include "code.h"
 #include "regex_constructor.h"
-#include <iostream>
 #include <regex>
 #include <sstream>
-// #include <stdio.h>
+#include <streambuf>
 
 using namespace std;
 
@@ -21,6 +20,9 @@ Code::Code(const string &_code) {
         include.insert((*i)[1].str());
 
     code = regex_replace(tmp, include_regex, "");
+}
+
+Code::Code(std::ifstream filestream) : Code(string(istreambuf_iterator<char>(filestream), istreambuf_iterator<char>())) {
 }
 
 Code::Code(const string &_code, const set<string> &_include = {}) : code(_code), include(_include) {
@@ -84,6 +86,10 @@ void Code::append(std::vector<Code> to_append_vector) {
         include.merge(to_append.include);
         code.append(to_append.code);
     }
+}
+
+bool Code::isEmpty() {
+    return code.empty() && include.empty();
 }
 
 string Code::to_string() {

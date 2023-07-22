@@ -1,9 +1,37 @@
 #include "expressions_tree.h"
-#include "error.h"
+#include "error_printer.h"
 #include <iostream>
 #include <map>
 
-void AbstractSyntaxTree::Expression::print(int indent) {
+bool AbstractSyntaxTree::Expression::isprimary() const {
+    switch (value->index()) {
+    case 4:
+    case 5:
+    case 6:
+    case 10:
+        return true;
+    case 11:
+        break;
+    }
+    return false;
+}
+
+bool AbstractSyntaxTree::Expression::issecundary() const {
+    switch (value->index()) {
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+    case 10:
+        return true;
+    case 11:
+        break;
+    }
+    return false;
+}
+
+void AbstractSyntaxTree::Expression::print(int indent) const {
     if (indent) {
         print_indent(indent);
         std::cout << "<Expression>: ";
@@ -43,6 +71,15 @@ void AbstractSyntaxTree::Expression::print(int indent) {
         break;
     case 9:
         std::get<Assgiment>(*value).print();
+        break;
+    case 10:
+        std::get<Bracket>(*value).print();
+        break;
+    case 11:
+        std::get<CodeBlock>(*value).print();
+        break;
+    case 12:
+        std::get<ConstArray>(*value).print();
         break;
     }
 
@@ -141,40 +178,113 @@ void AbstractSyntaxTree::Assgiment::print(int indent) {
     value.print();
 }
 
+AbstractSyntaxTree::Bracket::Bracket(const Expression &_expr) : expr(_expr) {
+}
+
+void AbstractSyntaxTree::Bracket::print(int indent) {
+    std::cout << "(";
+    expr.print();
+    std::cout << ")";
+}
+
+AbstractSyntaxTree::CodeBlock::CodeBlock(const std::deque<Token> &_arguments, const std::deque<Token> &_temps, const Expression &_expr) : arguments(_arguments), temps(_temps), expr(_expr) {
+}
+
+void AbstractSyntaxTree::CodeBlock::print(int indent) {
+    std::cout << "[";
+
+    for (auto i : arguments)
+        std::cout << ":" << i.text << " ";
+    std::cout << "|";
+
+    for (auto i : temps)
+        std::cout << i.text << " ";
+    std::cout << "|";
+
+    expr.print();
+    std::cout << "]";
+}
+
+AbstractSyntaxTree::ConstArray::ConstArray(const std::deque<Token> &_values) : elements(_values) {
+}
+
+void AbstractSyntaxTree::ConstArray::print(int indent) {
+    std::cout << "#(";
+
+    for (auto i : elements)
+        i.print();
+    std::cout << ")";
+}
+
 AbstractSyntaxTree::Expression::Expression() {
 }
 
-// AbstractSyntaxTree::Expression::Expression(const Expression &other) : value(other.value) {
-// }
-
-AbstractSyntaxTree::Expression::Expression(const ExpressionPair &val) {
+AbstractSyntaxTree::Expression::Expression(const ExpressionPair &val, TokenStackIterator _begin, TokenStackIterator _end) {
+    begin = _begin;
+    end = _end;
     value = std::make_shared<ExprVal>(ExprVal(val));
 }
 
-AbstractSyntaxTree::Expression::Expression(const CascadeUnary &val) {
+AbstractSyntaxTree::Expression::Expression(const CascadeUnary &val, TokenStackIterator _begin, TokenStackIterator _end) {
+    begin = _begin;
+    end = _end;
     value = std::make_shared<ExprVal>(ExprVal(val));
 }
-AbstractSyntaxTree::Expression::Expression(const CascadeBinary &val) {
+AbstractSyntaxTree::Expression::Expression(const CascadeBinary &val, TokenStackIterator _begin, TokenStackIterator _end) {
+    begin = _begin;
+    end = _end;
     value = std::make_shared<ExprVal>(ExprVal(val));
 }
-AbstractSyntaxTree::Expression::Expression(const CascadeKeyWord &val) {
+AbstractSyntaxTree::Expression::Expression(const CascadeKeyWord &val, TokenStackIterator _begin, TokenStackIterator _end) {
+    begin = _begin;
+    end = _end;
     value = std::make_shared<ExprVal>(ExprVal(val));
 }
-AbstractSyntaxTree::Expression::Expression(const ExpressionIdentifier &val) {
+AbstractSyntaxTree::Expression::Expression(const ExpressionIdentifier &val, TokenStackIterator it) {
+    begin = it;
+    end = it;
     value = std::make_shared<ExprVal>(ExprVal(val));
 }
-AbstractSyntaxTree::Expression::Expression(const ExpressionValue &val) {
+AbstractSyntaxTree::Expression::Expression(const ExpressionValue &val, TokenStackIterator it) {
+    begin = it;
+    end = it;
     value = std::make_shared<ExprVal>(ExprVal(val));
 }
-AbstractSyntaxTree::Expression::Expression(const ExpressionUnary &val) {
+AbstractSyntaxTree::Expression::Expression(const ExpressionUnary &val, TokenStackIterator _begin, TokenStackIterator _end) {
+    begin = _begin;
+    end = _end;
     value = std::make_shared<ExprVal>(ExprVal(val));
 }
-AbstractSyntaxTree::Expression::Expression(const ExpressionBinary &val) {
+AbstractSyntaxTree::Expression::Expression(const ExpressionBinary &val, TokenStackIterator _begin, TokenStackIterator _end) {
+    begin = _begin;
+    end = _end;
     value = std::make_shared<ExprVal>(ExprVal(val));
 }
-AbstractSyntaxTree::Expression::Expression(const ExpressionKeyWord &val) {
+AbstractSyntaxTree::Expression::Expression(const ExpressionKeyWord &val, TokenStackIterator _begin, TokenStackIterator _end) {
+    begin = _begin;
+    end = _end;
     value = std::make_shared<ExprVal>(ExprVal(val));
 }
-AbstractSyntaxTree::Expression::Expression(const Assgiment &val) {
+AbstractSyntaxTree::Expression::Expression(const Assgiment &val, TokenStackIterator _begin, TokenStackIterator _end) {
+    begin = _begin;
+    end = _end;
+    value = std::make_shared<ExprVal>(ExprVal(val));
+}
+
+AbstractSyntaxTree::Expression::Expression(const Bracket &val, TokenStackIterator _begin, TokenStackIterator _end) {
+    begin = _begin;
+    end = _end;
+    value = std::make_shared<ExprVal>(ExprVal(val));
+}
+
+AbstractSyntaxTree::Expression::Expression(const CodeBlock &val, TokenStackIterator _begin, TokenStackIterator _end) {
+    begin = _begin;
+    end = _end;
+    value = std::make_shared<ExprVal>(ExprVal(val));
+}
+
+AbstractSyntaxTree::Expression::Expression(const ConstArray &val, TokenStackIterator _begin, TokenStackIterator _end) {
+    begin = _begin;
+    end = _end;
     value = std::make_shared<ExprVal>(ExprVal(val));
 }

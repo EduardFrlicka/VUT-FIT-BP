@@ -1,6 +1,15 @@
 #include "lexical.h"
 #include "return_values.h"
 
+int LexicalAnalyzer::stateHash(int c) {
+    nextState = &LexicalAnalyzer::end;
+    token.type = tokenHash;
+    if (isalpha(c))
+        nextState = &LexicalAnalyzer::stateSymbol;
+
+    return SUCCESS;
+}
+
 int LexicalAnalyzer::stateDot(int) {
     nextState = &LexicalAnalyzer::end;
     token.type = tokenDot;

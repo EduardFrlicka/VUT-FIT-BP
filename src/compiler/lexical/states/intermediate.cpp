@@ -53,16 +53,7 @@ int LexicalAnalyzer::stateDollar(int c) {
     return SUCCESS;
 }
 
-int LexicalAnalyzer::stateHash(int c) {
-    EOFCHECK(c);
-    EOLCHECK(c);
 
-    if (!isalpha(c)) {
-        logger.c_error(token, MSG_LEX_UNEXPECTED_CHAR, c);
-    }
-    nextState = &LexicalAnalyzer::stateSymbol;
-    return SUCCESS;
-}
 
 int LexicalAnalyzer::stateStringOpen(int c) {
     EOFCHECK(c);

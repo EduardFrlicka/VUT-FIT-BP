@@ -1,5 +1,6 @@
 #pragma once
 
+#include "basic_identifier.h"
 #include "file_position.h"
 #include <deque>
 #include <stack>
@@ -11,13 +12,18 @@ typedef enum {
     tokenEOL,
     tokenEOF,
 
+    tokenIdentifier,
+
     /* literals */
 
     tokenChar,
-    tokenNumber,
-    tokenIdentifier,
+    tokenFloat,
+    tokenInteger,
     tokenSymbol,
     tokenString,
+    tokenTrue,
+    tokenFalse,
+    tokenNil,
 
     /* brackets */
 
@@ -55,6 +61,7 @@ typedef enum {
     tokenSemicolon,
     tokenAssign,
     tokenBacktick,
+    tokenHash,
 
     /* Keywords */
 
@@ -100,14 +107,9 @@ class TokenPayloadNumber {
     std::string toString();
 };
 
-class TokenPayload {
-  public:
+struct TokenPayload {
     TokenPayloadNumber number;
-
-    void numberInit();
-
-  private:
-    TokenPayloadType type;
+    BasicIdentifier id;
 };
 
 class Token;
@@ -117,7 +119,7 @@ class TokenStackIterator {
 
   public:
     TokenStackIterator();
-    TokenStackIterator(std::deque<Token>&);
+    TokenStackIterator(std::deque<Token> &);
 
     std::deque<Token>::iterator it;
     std::deque<Token>::iterator _begin;
@@ -153,7 +155,7 @@ class Token {
     std::string type_string();
     static std::string type_string(TokenType);
     bool isspace();
+    bool isliteral();
 
-    void print();
+    void print() const;
 };
-

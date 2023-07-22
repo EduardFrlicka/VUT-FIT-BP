@@ -1,13 +1,16 @@
 #pragma once
+#include "token.h"
 
 namespace AbstractSyntaxTree {
 
 class Base {
   public:
-    virtual void print(int indent = 0);
+    TokenStackIterator begin;
+    TokenStackIterator end;
+    virtual void print(int indent = 0) const;
 
   protected:
-    void print_indent(int);
+    void print_indent(int) const;
 };
 } // namespace AbstractSyntaxTree
 

@@ -55,7 +55,7 @@ class ExpressionSyntaxAnalyzer {
   private:
     PrecedenceTable table;
     ExpressionStack stack;
-    TokenStackIterator &token_stack;
+    TokenStackIterator &tokenStack;
     int reduce();
 
     void reduce_expression_concat();
@@ -71,6 +71,13 @@ class ExpressionSyntaxAnalyzer {
     void reduce_keyword_message();
     void reduce_assigment();
 
+    int array_const();
+    int code_block();
+
+    bool terminal(TokenType);
+    bool forward_check_fun(const std::vector<TokenType> &);
+    bool any_terminal_fun(const std::vector<TokenType> &);
+
   public:
     ExpressionSyntaxAnalyzer(TokenStackIterator &);
     int analyze_expression(ast::Expression &);
@@ -80,6 +87,7 @@ enum class Precedence {
     Push,
     PushStop,
     Reduce,
+    Function,
     Error,
     End,
 };
@@ -97,6 +105,8 @@ enum class ExprType {
     _semicolom,
     _assigment,
     _colom,
+    _leftBlock,
+    _hash,
     _add,
     _sub,
     _mul,

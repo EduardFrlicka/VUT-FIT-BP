@@ -1,4 +1,5 @@
 #include "expressions.h"
+#include "iostream"
 #include "logger.h"
 #include "messages.h"
 #include "return_values.h"
@@ -28,7 +29,35 @@ reduction rules:
 precedence table
 */
 
-ExpressionSyntaxAnalyzer::ExpressionSyntaxAnalyzer(TokenStackIterator &_token_stack) : token_stack(_token_stack) {
+bool ExpressionSyntaxAnalyzer::terminal(TokenType type) {
+    if (tokenStack.end())
+        return false;
+    return tokenStack.get().type == type;
+}
+
+bool ExpressionSyntaxAnalyzer::forward_check_fun(const std::vector<TokenType> &types) {
+    std::vector<TokenType>::const_iterator type;
+    tokenStack.stash_push();
+    type = types.begin();
+
+    while (type != types.end() && terminal(*type)) {
+        tokenStack.succ();
+        type++;
+    }
+    tokenStack.stash_pop();
+
+    return type == types.end();
+}
+
+bool ExpressionSyntaxAnalyzer::any_terminal_fun(const std::vector<TokenType> &types) {
+    for (auto type : types)
+        if (terminal(type))
+            return true;
+
+    return false;
+}
+
+ExpressionSyntaxAnalyzer::ExpressionSyntaxAnalyzer(TokenStackIterator &_token_stack) : tokenStack(_token_stack) {
 }
 
 int ExpressionSyntaxAnalyzer::reduce() {
@@ -120,51 +149,57 @@ int ExpressionSyntaxAnalyzer::reduce() {
         return SUCCESS;
     }
 
-    logger.c_error(token_stack.get(), MSG_SYN_UNEXPECTED_TOKEN);
+    logger.c_error(tokenStack.get(), MSG_SYN_UNEXPECTED_TOKEN);
     stack.print();
     return ERR_SYNTAX;
 }
 
 int ExpressionSyntaxAnalyzer::analyze_expression(ast::Expression &result) {
-    int res;
+    int res = SUCCESS;
     stack.reset();
 
     for (;;) {
-        switch (table.get(stack.top(), token_stack.get(), token_stack.get(1))) {
+        switch (table.get(stack.top(), tokenStack.get(), tokenStack.get(1))) {
 
         case Precedence::Push:
-            stack.push(token_stack.get());
-            token_stack.succ();
+            stack.push(tokenStack.get());
+            tokenStack.succ();
             break;
 
         case Precedence::PushStop:
             stack.push_stop();
-            stack.push(token_stack.get());
-            token_stack.succ();
+            stack.push(tokenStack.get());
+            tokenStack.succ();
             break;
 
         case Precedence::Reduce:
             res = reduce();
-            if (res)
-                return res;
+            break;
+
+        case Precedence::Function:
+            if (tokenStack.get().type == tokenLeftSquareBracket)
+                res = code_block();
+
+            if (tokenStack.get().type == tokenHash && tokenStack.get(1).type == tokenLeftRoundBracket)
+                res = array_const();
+
             break;
 
         case Precedence::Error:
-            logger.c_error(token_stack.get(), MSG_SYN_UNEXPECTED_TOKEN);
-            break;
+            logger.c_error(tokenStack.get(), MSG_SYN_UNEXPECTED_TOKEN);
+            return ERR_SYNTAX;
 
         case Precedence::End:
-            if (stack.top_elem().type == ExprType::_Expr) {
-                result = std::get<ast::Expression>(stack.top_elem().value);
-                return SUCCESS;
-            } else {
-                logger.c_error(token_stack.get(), MSG_SYN_NO_EXPRESSION);
+            if (stack.top_elem().type != ExprType::_Expr) {
+                logger.c_error(tokenStack.get(), MSG_SYN_NO_EXPRESSION);
+                return ERR_SYNTAX;
             }
-            break;
+            result = std::get<ast::Expression>(stack.top_elem().value);
 
-        default:
-            break;
+            return SUCCESS;
         }
+        if (res)
+            return res;
     }
     return SUCCESS;
 }

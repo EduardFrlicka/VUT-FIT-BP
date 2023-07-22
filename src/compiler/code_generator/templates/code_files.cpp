@@ -4,6 +4,13 @@
 
 using namespace std;
 
+CodeFiles::CodeFiles() {
+}
+
+CodeFiles::CodeFiles(const std::map<std::string, Code> &input_map) {
+    code_files.insert(input_map.begin(), input_map.end());
+}
+
 CodeFiles::CodeFiles(const std::map<std::string, Code> &input_map, const Code &_free_code) : free_code(_free_code) {
     code_files.insert(input_map.begin(), input_map.end());
 }

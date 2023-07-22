@@ -14,11 +14,6 @@ int hex2int(char c) {
     return -1;
 }
 
-void TokenPayload::numberInit() {
-    number = TokenPayloadNumber();
-    type = tokenPayloadNum;
-}
-
 bool TokenPayloadNumber::isdigit(int c) {
     if (!isalnum(c))
         return false;

@@ -3,7 +3,7 @@
 #include "return_values.h"
 #include <cstdarg>
 
-SyntaxAnalyzer::SyntaxAnalyzer(TokenStackIterator &_tokenStack) : tokenStack(_tokenStack), expressionAnalyzer(_tokenStack) {
+SyntaxAnalyzer::SyntaxAnalyzer(const TokenStackIterator &_tokenStack) : tokenStack(_tokenStack), expressionAnalyzer(tokenStack) {
     int res;
 
     if ((res = rule_classes(tree))) {

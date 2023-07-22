@@ -18,6 +18,24 @@ bool Token::isspace() {
     }
 }
 
+bool Token::isliteral() {
+    switch (type) {
+
+    case tokenChar:
+    case tokenFloat:
+    case tokenInteger:
+    case tokenSymbol:
+    case tokenString:
+    case tokenTrue:
+    case tokenFalse:
+    case tokenNil:
+        return true;
+
+    default:
+        return false;
+    }
+}
+
 std::string Token::type_string() {
     return type_string(type);
 }
@@ -36,7 +54,11 @@ std::string Token::type_string(TokenType type) {
         CASE(tokenEOL);
         CASE(tokenEOF);
         CASE(tokenChar);
-        CASE(tokenNumber);
+        CASE(tokenInteger);
+        CASE(tokenFloat);
+        CASE(tokenTrue);
+        CASE(tokenFalse);
+        CASE(tokenNil);
         CASE(tokenIdentifier);
         CASE(tokenSymbol);
         CASE(tokenString);
@@ -68,6 +90,7 @@ std::string Token::type_string(TokenType type) {
         CASE(tokenSemicolon);
         CASE(tokenAssign);
         CASE(tokenBacktick);
+        CASE(tokenHash);
         CASE(tokenMain);
         CASE(tokenClass);
         CASE(tokenIs_a);
@@ -89,6 +112,6 @@ std::string Token::type_string(TokenType type) {
 #undef CASE
 }
 
-void Token::print() {
+void Token::print() const {
     std::cout << "<Token>: " << (text == "\n" ? "EOL" : text) << std::endl;
 }

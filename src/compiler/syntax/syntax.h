@@ -7,13 +7,13 @@
 
 class SyntaxAnalyzer {
   public:
-    SyntaxAnalyzer(TokenStackIterator &);
+    SyntaxAnalyzer(const TokenStackIterator &);
 
     ast::Classes &root();
 
   private:
     ast::Classes tree;
-    TokenStackIterator &tokenStack;
+    TokenStackIterator tokenStack;
     ExpressionSyntaxAnalyzer expressionAnalyzer;
 
     bool terminal(TokenType);
@@ -30,7 +30,6 @@ class SyntaxAnalyzer {
     int rule_message(ast::Message &);
     int rule_net(ast::Net &);
     int rule_place(ast::Place &);
-    int rule_init(ast::Init &);
     // int rule_initmarking();
     int rule_initaction(ast::InitAction &);
     int rule_transition(ast::Transition &);

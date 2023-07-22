@@ -37,8 +37,12 @@ Arguments::Arguments(int argc, char *argv[]) {
     for (source = argv + optind; *source; source++) {
         sources.push_back(std::string(*source));
     }
-    
 }
 
 Arguments::Arguments() {
+    help = false;
+    target_dir = "pn_compiled";
+    target_bin = "pn_compiled/binnary";
+    static_templates_path = "src/templates/static";
+    compiler_templates_path = "src/templates/compiler";
 }

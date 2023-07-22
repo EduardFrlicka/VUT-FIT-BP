@@ -17,11 +17,19 @@ Token &TokenStackIterator::get() {
 Token &TokenStackIterator::get(int count) {
     auto save = it;
     auto res = it;
-    for (auto i = 0; i < count; i++) {
-        do {
-            it++;
-        } while (it->isspace() && it < _end);
-    }
+    if (count > 0)
+        for (auto i = 0; i < count; i++) {
+            do {
+                it++;
+            } while (it < _end && it->isspace());
+        }
+    else
+        for (auto i = 0; i > count; i--) {
+            do {
+                it--;
+            } while (it >= _begin && it->isspace());
+        }
+
     res = it;
     it = save;
 
