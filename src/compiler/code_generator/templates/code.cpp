@@ -28,7 +28,7 @@ Code::Code(std::ifstream filestream) : Code(string(istreambuf_iterator<char>(fil
 Code::Code(const string &_code, const set<string> &_include = {}) : code(_code), include(_include) {
 }
 
-void Code::replace(regex key, string value) {
+void Code::apply(regex key, string value) {
     std::string out;
     std::map<std::string, std::string> changes;
 
@@ -46,23 +46,23 @@ void Code::replace(regex key, string value) {
     code = regex_replace(code, key, value);
 }
 
-void Code::replace(std::string key, Code value) {
+void Code::apply(std::string key, Code value) {
     include.merge(value.include);
     code = regex_replace(code, regex_replacement(key), value.code);
 }
 
-void Code::replace(regex key, Code value) {
+void Code::apply(regex key, Code value) {
     include.merge(value.include);
     code = regex_replace(code, key, value.code);
 }
 
-void Code::replace(std::string key, std::string value) {
-    replace(regex_replacement(key), value);
+void Code::apply(std::string key, std::string value) {
+    apply(regex_replacement(key), value);
 }
 
 void Code::uncomment(const std::string &key) {
-    regex re = regex_optional("(.*?__" + key + "__.*?\n?)");
-    replace(re, "$1");
+    regex re = regex_optional("(.*?__" + key + "__.*?)");
+    apply(re, "$1");
 }
 
 Code Code::apply(std::map<std::string, std::string> replacements) {
@@ -70,7 +70,7 @@ Code Code::apply(std::map<std::string, std::string> replacements) {
 
     for (auto kv : replacements) {
         out.uncomment(kv.first);
-        out.replace(kv.first, kv.second);
+        out.apply(kv.first, kv.second);
     }
 
     return out;

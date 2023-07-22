@@ -4,6 +4,10 @@
 #include <iomanip>
 ErrorPrinter error;
 
+void ErrorPrinter::undeclared_class(TokenStackIterator id) {
+    std::cerr << "undeclared_class" << std::endl;
+}
+
 void ErrorPrinter::class_redeclaration(Identifier defined, TokenStackIterator redefined) {
     std::cerr << "class_redeclaration" << std::endl;
 }

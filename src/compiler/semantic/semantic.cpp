@@ -1,14 +1,24 @@
 #include "semantic.h"
 #include "error_printer.h"
-#include "semantic_rule_frame.h"
 #include <iostream>
 
-SemanticAnalyzer::SemanticAnalyzer(const ast::Classes &root) {
-    analyze(root);
+#define analyze_vector(baf)
+
+SemanticAnalyzer::SemanticAnalyzer(const ast::Classes &__root) {
+    _root = analyze(__root);
+    if (res)
+        exit(res);
 }
 
-void SemanticAnalyzer::analyze(const ast::Classes &node) {
+asg::Classes &SemanticAnalyzer::root() {
+    return _root;
+}
+
+asg::Classes SemanticAnalyzer::analyze(const ast::Classes &node) {
     Identifier _class;
+    asg::Classes result_node;
+
+    classes.push(Identifier("PN"));
 
     for (auto i : node.classes) {
         if (classes.search(i.head.derived->payload.id)) {
@@ -22,28 +32,36 @@ void SemanticAnalyzer::analyze(const ast::Classes &node) {
         }
     }
 
-    analyze_vector(node.classes);
+    for (auto i : node.classes)
+        result_node.classes.push_back(analyze(i));
+
+    return result_node;
 }
 
-void SemanticAnalyzer::analyze(const ast::Class &node) {
-    /*begin*/
+asg::Class SemanticAnalyzer::analyze(const ast::Class &node) {
+    asg::Class result_node;
 
     messages.push_frame();
 
-    analyze_attribute(node.head);
-    analyze_attribute(node.object.value());
-    analyze_vector(node.constructors);
-    analyze_vector(node.methods);
-    analyze_vector(node.syn_ports);
+    analyze(node.head);
+    result_node.base = classes.get(node.head.base->payload.id);
+    result_node.name = classes.get(node.head.derived->payload.id);
+    if (node.object.has_value())
+        result_node.object = analyze(node.object.value());
+
+    for (auto i : node.methods)
+        result_node.methods.push_back(analyze(i));
+    for (auto i : node.constructors)
+        result_node.constructors.push_back(analyze(i));
+    for (auto i : node.syn_ports)
+        result_node.syn_ports.push_back(analyze(i));
 
     messages.pop_frame();
 
-    /*end*/
+    return result_node;
 }
 
 void SemanticAnalyzer::analyze(const ast::ClassHead &node) {
-    /*begin*/
-
     if (node.derived->payload.id.is_lower()) {
         error.expected_upper(node.derived->it);
         res = ERR_SEMANTIC;
@@ -54,59 +72,79 @@ void SemanticAnalyzer::analyze(const ast::ClassHead &node) {
         res = ERR_SEMANTIC;
     }
 
-    /*end*/
+    if (!classes.search(node.base->payload.id)) {
+        error.undeclared_class(node.base->it);
+        res = ERR_SEMANTIC;
+    }
 }
 
-void SemanticAnalyzer::analyze(const ast::ObjectNet &node) {
-    /*begin*/
+asg::Net SemanticAnalyzer::analyze(const ast::ObjectNet &node) {
+    asg::Net result_node;
 
     transitions.push_frame();
 
-    analyze_vector(node.net.places);
-    analyze_vector(node.net.transitions);
+    for (auto place : node.net.places) {
+        result_node.places.push_back(analyze(place));
+    }
+
+    for (auto transition : node.net.transitions) {
+        result_node.transitions.push_back(analyze(transition));
+    }
 
     transitions.pop_frame();
 
-    /*end*/
+    return result_node;
 }
-void SemanticAnalyzer::analyze(const ast::MethodNet &node) {
-    /*begin*/
+
+asg::Method SemanticAnalyzer::analyze(const ast::MethodNet &node) {
+    asg::Method result_node;
     variables.push_frame();
-    analyze_attribute(node.message);
-    analyze_attribute(node.net);
+    auto message = analyze(node.message);
+    result_node.selector = message.first;
+    result_node.arguments = message.second;
+    result_node.net = analyze(node.net);
     variables.pop_frame();
-    /*end*/
+
+    return result_node;
 }
-void SemanticAnalyzer::analyze(const ast::Constructor &node) {
-    /*begin*/
+
+asg::Constructor SemanticAnalyzer::analyze(const ast::Constructor &node) {
+    asg::Constructor result_node;
     variables.push_frame();
-    analyze_attribute(node.message);
-    analyze_attribute(node.net);
+    auto message = analyze(node.message);
+    result_node.selector = message.first;
+    result_node.arguments = message.second;
+    result_node.net = analyze(node.net);
     variables.pop_frame();
-    /*end*/
+
+    return result_node;
 }
-void SemanticAnalyzer::analyze(const ast::SynPort &node) {
-    /*begin*/
+
+asg::SynPort SemanticAnalyzer::analyze(const ast::SynPort &node) {
+    asg::SynPort result_node;
     variables.push_frame();
-    analyze_attribute(node.message);
+
+    auto message = analyze(node.message);
+    result_node.selector = message.first;
+    result_node.arguments = message.second;
 
     /* TODO check if has effect */
     if (node.conditions.has_value())
-        analyze_attribute(node.conditions.value());
+        analyze(node.conditions.value());
     if (node.pre_conditions.has_value())
-        analyze_attribute(node.pre_conditions.value());
+        analyze(node.pre_conditions.value());
     if (node.guard.has_value())
-        analyze_attribute(node.guard.value());
+        analyze(node.guard.value());
     if (node.post_contitions.has_value())
-        analyze_attribute(node.post_contitions.value());
+        analyze(node.post_contitions.value());
 
     variables.pop_frame();
-    /*end*/
+    return result_node;
 }
-void SemanticAnalyzer::analyze(const ast::Message &node) {
-    /*begin*/
+std::pair<Identifier, std::deque<Identifier>> SemanticAnalyzer::analyze(const ast::Message &node) {
     BasicIdentifier id;
     Identifier var;
+    std::deque<Identifier> vars;
     Identifier message;
 
     if (node.unary.has_value()) {
@@ -126,6 +164,7 @@ void SemanticAnalyzer::analyze(const ast::Message &node) {
 
         var = Identifier(node.binary->second->payload.id);
         var.declare_define(node.binary->second->it);
+        vars.push_back(var);
         variables.push(var);
     }
 
@@ -139,6 +178,7 @@ void SemanticAnalyzer::analyze(const ast::Message &node) {
             }
             var = Identifier(kv.second->payload.id);
             var.declare_define(kv.second->it);
+            vars.push_back(var);
             variables.push(var);
         }
     }
@@ -151,25 +191,29 @@ void SemanticAnalyzer::analyze(const ast::Message &node) {
     message.declare_define(node.begin, node.end);
     messages.push(message);
 
-    /*end*/
+    return std::make_pair(message, vars);
 }
-void SemanticAnalyzer::analyze(const ast::Net &node) {
-    /*begin*/
+asg::Net SemanticAnalyzer::analyze(const ast::Net &node) {
+    asg::Net result_node;
 
     places.push_frame();
     transitions.push_frame();
 
-    analyze_vector(node.places);
-    analyze_vector(node.transitions);
+    for (auto place : node.places) {
+        result_node.places.push_back(analyze(place));
+    }
+
+    for (auto transition : node.transitions) {
+        result_node.transitions.push_back(analyze(transition));
+    }
 
     places.pop_frame();
     transitions.pop_frame();
-
-    /*end*/
+    return result_node;
 }
-void SemanticAnalyzer::analyze(const ast::Place &node) {
-    /*begin*/
+asg::Place SemanticAnalyzer::analyze(const ast::Place &node) {
     Identifier place;
+    asg::Place result_node;
 
     if (places.search(node.name->payload.id)) {
         error.place_redeclaration(places.get(node.name->payload.id), node.name->it);
@@ -177,17 +221,19 @@ void SemanticAnalyzer::analyze(const ast::Place &node) {
     }
     place = Identifier(node.name->payload.id);
     place.declare_define(node.name->it);
+    result_node.name = place;
     places.push(place);
 
     if (node.init_state.has_value())
-        analyze_attribute(node.init_state.value());
+        analyze(node.init_state.value());
 
     /* TODO variables ?? */
 
     if (node.init_func.has_value())
-        analyze_attribute(node.init_func.value());
+        analyze(node.init_func.value());
 
     /*end*/
+    return result_node;
 }
 
 void SemanticAnalyzer::analyze(const ast::InitAction &node) {
@@ -211,14 +257,15 @@ void SemanticAnalyzer::analyze(const ast::InitAction &node) {
         variables.push(var);
     }
 
-    analyze_attribute(node.expr);
+    analyze(node.expr);
 
     variables.pop_frame();
     /*end*/
 }
 
-void SemanticAnalyzer::analyze(const ast::Transition &node) {
+asg::Transition SemanticAnalyzer::analyze(const ast::Transition &node) {
     /*begin*/
+    asg::Transition result_node;
     Identifier transition;
 
     if (transitions.search(node.name->payload.id)) {
@@ -235,18 +282,19 @@ void SemanticAnalyzer::analyze(const ast::Transition &node) {
     /* TODO check if has effect */
 
     if (node.conditions.has_value())
-        analyze_attribute(node.conditions.value());
+        analyze(node.conditions.value());
     if (node.pre_conditions.has_value())
-        analyze_attribute(node.pre_conditions.value());
+        analyze(node.pre_conditions.value());
     if (node.guard.has_value())
-        analyze_attribute(node.guard.value());
+        analyze(node.guard.value());
     if (node.action.has_value())
-        analyze_attribute(node.action.value());
+        analyze(node.action.value());
     if (node.post_contitions.has_value())
-        analyze_attribute(node.post_contitions.value());
+        analyze(node.post_contitions.value());
 
     variables.pop_frame();
     /*end*/
+    return result_node;
 }
 void SemanticAnalyzer::analyze(const ast::ConditionPair &node) {
     /*begin*/
@@ -256,7 +304,7 @@ void SemanticAnalyzer::analyze(const ast::ConditionPair &node) {
         res = ERR_SEMANTIC;
     }
 
-    analyze_attribute(node.second);
+    analyze(node.second);
 
     /*end*/
 }
@@ -293,7 +341,7 @@ void SemanticAnalyzer::analyze(const ast::Guard &node) {
     //     res = ERR_SEMANTIC;
     // }
 
-    analyze_attribute(node.expr);
+    analyze(node.expr);
 
     /*end*/
 }
@@ -319,7 +367,7 @@ void SemanticAnalyzer::analyze(const ast::Action &node) {
         variables.push(var);
     }
 
-    analyze_attribute(node.expr);
+    analyze(node.expr);
 
     variables.pop_frame();
 
@@ -338,7 +386,7 @@ void SemanticAnalyzer::analyze(const ast::MultiSetElem &node) {
     /*begin*/
 
     /* TODO variables ? */
-    analyze_attribute(node.term);
+    analyze(node.term);
 
     /*end*/
 }

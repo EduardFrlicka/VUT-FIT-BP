@@ -1,11 +1,12 @@
 #include "generator.h"
 #include "error_printer.h"
+#include <iostream>
 
-CodeGenerator::CodeGenerator(const ast::Classes &root) : template_manager(args.compiler_templates_path) {
+CodeGenerator::CodeGenerator(const asg::Classes &root) : template_manager(args.compiler_templates_path) {
     CodeFiles static_files;
     CodeFiles result;
 
-    result = generate_classes(root);
+    result = generate(root);
 
     // static_files = load_static_code_files(args.static_templates_path);
     // result = static_files.combine({{"generated", result}});
@@ -13,32 +14,64 @@ CodeGenerator::CodeGenerator(const ast::Classes &root) : template_manager(args.c
     result.print();
 }
 
-CodeFiles CodeGenerator::generate_classes(const ast::Classes &node) {
-    CodeFiles res;
-    res = template_manager.get("classes").apply({{"main", node.main->text}});
+CodeFiles CodeGenerator::generate(const asg::Classes &node) {
+    CodeFiles res = template_manager.get("classes");
+    res.apply({{"main", node.main.toString()}});
 
     for (auto i : node.classes)
-        res = res.combine("class", generate_class(i));
+        res.apply("class", generate(i));
 
     return res;
 }
 
-CodeFiles CodeGenerator::generate_class(const ast::Class &node) {
-    CodeFiles res;
-    names["class_name"] = node.head.derived->text;
-    names["base_class_name"] = node.head.base->text;
+CodeFiles CodeGenerator::generate(const asg::Class &node) {
+    CodeFiles res = template_manager.get("class");
+    names["class_name"] = node.name.toString();
+    names["base_class_name"] = node.base.toString();
 
-    res = template_manager.get("class").apply(names);
-    if (node.object.has_value())
-        res = res.combine({{"object", generate_object_net(*node.object)}});
+    res.apply(names);
+
+    if (node.object.has_value()) {
+        res.apply("object", generate(*node.object));
+    }
 
     names.erase("class_name");
     names.erase("base_class_name");
     return res;
 }
 
-CodeFiles CodeGenerator::generate_object_net(const ast::ObjectNet &node) {
+CodeFiles CodeGenerator::generate(const asg::Net &node) {
+    CodeFiles res = template_manager.get("net");
+    res.apply(names);
 
+    for (auto place : node.places)
+        res.apply("place", generate(place));
+
+    return res;
+}
+
+CodeFiles CodeGenerator::generate(const asg::Method &) {
+    return CodeFiles();
+}
+
+CodeFiles CodeGenerator::generate(const asg::Constructor &) {
+    return CodeFiles();
+}
+
+CodeFiles CodeGenerator::generate(const asg::SynPort &) {
+    return CodeFiles();
+}
+
+CodeFiles CodeGenerator::generate(const asg::Place &node) {
+    CodeFiles res = template_manager.get("place");
+    names["place_name"] = node.name.toString();
+    res.apply(names);
+
+    names.erase("place_name");
+    return res;
+}
+
+CodeFiles CodeGenerator::generate(const asg::Transition &) {
     return CodeFiles();
 }
 

@@ -22,10 +22,10 @@ class Code {
 
     std::string to_string();
 
-    void replace(std::string, Code);
-    void replace(std::regex, Code);
-    void replace(std::regex, std::string);
-    void replace(std::string, std::string);
+    void apply(std::string, Code);
+    void apply(std::regex, Code);
+    void apply(std::regex, std::string);
+    void apply(std::string, std::string);
     void uncomment(const std::string &);
     void append(Code);
     void append(std::vector<Code>);
@@ -39,14 +39,14 @@ class CodeFiles {
   private:
     Code free_code;
     std::map<std::string, Code> code_files;
-    void replace(const std::string &, const CodeFiles &);
     bool contain_file(const std::string &);
 
   public:
     CodeFiles();
     CodeFiles(const std::map<std::string, Code> &);
     CodeFiles(const std::map<std::string, Code> &, const Code &);
-    CodeFiles combine(const std::map<std::string, CodeFiles> &);
-    CodeFiles combine(const std::string &, const CodeFiles &);
+    void apply(const std::map<std::string, CodeFiles> &);
+    void apply(const std::string &, const CodeFiles &);
+    void apply(const std::map<std::string, std::string> &);
     void print();
 };

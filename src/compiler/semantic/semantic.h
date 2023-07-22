@@ -30,27 +30,29 @@ class NameSpace {
 class SemanticAnalyzer {
   public:
     SemanticAnalyzer(const ast::Classes &);
+    asg::Classes &root();
 
   private:
-    int res;
+    int res = 0;
+    asg::Classes _root;
     NameSpace classes;
     NameSpace variables;
     NameSpace messages;
     NameSpace places;
     NameSpace transitions;
 
-    void analyze(const ast::Classes &);
-    void analyze(const ast::Class &);
+    asg::Classes analyze(const ast::Classes &);
+    asg::Class analyze(const ast::Class &);
     void analyze(const ast::ClassHead &);
-    void analyze(const ast::ObjectNet &);
-    void analyze(const ast::MethodNet &);
-    void analyze(const ast::Constructor &);
-    void analyze(const ast::SynPort &);
-    void analyze(const ast::Message &);
-    void analyze(const ast::Net &);
-    void analyze(const ast::Place &);
+    asg::Net analyze(const ast::ObjectNet &);
+    asg::Method analyze(const ast::MethodNet &);
+    asg::Constructor analyze(const ast::Constructor &);
+    asg::SynPort analyze(const ast::SynPort &);
+    std::pair<Identifier, std::deque<Identifier>> analyze(const ast::Message &);
+    asg::Net analyze(const ast::Net &);
+    asg::Place analyze(const ast::Place &);
     void analyze(const ast::InitAction &);
-    void analyze(const ast::Transition &);
+    asg::Transition analyze(const ast::Transition &);
     void analyze(const ast::ConditionPair &);
     void analyze(const ast::Condition &);
     void analyze(const ast::PreCondition &);

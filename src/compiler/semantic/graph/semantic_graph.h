@@ -1,3 +1,4 @@
+#pragma once
 #include "identifier.h"
 #include "semantic_graph_base.h"
 #include <deque>
@@ -13,21 +14,34 @@ class Guard : public Base {};
 class Action : public Base {};
 class PostCondPair : public Base {};
 
-class ObjectNet : public Base {};
+class Transition : public Base {};
+class Place : public Base {
+  public:
+    Identifier name;
+};
+
+class Net : public Base {
+  public:
+    std::deque<Place> places;
+    std::deque<Transition> transitions;
+};
 
 class Method : public Base {
+  public:
     Identifier selector;
     std::deque<Identifier> arguments;
-    ObjectNet net;
+    Net net;
 };
 
 class Constructor : public Base {
+  public:
     Identifier selector;
     std::deque<Identifier> arguments;
-    ObjectNet net;
+    Net net;
 };
 
 class SynPort : public Base {
+  public:
     Identifier selector;
     std::deque<Identifier> arguments;
     std::deque<PreCondPair> pre_conds;
@@ -37,12 +51,17 @@ class SynPort : public Base {
 };
 
 class Class : public Base {
+  public:
     Identifier name;
     Identifier base;
-    std::optional<ObjectNet> object;
+    std::optional<Net> object;
+    std::deque<Method> methods;
+    std::deque<Constructor> constructors;
+    std::deque<SynPort> syn_ports;
 };
 
 class Classes : public Base {
+  public:
     Identifier main;
     std::deque<Class> classes;
 };

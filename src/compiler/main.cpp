@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 
     auto sem_analyzer = SemanticAnalyzer(syn_analyzer.root());
 
-    auto code_generator = CodeGenerator(syn_analyzer.root());
+    auto code_generator = CodeGenerator(sem_analyzer.root());
 
     // syn_analyzer.root().print();
 

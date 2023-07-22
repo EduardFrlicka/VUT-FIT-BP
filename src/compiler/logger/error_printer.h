@@ -27,6 +27,7 @@ extern ErrorPrinter error;
 
 class ErrorPrinter {
   public:
+    void undeclared_class(TokenStackIterator id);
     void class_redeclaration(Identifier declaration, TokenStackIterator redefined);
     void message_redeclaration(Identifier declaration, TokenStackIterator redefined);
     void place_redeclaration(Identifier declaration, TokenStackIterator redefined);
