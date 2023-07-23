@@ -5,6 +5,22 @@
 #define analyze_vector(baf)
 
 SemanticAnalyzer::SemanticAnalyzer(const ast::Classes &__root) {
+    Identifier id;
+
+    /* INITIALIZATION */
+    id = Identifier("PN");
+    id.declare_define(__root.begin);
+    classes.push(id);
+
+    id = Identifier("self");
+    id.declare_define(__root.begin);
+    variables.push(id);
+
+    id = Identifier("super");
+    id.declare_define(__root.begin);
+    variables.push(id);
+
+    /* ANALYSYS */
     _root = analyze(__root);
     if (res)
         exit(res);
@@ -17,8 +33,6 @@ asg::Classes &SemanticAnalyzer::root() {
 asg::Classes SemanticAnalyzer::analyze(const ast::Classes &node) {
     Identifier _class;
     asg::Classes result_node;
-
-    classes.push(Identifier("PN"));
 
     for (auto i : node.classes) {
         if (classes.search(i.head.derived->payload.id)) {
@@ -232,7 +246,6 @@ asg::Place SemanticAnalyzer::analyze(const ast::Place &node) {
     if (node.init_func.has_value())
         analyze(node.init_func.value());
 
-    /*end*/
     return result_node;
 }
 
@@ -287,10 +300,10 @@ asg::Transition SemanticAnalyzer::analyze(const ast::Transition &node) {
         analyze(node.pre_conditions.value());
     if (node.guard.has_value())
         analyze(node.guard.value());
-    if (node.action.has_value())
-        analyze(node.action.value());
     if (node.post_contitions.has_value())
         analyze(node.post_contitions.value());
+    if (node.action.has_value())
+        analyze(node.action.value());
 
     variables.pop_frame();
     /*end*/
@@ -311,7 +324,9 @@ void SemanticAnalyzer::analyze(const ast::ConditionPair &node) {
 void SemanticAnalyzer::analyze(const ast::Condition &node) {
     /*begin*/
 
-    analyze_vector(node.conditions);
+    for (auto i : node.conditions) {
+        analyze(i);
+    }
 
     /*end*/
 }
@@ -319,14 +334,18 @@ void SemanticAnalyzer::analyze(const ast::Condition &node) {
 void SemanticAnalyzer::analyze(const ast::PreCondition &node) {
     /*begin*/
 
-    analyze_vector(node.conditions);
+    for (auto i : node.conditions) {
+        analyze(i);
+    }
 
     /*end*/
 }
 void SemanticAnalyzer::analyze(const ast::PostCondition &node) {
     /*begin*/
 
-    analyze_vector(node.conditions);
+    for (auto i : node.conditions) {
+        analyze(i);
+    }
 
     /*end*/
 }
@@ -378,7 +397,9 @@ void SemanticAnalyzer::analyze(const ast::MultiSet &node) {
 
     /* TODO variables ? */
 
-    analyze_vector(node.elements);
+    for (auto i : node.elements) {
+        analyze(i);
+    }
 
     /*end*/
 }
@@ -392,13 +413,19 @@ void SemanticAnalyzer::analyze(const ast::MultiSetElem &node) {
 }
 void SemanticAnalyzer::analyze(const ast::MultiSetTerm &node) {
     /*begin*/
+    Identifier var;
 
     if (node.value.has_value()) {
-        if (node.value->type == tokenIdentifier)
+        if (node.value->type == tokenIdentifier) {
             if (node.value->payload.id.is_upper()) {
                 error.expected_lower(node.value->it);
                 res = ERR_SEMANTIC;
             }
+
+            var = Identifier(node.value->payload.id);
+            var.declare_define(node.value->it);
+            variables.push(var);
+        }
     }
 
     /*end*/
@@ -413,72 +440,6 @@ void SemanticAnalyzer::analyze(const ast::MultiSetTerm::MultiSetList &node) {
     }
 
     analyze_vector(node.values);
-
-    /*end*/
-}
-
-void SemanticAnalyzer::analyze(const ast::Expression &node) {
-    /*begin*/
-
-    /*end*/
-}
-
-void SemanticAnalyzer::analyze(const ast::ExpressionPair &) {
-    /*begin*/
-
-    /*end*/
-}
-
-void SemanticAnalyzer::analyze(const ast::CascadeUnary &) {
-    /*begin*/
-
-    /*end*/
-}
-
-void SemanticAnalyzer::analyze(const ast::CascadeBinary &) {
-    /*begin*/
-
-    /*end*/
-}
-
-void SemanticAnalyzer::analyze(const ast::CascadeKeyWord &) {
-    /*begin*/
-
-    /*end*/
-}
-
-void SemanticAnalyzer::analyze(const ast::ExpressionIdentifier &) {
-    /*begin*/
-
-    /*end*/
-}
-
-void SemanticAnalyzer::analyze(const ast::ExpressionValue &) {
-    /*begin*/
-
-    /*end*/
-}
-
-void SemanticAnalyzer::analyze(const ast::ExpressionUnary &) {
-    /*begin*/
-
-    /*end*/
-}
-
-void SemanticAnalyzer::analyze(const ast::ExpressionBinary &) {
-    /*begin*/
-
-    /*end*/
-}
-
-void SemanticAnalyzer::analyze(const ast::ExpressionKeyWord &) {
-    /*begin*/
-
-    /*end*/
-}
-
-void SemanticAnalyzer::analyze(const ast::Assgiment &) {
-    /*begin*/
 
     /*end*/
 }

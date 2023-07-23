@@ -46,6 +46,10 @@ class Expression : public Base {
     std::shared_ptr<ExprVal> value;
     bool isprimary() const;
     bool issecundary() const;
+    bool iscascade() const;
+    template <class T> T get() const;
+    template <class T> bool is_type() const;
+
     void print(int indent = 0) const;
 };
 
@@ -151,10 +155,18 @@ class CodeBlock : public Base {
 
 class ConstArray : public Base {
   public:
-    ConstArray(const std::deque<Token>&);
+    ConstArray(const std::deque<Token> &);
 
     std::deque<Token> elements;
     void print(int indent = 0);
+};
+
+template <class T> inline T Expression::get() const {
+    return std::get<T>(*value);
+};
+
+template <class T> inline bool Expression::is_type() const {
+    return std::holds_alternative<T>(*value);
 };
 
 } // namespace AbstractSyntaxTree

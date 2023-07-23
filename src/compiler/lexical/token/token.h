@@ -93,12 +93,12 @@ typedef enum {
     tokenPayloadNil,
 } TokenPayloadType;
 
-class TokenPayloadNumber {
-  public:
+class TokenPayloadInteger {
+  protected:
     std::string data = "";
     int radix = 10;
-    long integer = -1, exponent = -1;
-    double number;
+  public:
+    long number;
 
     bool isdigit(int);
     void append(int);
@@ -107,8 +107,20 @@ class TokenPayloadNumber {
     std::string toString();
 };
 
+class TokenPayloadFloat : public TokenPayloadInteger{
+  public:
+    TokenPayloadFloat();
+    TokenPayloadFloat(TokenPayloadInteger);
+    double number;
+
+    void convert();
+    std::string toString();
+};
+
+
 struct TokenPayload {
-    TokenPayloadNumber number;
+    TokenPayloadFloat float_number;
+    TokenPayloadInteger integer_number;
     BasicIdentifier id;
 };
 

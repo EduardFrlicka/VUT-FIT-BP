@@ -14,27 +14,43 @@ int hex2int(char c) {
     return -1;
 }
 
-bool TokenPayloadNumber::isdigit(int c) {
+bool TokenPayloadInteger::isdigit(int c) {
     if (!isalnum(c))
         return false;
 
     return hex2int(c) < radix;
 }
 
-void TokenPayloadNumber::append(int c) {
+void TokenPayloadInteger::append(int c) {
     data += c;
 }
 
-void TokenPayloadNumber::convertRadix() {
+void TokenPayloadInteger::convertRadix() {
     radix = std::stoi(data);
     data = "";
 }
 
-void TokenPayloadNumber::convert() {
+void TokenPayloadInteger::convert() {
+    number = std::stol(data, nullptr, radix);
+}
+
+std::string TokenPayloadInteger::toString() {
+    std::stringstream ss;
+    ss << number;
+    return ss.str();
+}
+
+TokenPayloadFloat::TokenPayloadFloat() {
+}
+
+TokenPayloadFloat::TokenPayloadFloat(TokenPayloadInteger _base) : TokenPayloadInteger(_base) {
+}
+
+void TokenPayloadFloat::convert() {
     std::string::size_type idx;
     std::string tmp = data;
-    long decimal;
-
+    long decimal, integer, exponent;
+    
     integer = std::stol(tmp, &idx, radix);
     tmp = tmp.substr(idx);
 
@@ -56,7 +72,7 @@ void TokenPayloadNumber::convert() {
     }
 }
 
-std::string TokenPayloadNumber::toString() {
+std::string TokenPayloadFloat::toString() {
     std::stringstream ss;
     ss << number;
     // if (decimal >= 0)

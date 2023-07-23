@@ -45,30 +45,36 @@ class Logger {
     Logger();
     ~Logger();
 
+
     void c_error(const char *, ...);
     void c_error(const FilePosition &, const char *, ...);
     void c_error(const Token &, const char *, ...);
+    void c_error(const TokenStackIterator &, const char *, ...);
     void c_error(const std::filesystem::path &, const char *, ...);
     void c_error(const char *, va_list);
 
     void c_warning(const char *, ...);
     void c_warning(const FilePosition &, const char *, ...);
     void c_warning(const Token &, const char *, ...);
+    void c_warning(const TokenStackIterator &, const char *, ...);
     void c_warning(const std::filesystem::path &, const char *, ...);
     void c_warning(const char *, va_list);
 
     void c_note(const char *, ...);
     void c_note(const FilePosition &, const char *, ...);
     void c_note(const Token &, const char *, ...);
+    void c_note(const TokenStackIterator &, const char *, ...);
     void c_note(const std::filesystem::path &, const char *, ...);
     void c_note(const char *, va_list);
 
   private:
+    void print_position(const TokenStackIterator &);
     void print_position(const Token &);
     void print_position(const FilePosition &);
     void print_position(const std::filesystem::path &);
 
     void print_line(const Token &token, void (LoggerColors::*colorFunc)(void));
+    void print_line(const TokenStackIterator &iterator, void (LoggerColors::*colorFunc)(void));
     FILE *filePtr;
     LoggerColors colors;
 };

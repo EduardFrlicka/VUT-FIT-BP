@@ -215,10 +215,10 @@ int LexicalAnalyzer::end(int c) {
         break;
 
     case tokenInteger:
-        token.payload.number.convert();
+        token.payload.integer_number.convert();
         break;
     case tokenFloat:
-        token.payload.number.convert();
+        token.payload.float_number.convert();
         break;
     default:
         break;

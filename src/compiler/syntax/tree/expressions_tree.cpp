@@ -31,6 +31,16 @@ bool AbstractSyntaxTree::Expression::issecundary() const {
     return false;
 }
 
+bool AbstractSyntaxTree::Expression::iscascade() const {
+    switch (value->index()) {
+    case 1:
+    case 2:
+    case 3:
+        return true;
+    }
+    return false;
+}
+
 void AbstractSyntaxTree::Expression::print(int indent) const {
     if (indent) {
         print_indent(indent);

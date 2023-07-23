@@ -10,6 +10,10 @@ Logger::Logger() : colors() {
 Logger::~Logger() {
 }
 
+void Logger::print_position(const TokenStackIterator &iterator) {
+    print_position(iterator.it->pos);
+}
+
 void Logger::print_position(const Token &token) {
     print_position(token.pos);
 }
@@ -29,33 +33,37 @@ void Logger::print_position(const std::filesystem::path &filepath) {
 }
 
 void Logger::print_line(const Token &token, void (LoggerColors::*colorFunc)(void)) {
-    std::deque<Token>::iterator start = token.it.it;
+    print_line(token.it, colorFunc);
+}
+
+void Logger::print_line(const TokenStackIterator &iterator, void (LoggerColors::*colorFunc)(void)) {
+    std::deque<Token>::iterator start = iterator.it;
     std::deque<Token>::iterator it;
     size_t size;
     std::string underline;
 
     /* find first token in line */
-    while (start->type != tokenEOL && start > token.it._begin)
+    while (start->type != tokenEOL && start > iterator._begin)
         start--;
     start++;
 
     /* print left margin */
-    fprintf(stderr, "%5u |", token.pos.line);
+    fprintf(stderr, "%5u |", iterator.it->pos.line);
 
     /* print all tokens from line before "token" */
-    for (it = start; it < token.it.it; it++)
+    for (it = start; it < iterator.it; it++)
         fprintf(stderr, "%s", it->text.c_str());
 
     /* colored print of "token" */
     colors.bold();
     (colors.*colorFunc)();
-    size = fprintf(stderr, "%s", token.text.c_str());
+    size = fprintf(stderr, "%s", iterator.it->text.c_str());
     colors.reset();
 
     /* pritn all tokens in line after "token" */
 
-    if (token.type != tokenEOL) {
-        for (it = token.it.it + 1; it < token.it._end && it->type != tokenEOL; it++)
+    if (iterator.it->type != tokenEOL) {
+        for (it = iterator.it + 1; it < iterator._end && it->type != tokenEOL; it++)
             fprintf(stderr, "%s", it->text.c_str());
         fprintf(stderr, "\n");
     }
@@ -69,7 +77,7 @@ void Logger::print_line(const Token &token, void (LoggerColors::*colorFunc)(void
     fprintf(stderr, "      |");
 
     /* print whitespace until "token" position */
-    for (it = start; it < token.it.it; it++)
+    for (it = start; it < iterator.it; it++)
         if (it->type != tokenWhiteSpace)
             fprintf(stderr, "%*.s", (int)it->text.length(), "");
         else
@@ -110,6 +118,17 @@ void Logger::c_error(const Token &token, const char *fmt, ...) {
     va_end(args);
 
     print_line(token, &LoggerColors::red);
+}
+
+void Logger::c_error(const TokenStackIterator &iterator, const char *fmt, ...) {
+    print_position(iterator);
+
+    va_list args;
+    va_start(args, fmt);
+    c_error(fmt, args);
+    va_end(args);
+
+    print_line(iterator, &LoggerColors::red);
 }
 
 void Logger::c_error(const std::filesystem::path &filepath, const char *fmt, ...) {
@@ -164,6 +183,17 @@ void Logger::c_warning(const Token &token, const char *fmt, ...) {
     print_line(token, &LoggerColors::magenta);
 }
 
+void Logger::c_warning(const TokenStackIterator &iterator, const char *fmt, ...) {
+    print_position(iterator);
+
+    va_list args;
+    va_start(args, fmt);
+    c_warning(fmt, args);
+    va_end(args);
+
+    print_line(iterator, &LoggerColors::magenta);
+}
+
 void Logger::c_warning(const std::filesystem::path &filepath, const char *fmt, ...) {
     print_position(filepath);
 
@@ -214,6 +244,17 @@ void Logger::c_note(const Token &token, const char *fmt, ...) {
     va_end(args);
 
     print_line(token, &LoggerColors::cyan);
+}
+
+void Logger::c_note(const TokenStackIterator &iterator, const char *fmt, ...) {
+    print_position(iterator);
+
+    va_list args;
+    va_start(args, fmt);
+    c_note(fmt, args);
+    va_end(args);
+
+    print_line(iterator, &LoggerColors::cyan);
 }
 
 void Logger::c_note(const std::filesystem::path &filepath, const char *fmt, ...) {

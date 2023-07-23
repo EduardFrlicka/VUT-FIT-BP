@@ -69,7 +69,7 @@ void ExpressionSyntaxAnalyzer::reduce_id() {
 void ExpressionSyntaxAnalyzer::reduce_lit() {
     Token lit = stack.pop<Token>();
     stack.pop();
-    stack.push(Expression(ExpressionIdentifier(lit), lit.it));
+    stack.push(Expression(ExpressionValue(lit), lit.it));
 }
 
 /* (E) -> E            - bracket */
@@ -98,13 +98,6 @@ void ExpressionSyntaxAnalyzer::reduce_binary_message() {
     stack.push(Expression(ExpressionBinary(recv, selector, argument), recv.begin, argument.end));
 }
 
-/*
-
- 0 < 1 7 < E 1 8 < E 1 8 < E 1 8 E
-
-
-*/
-
 /* E (id: E)+ -> E     - keyword message left */
 void ExpressionSyntaxAnalyzer::reduce_keyword_message() {
     std::deque<Token> selector;
@@ -131,4 +124,3 @@ void ExpressionSyntaxAnalyzer::reduce_assigment() {
     stack.pop();
     stack.push(Expression(Assgiment(target, value), target.it, value.end));
 }
-

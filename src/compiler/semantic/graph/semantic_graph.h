@@ -1,12 +1,39 @@
 #pragma once
 #include "identifier.h"
+#include "semantic_expression_graph.h"
 #include "semantic_graph_base.h"
 #include <deque>
 #include <optional>
 
 namespace AbstractSemanticGraph {
 
-class Templ : public Base {};
+// class Templ : public Base {};
+// class Templ : public Base {};
+// class Templ : public Base {};
+// class Templ : public Base {};
+// class Templ : public Base {};
+// class Templ : public Base {};
+// class Templ : public Base {};
+// class Templ : public Base {};
+// class Templ : public Base {};
+
+class MultiSetTerm;
+class MultiSetList : public Base {
+  public:
+    std::deque<MultiSetTerm> elements;
+    std::optional<Identifier> tail;
+};
+class MultiSetTerm : public Base {
+    std::optional<MultiSetList> list;
+    std::optional<Literal> lit;
+    std::optional<Variable> val;
+};
+
+// class Templ : public Base {};
+// class Templ : public Base {};
+// class Templ : public Base {};
+// class Templ : public Base {};
+// class Templ : public Base {};
 
 class PreCondPair : public Base {};
 class CondPair : public Base {};

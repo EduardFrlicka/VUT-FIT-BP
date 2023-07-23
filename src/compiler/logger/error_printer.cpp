@@ -5,7 +5,7 @@
 ErrorPrinter error;
 
 void ErrorPrinter::undeclared_class(TokenStackIterator id) {
-    std::cerr << "undeclared_class" << std::endl;
+    logger.c_error(id, "Use of undeclared class name");
 }
 
 void ErrorPrinter::class_redeclaration(Identifier defined, TokenStackIterator redefined) {
@@ -22,6 +22,16 @@ void ErrorPrinter::place_redeclaration(Identifier defined, TokenStackIterator re
 
 void ErrorPrinter::transition_redeclaration(Identifier defined, TokenStackIterator redefined) {
     std::cerr << "transition_redeclaration" << std::endl;
+}
+
+void ErrorPrinter::undeclared_variable(TokenStackIterator id) {
+    // std::cerr << "undeclared_variable" << std::endl;
+    logger.c_error(id, "Use of undeclared variable");
+}
+
+void ErrorPrinter::undefined_variable(Identifier id, TokenStackIterator it) {
+    logger.c_error(it, "Use of undefined variable");
+    logger.c_note(id.declaration_begin, "Variable declared:");
 }
 
 void ErrorPrinter::variable_redeclaration(Identifier declaration, TokenStackIterator redefined) {

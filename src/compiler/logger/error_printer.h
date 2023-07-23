@@ -29,10 +29,14 @@ class ErrorPrinter {
   public:
     void undeclared_class(TokenStackIterator id);
     void class_redeclaration(Identifier declaration, TokenStackIterator redefined);
+
+    void undeclared_variable(TokenStackIterator id);
+    void undefined_variable(Identifier id, TokenStackIterator it);
+    void variable_redeclaration(Identifier declaration, TokenStackIterator redefined);
+
     void message_redeclaration(Identifier declaration, TokenStackIterator redefined);
     void place_redeclaration(Identifier declaration, TokenStackIterator redefined);
     void transition_redeclaration(Identifier declaration, TokenStackIterator redefined);
-    void variable_redeclaration(Identifier declaration, TokenStackIterator redefined);
 
     void place_not_found(TokenStackIterator id);
 

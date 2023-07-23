@@ -6,23 +6,25 @@ int LexicalAnalyzer::stateNumber(int c) {
     token.type = tokenInteger;
 
     if (c == 'r') {
-        token.payload.number.convertRadix();
+        token.payload.integer_number.convertRadix();
         nextState = &LexicalAnalyzer::stateNumberR;
         return SUCCESS;
     }
 
-    if (c == 'e')
+    if (c == 'e') {
+        token.payload.float_number = token.payload.integer_number;
         nextState = &LexicalAnalyzer::stateNumberE;
+    }
 
     if (c == '.')
         stateNumberDot(c);
 
-    if (token.payload.number.isdigit(c)) {
+    if (token.payload.integer_number.isdigit(c)) {
         nextState = &LexicalAnalyzer::stateNumber;
     }
 
     if (nextState != &LexicalAnalyzer::end)
-        token.payload.number.append(c);
+        token.payload.integer_number.append(c);
 
     return SUCCESS;
 }
@@ -31,43 +33,46 @@ int LexicalAnalyzer::stateNumberR(int c) {
     nextState = &LexicalAnalyzer::end;
     token.type = tokenInteger;
 
-    if (c == 'e')
+    if (c == 'e') {
+        token.payload.float_number = token.payload.integer_number;
         nextState = &LexicalAnalyzer::stateNumberE;
-
+    }
     if (c == '.')
         stateNumberDot(c);
 
-    if (token.payload.number.isdigit(c)) {
+    if (token.payload.integer_number.isdigit(c)) {
         nextState = &LexicalAnalyzer::stateNumberR;
     }
 
     if (nextState != &LexicalAnalyzer::end)
-        token.payload.number.append(c);
+        token.payload.integer_number.append(c);
 
     return SUCCESS;
 }
 
 int LexicalAnalyzer::stateNumberDot(int c) {
     int c2;
-    token.type = tokenFloat;
     nextState = &LexicalAnalyzer::end;
 
     if (c == '.') {
         c2 = file->peek2();
-        if (token.payload.number.isdigit(c2))
-            nextState = &LexicalAnalyzer::stateNumberDot;
+        if (token.payload.float_number.isdigit(c2)) {
+            token.type = tokenFloat;
+            token.payload.float_number = token.payload.integer_number;
+                nextState = &LexicalAnalyzer::stateNumberDot;
+        }
         return SUCCESS;
     }
 
     if (c == 'e')
         nextState = &LexicalAnalyzer::stateNumberE;
 
-    if (token.payload.number.isdigit(c)) {
+    if (token.payload.float_number.isdigit(c)) {
         nextState = &LexicalAnalyzer::stateNumberDot;
     }
 
     if (nextState != &LexicalAnalyzer::end)
-        token.payload.number.append(c);
+        token.payload.float_number.append(c);
 
     return SUCCESS;
 }
@@ -81,7 +86,7 @@ int LexicalAnalyzer::stateNumberE(int c) {
     }
 
     if (nextState != &LexicalAnalyzer::end)
-        token.payload.number.append(c);
+        token.payload.float_number.append(c);
 
     return SUCCESS;
 }
