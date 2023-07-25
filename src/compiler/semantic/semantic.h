@@ -51,18 +51,19 @@ class SemanticAnalyzer {
     std::pair<Identifier, std::deque<Identifier>> analyze(const ast::Message &);
     asg::Net analyze(const ast::Net &);
     asg::Place analyze(const ast::Place &);
-    void analyze(const ast::InitAction &);
+    asg::Action analyze(const ast::InitAction &);
     asg::Transition analyze(const ast::Transition &);
-    void analyze(const ast::ConditionPair &);
-    void analyze(const ast::Condition &);
-    void analyze(const ast::PreCondition &);
-    void analyze(const ast::PostCondition &);
-    void analyze(const ast::Guard &);
-    void analyze(const ast::Action &);
-    void analyze(const ast::MultiSet &);
-    void analyze(const ast::MultiSetElem &);
-    void analyze(const ast::MultiSetTerm &);
-    void analyze(const ast::MultiSetTerm::MultiSetList &);
+    asg::CondPair analyze(const ast::ConditionPair &);
+    std::deque<asg::CondPair> analyze(const ast::Condition &);
+    std::deque<asg::PreCondPair> analyze(const ast::PreCondition &);
+    std::deque<asg::PostCondPair> analyze(const ast::PostCondition &);
+    asg::Guard analyze(const ast::Guard &);
+    asg::Action analyze(const ast::Action &);
+
+    asg::MultiSet analyze(const ast::MultiSet &);
+    asg::MultiSetElemPair analyze(const ast::MultiSetElem &);
+    asg::MultiSetTerm analyze(const ast::MultiSetTerm &);
+    asg::MultiSetList analyze(const ast::MultiSetTerm::MultiSetList &);
 
     asg::Expression analyze(const ast::Expression &);
     asg::Expression analyze(const ast::ExpressionPair &);

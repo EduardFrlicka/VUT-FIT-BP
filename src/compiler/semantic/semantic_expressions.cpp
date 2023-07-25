@@ -307,7 +307,7 @@ asg::Expression SemanticAnalyzer::analyze(const ast::ConstArray &node) {
     asg::ConstArray result_node;
 
     for (auto elem : node.elements) {
-        result_node.elements.push_back(asg::Literal(elem.payload));
+        result_node.elements.push_back(asg::Literal(elem.payload, elem.type));
     }
 
     return result_node;

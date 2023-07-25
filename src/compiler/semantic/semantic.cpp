@@ -22,8 +22,8 @@ SemanticAnalyzer::SemanticAnalyzer(const ast::Classes &__root) {
 
     /* ANALYSYS */
     _root = analyze(__root);
-    if (res)
-        exit(res);
+    // if (res)
+    //     exit(res);
 }
 
 asg::Classes &SemanticAnalyzer::root() {
@@ -226,8 +226,8 @@ asg::Net SemanticAnalyzer::analyze(const ast::Net &node) {
     return result_node;
 }
 asg::Place SemanticAnalyzer::analyze(const ast::Place &node) {
-    Identifier place;
     asg::Place result_node;
+    Identifier place;
 
     if (places.search(node.name->payload.id)) {
         error.place_redeclaration(places.get(node.name->payload.id), node.name->it);
@@ -239,21 +239,22 @@ asg::Place SemanticAnalyzer::analyze(const ast::Place &node) {
     places.push(place);
 
     if (node.init_state.has_value())
-        analyze(node.init_state.value());
+        result_node.init_state = analyze(node.init_state.value());
 
     /* TODO variables ?? */
 
     if (node.init_func.has_value())
-        analyze(node.init_func.value());
+        result_node.init_action = analyze(node.init_func.value());
 
     return result_node;
 }
 
-void SemanticAnalyzer::analyze(const ast::InitAction &node) {
-    /*begin*/
+asg::Action SemanticAnalyzer::analyze(const ast::InitAction &node) {
+    asg::Action result_node;
     Identifier var;
 
     variables.push_frame();
+
     for (auto temp_var : node.temporaries) {
         if (temp_var.payload.id.is_upper()) {
             error.expected_lower(temp_var.it);
@@ -268,16 +269,17 @@ void SemanticAnalyzer::analyze(const ast::InitAction &node) {
         var = Identifier(temp_var.payload.id);
         var.declare(temp_var.it);
         variables.push(var);
+        result_node.temporaries.push_back(var);
     }
 
-    analyze(node.expr);
+    result_node.expression = analyze(node.expr);
 
     variables.pop_frame();
-    /*end*/
+
+    return result_node;
 }
 
 asg::Transition SemanticAnalyzer::analyze(const ast::Transition &node) {
-    /*begin*/
     asg::Transition result_node;
     Identifier transition;
 
@@ -289,83 +291,94 @@ asg::Transition SemanticAnalyzer::analyze(const ast::Transition &node) {
     transition = Identifier(node.name->payload.id);
     transition.declare_define(node.name->it);
     transitions.push(transition);
+    result_node.name = transition;
 
     variables.push_frame();
 
     /* TODO check if has effect */
 
     if (node.conditions.has_value())
-        analyze(node.conditions.value());
+        result_node.conditions = analyze(node.conditions.value());
     if (node.pre_conditions.has_value())
-        analyze(node.pre_conditions.value());
+        result_node.pre_conditions = analyze(node.pre_conditions.value());
     if (node.guard.has_value())
-        analyze(node.guard.value());
-    if (node.post_contitions.has_value())
-        analyze(node.post_contitions.value());
+        result_node.guard = analyze(node.guard.value());
     if (node.action.has_value())
-        analyze(node.action.value());
+        result_node.action = analyze(node.action.value());
+    if (node.post_contitions.has_value())
+        result_node.post_conditions = analyze(node.post_contitions.value());
 
     variables.pop_frame();
-    /*end*/
     return result_node;
 }
-void SemanticAnalyzer::analyze(const ast::ConditionPair &node) {
-    /*begin*/
+
+asg::CondPair SemanticAnalyzer::analyze(const ast::ConditionPair &node) {
+    asg::CondPair result_node;
 
     if (!places.search(node.first->payload.id)) {
         error.place_not_found(node.first->it);
         res = ERR_SEMANTIC;
     }
 
-    analyze(node.second);
+    result_node.place = places.get(node.first->payload.id);
 
-    /*end*/
+    result_node.edge_expression = analyze(node.second);
+
+    return result_node;
 }
-void SemanticAnalyzer::analyze(const ast::Condition &node) {
-    /*begin*/
+
+std::deque<asg::CondPair> SemanticAnalyzer::analyze(const ast::Condition &node) {
+    std::deque<asg::CondPair> result_array;
 
     for (auto i : node.conditions) {
-        analyze(i);
+        result_array.push_back(analyze(i));
     }
 
-    /*end*/
+    return result_array;
 }
 
-void SemanticAnalyzer::analyze(const ast::PreCondition &node) {
-    /*begin*/
+std::deque<asg::PreCondPair> SemanticAnalyzer::analyze(const ast::PreCondition &node) {
+    std::deque<asg::PreCondPair> result_array;
 
     for (auto i : node.conditions) {
-        analyze(i);
+        result_array.push_back(analyze(i));
     }
 
-    /*end*/
+    return result_array;
 }
-void SemanticAnalyzer::analyze(const ast::PostCondition &node) {
-    /*begin*/
+
+std::deque<asg::PostCondPair> SemanticAnalyzer::analyze(const ast::PostCondition &node) {
+    std::deque<asg::PostCondPair> result_array;
 
     for (auto i : node.conditions) {
-        analyze(i);
+        result_array.push_back(analyze(i));
     }
 
-    /*end*/
+    return result_array;
 }
 
-void SemanticAnalyzer::analyze(const ast::Guard &node) {
-    /*begin*/
+asg::Guard SemanticAnalyzer::analyze(const ast::Guard &node) {
+    asg::Guard result_node;
+    asg::Expression expr;
 
     /* TODO */
-    // if (!node.expr.issecundary()) {
-    //     std::cout << node.expr.value->index() << std::endl;
-    //     error.expression_primary_expected(node.expr.begin, node.expr.end);
-    //     res = ERR_SEMANTIC;
-    // }
+    if (!node.expr.issecundary()) {
+        std::cout << node.expr.value->index() << std::endl;
+        error.expression_primary_expected(node.expr.begin, node.expr.end);
+        res = ERR_SEMANTIC;
+    }
 
-    analyze(node.expr);
+    expr = analyze(node.expr);
 
-    /*end*/
+    if (expr.is_type<asg::Expressions>())
+        result_node.expression = expr.get<asg::Expressions>();
+    else
+        result_node.expression = asg::Expressions({expr});
+
+    return result_node;
 }
-void SemanticAnalyzer::analyze(const ast::Action &node) {
-    /*begin*/
+asg::Action SemanticAnalyzer::analyze(const ast::Action &node) {
+    asg::Action result_node;
     Identifier var;
 
     variables.push_frame();
@@ -384,62 +397,109 @@ void SemanticAnalyzer::analyze(const ast::Action &node) {
         var = Identifier(temp_var.payload.id);
         var.declare(temp_var.it);
         variables.push(var);
+        result_node.temporaries.push_back(var);
     }
 
-    analyze(node.expr);
+    result_node.expression = analyze(node.expr);
 
     variables.pop_frame();
 
-    /*end*/
+    return result_node;
 }
-void SemanticAnalyzer::analyze(const ast::MultiSet &node) {
-    /*begin*/
+
+asg::MultiSet SemanticAnalyzer::analyze(const ast::MultiSet &node) {
+    asg::MultiSet result_node;
 
     /* TODO variables ? */
 
     for (auto i : node.elements) {
-        analyze(i);
+        result_node.elements.push_back(analyze(i));
     }
 
-    /*end*/
+    return result_node;
 }
-void SemanticAnalyzer::analyze(const ast::MultiSetElem &node) {
-    /*begin*/
+asg::MultiSetElemPair SemanticAnalyzer::analyze(const ast::MultiSetElem &node) {
+    asg::MultiSetElemPair result_node;
+
+    result_node.term = analyze(node.term);
 
     /* TODO variables ? */
-    analyze(node.term);
 
-    /*end*/
-}
-void SemanticAnalyzer::analyze(const ast::MultiSetTerm &node) {
-    /*begin*/
-    Identifier var;
+    if (!node.count.has_value())
+        return result_node;
 
-    if (node.value.has_value()) {
-        if (node.value->type == tokenIdentifier) {
-            if (node.value->payload.id.is_upper()) {
-                error.expected_lower(node.value->it);
-                res = ERR_SEMANTIC;
-            }
-
-            var = Identifier(node.value->payload.id);
-            var.declare_define(node.value->it);
-            variables.push(var);
+    if (node.count->type == tokenIdentifier) {
+        if (!variables.search(node.count->payload.id)) {
+            error.undeclared_variable(node.count->it);
+            res = ERR_SEMANTIC;
+        } else if (!variables.get(node.count->payload.id).defined) {
+            error.undefined_variable(variables.get(node.count->payload.id), node.count->it);
+            res = ERR_SEMANTIC;
+        } else {
+            result_node.count = asg::Variable(variables.get(node.count->payload.id));
         }
     }
 
-    /*end*/
-}
-
-void SemanticAnalyzer::analyze(const ast::MultiSetTerm::MultiSetList &node) {
-    /*begin*/
-
-    if (node.tail->payload.id.is_upper()) {
-        error.expected_lower(node.tail->it);
-        res = ERR_SEMANTIC;
+    if (node.count->type == tokenInteger) {
+        if (node.count->payload.integer_number.number < 0) {
+            error.negative_count_in_multiset(node.count->it);
+            res = ERR_SEMANTIC;
+        } else {
+            result_node.count = node.count->payload.integer_number.number;
+        }
     }
 
-    analyze_vector(node.values);
+    return result_node;
+}
 
+asg::MultiSetTerm SemanticAnalyzer::analyze(const ast::MultiSetTerm &node) {
+    asg::MultiSetTerm result_node;
+    Identifier var;
+
+    if (node.list.has_value()) {
+        result_node.list = analyze(*node.list);
+        return result_node;
+    }
+
+    if (node.value->type == tokenIdentifier) {
+        if (node.value->payload.id.is_upper()) {
+            error.expected_lower(node.value->it);
+            res = ERR_SEMANTIC;
+        }
+
+        if (variables.search(node.value->payload.id)) {
+            result_node.variable = variables.get(node.value->payload.id);
+        } else {
+            var = Identifier(node.value->payload.id);
+            var.declare_define(node.value->it);
+            variables.push(var);
+            result_node.variable = var;
+        }
+    }
+
+    if (node.value->isliteral()) {
+        result_node.literal = asg::Literal(node.value->payload, node.value->type);
+    }
+
+    return result_node;
+}
+
+asg::MultiSetList SemanticAnalyzer::analyze(const ast::MultiSetTerm::MultiSetList &node) {
+    asg::MultiSetList result_node;
+
+    for (auto const &i : node.values) {
+        result_node.elements.push_back(analyze(i));
+    }
+
+    if (node.tail.has_value()) {
+        if (node.tail->payload.id.is_upper()) {
+            error.expected_lower(node.tail->it);
+            res = ERR_SEMANTIC;
+        }
+        if (variables.search(node.tail->payload.id)) {
+        }
+    }
+
+    return result_node;
     /*end*/
 }

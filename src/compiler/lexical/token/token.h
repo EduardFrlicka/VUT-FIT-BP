@@ -166,8 +166,8 @@ class Token {
 
     std::string type_string();
     static std::string type_string(TokenType);
-    bool isspace();
-    bool isliteral();
+    bool isspace() const;
+    bool isliteral() const;
 
     void print() const;
 };

@@ -1,14 +1,14 @@
 #include "error_printer.h"
 #include "logger.h"
+#include "regex_constructor.h"
 #include "template.h"
 #include <iostream>
-#include "regex_constructor.h"
 
 using std::map;
-using std::set;
-using std::string;
 using std::regex;
+using std::set;
 using std::smatch;
+using std::string;
 using namespace std::filesystem;
 
 CodeTemplateManager::CodeTemplateManager(const std::filesystem::path &dir_path) {
@@ -33,8 +33,10 @@ CodeTemplateManager::CodeTemplateManager(const std::filesystem::path &dir_path) 
         templ_name = template_name(file.path(), dir_path);
         templ = create_template(file);
 
-        templates.insert(std::make_pair(templ_name, templ));
+        templates[templ_name] = templ;
     }
+
+    templates[""] = CodeFiles();
 }
 
 CodeFiles CodeTemplateManager::get(const std::string name) {

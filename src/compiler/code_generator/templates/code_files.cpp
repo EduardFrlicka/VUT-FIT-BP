@@ -20,6 +20,9 @@ CodeFiles::CodeFiles(const std::map<std::string, Code> &input_map, const Code &_
     code_files.insert(input_map.begin(), input_map.end());
 }
 
+// void CodeFiles::remove_slot(const std::string &slot_name) {
+// }
+
 void CodeFiles::apply(const std::map<std::string, CodeFiles> &replacements) {
     for (auto kv : replacements)
         apply(kv.first, kv.second);
@@ -53,6 +56,10 @@ void CodeFiles::apply(const std::string &key, const CodeFiles &replacement) {
         free_code.uncomment(key);
         free_code.apply(key, replacement.free_code);
     }
+}
+
+void CodeFiles::apply(const std::string &slot_key, const std::string &slot_value) {
+    apply({{slot_key, slot_value}});
 }
 
 void CodeFiles::apply(const std::map<std::string, std::string> &string_replacements) {

@@ -2,28 +2,31 @@
 #include "object.h"
 #include <iostream>
 
-std::atomic<long> PN::id_counter = 0;
+using namespace PNtalk;
 
-PN::ObjectBase::ObjectBase() {
-    id = PN::id_counter++;
+// std::atomic<long> id_counter = 0;
+
+ObjectBase::ObjectBase() {
+    // id = id_counter++;
 
     message_translator["_eq_identity_"] = &ObjectBase::_eq_identity_;
     message_translator["_neq_identity_"] = &ObjectBase::_neq_identity_;
 }
 
-PN::Object PN::ObjectBase::message(const std::string &message_selector, const std::deque<PN::Object> &arguments) {
+std::shared_ptr<Object> PNtalk::ObjectBase::_eq_identity_(std::weak_ptr<Object> this_obj, MessageArguments arguments) {
+    std::cout << "base_obj" << std::endl;
+    return std::make_shared<Object>(Object(Bool(this_obj.lock()->_value == arguments.front()->_value)));
+}
+
+std::shared_ptr<Object> PNtalk::ObjectBase::_neq_identity_(std::weak_ptr<Object> this_obj, MessageArguments arguments) {
+    return std::make_shared<Object>(Object(Bool(this_obj.lock()->_value != arguments.front()->_value)));
+}
+
+std::shared_ptr<Object> ObjectBase::message(std::weak_ptr<Object> this_obj, const std::string &message_selector, MessageArguments arguments) {
     if (message_translator.find(message_selector) == message_translator.end()) {
         std::cout << "FAILED " << message_selector << std::endl;
-        return Object();
+        exit(1);
     }
 
-    return (this->*(message_translator[message_selector]))(arguments);
-}
-
-PN::Object PN::ObjectBase::_eq_identity_(const std::deque<PN::Object> &) {
-    return Object();
-}
-
-PN::Object PN::ObjectBase::_neq_identity_(const std::deque<PN::Object> &) {
-    return Object();
+    return (this->*(message_translator[message_selector]))(this_obj, arguments);
 }

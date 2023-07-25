@@ -1,15 +1,21 @@
 #include "boolean.h"
 
-PN::Bool::operator bool() const {
-    return value;
+PNtalk::Bool::Bool() {
 }
 
-bool PN::Bool::operator==(const PN::Bool &other) const {
-    return other.value == value;
+PNtalk::Bool::Bool(bool value): _value(value) {
 }
-bool PN::Bool::operator!=(const PN::Bool &other) const {
-    return other.value != value;
+
+PNtalk::Bool::operator bool() const {
+    return _value;
 }
-bool PN::Bool::operator!() const {
-    return !value;
+
+bool PNtalk::Bool::operator==(const PNtalk::Bool &other) const {
+    return other._value == _value;
+}
+bool PNtalk::Bool::operator!=(const PNtalk::Bool &other) const {
+    return other._value != _value;
+}
+bool PNtalk::Bool::operator!() const {
+    return !_value;
 }

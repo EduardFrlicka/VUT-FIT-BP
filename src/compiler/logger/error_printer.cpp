@@ -42,6 +42,10 @@ void ErrorPrinter::place_not_found(TokenStackIterator id) {
     std::cerr << "place_not_found" << std::endl;
 }
 
+void ErrorPrinter::negative_count_in_multiset(TokenStackIterator it) {
+    std::cerr << "negative_count_in_multiset" << std::endl;
+}
+
 void ErrorPrinter::expression_primary_expected(TokenStackIterator begin, TokenStackIterator end) {
     std::cerr << "expression_primary_expected" << std::endl;
     logger.c_note(begin.get(), "baf");

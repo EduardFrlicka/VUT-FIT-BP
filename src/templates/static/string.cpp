@@ -1,27 +1,30 @@
 #include "string.h"
 #include "object.h"
 
-// PN::Object PN::String::message(const std::string &message_selector, const std::deque<PN::Object> &arguments) {
+// PNtalk::Object PNtalk::String::message(const std::string &message_selector, const std::deque<PNtalk::Object> &arguments) {
 //     if (message_selector == "at")
 //         return at(arguments);
-//     return PN::Object();
+//     return PNtalk::Object();
 // }
 
-PN::Object PN::String::message(const std::string &message_selector, const std::deque<PN::Object> &arguments) {
+using namespace PNtalk;
+
+PNtalk::String::String() : super() {
+    message_translator["at"] = &String::at;
+}
+PNtalk::String::String(std::string value) : String() {
+    _value = value;
+}
+
+std::shared_ptr<Object> PNtalk::String::message(std::weak_ptr<Object> this_obj, const std::string &message_selector, MessageArguments arguments) {
     if (message_translator.find(message_selector) == message_translator.end()) {
-        return super::message(message_selector, arguments);
+        return super::message(this_obj, message_selector, arguments);
     }
 
-    (this->*(message_translator[message_selector]))(arguments);
-
-    return Object();
+    return (this->*(message_translator[message_selector]))(this_obj, arguments);
 }
 
-PN::Object PN::String::at(const std::deque<PN::Object> &) {
-    std::cout << "at" << std::endl;
-    return PN::Object();
+std::shared_ptr<Object> PNtalk::String::at(std::weak_ptr<Object> this_obj, MessageArguments arguments) {
+    std::cout << "string" << std::endl;
+    return std::shared_ptr<Object>();
 }
-
-PN::String::String() : super() {
-    message_translator["at"] = &String::at;
-};

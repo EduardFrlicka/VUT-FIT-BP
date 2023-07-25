@@ -7,16 +7,6 @@
 
 namespace AbstractSemanticGraph {
 
-// class Templ : public Base {};
-// class Templ : public Base {};
-// class Templ : public Base {};
-// class Templ : public Base {};
-// class Templ : public Base {};
-// class Templ : public Base {};
-// class Templ : public Base {};
-// class Templ : public Base {};
-// class Templ : public Base {};
-
 class MultiSetTerm;
 class MultiSetList : public Base {
   public:
@@ -24,27 +14,83 @@ class MultiSetList : public Base {
     std::optional<Identifier> tail;
 };
 class MultiSetTerm : public Base {
+  public:
     std::optional<MultiSetList> list;
-    std::optional<Literal> lit;
-    std::optional<Variable> val;
+    std::optional<Literal> literal;
+    std::optional<Variable> variable;
 };
 
-// class Templ : public Base {};
-// class Templ : public Base {};
-// class Templ : public Base {};
-// class Templ : public Base {};
-// class Templ : public Base {};
+class MultiSetCount : public Base {
+  private:
+    std::variant<int, Variable> _value;
 
-class PreCondPair : public Base {};
-class CondPair : public Base {};
-class Guard : public Base {};
-class Action : public Base {};
-class PostCondPair : public Base {};
+  public:
+    MultiSetCount();
+    MultiSetCount(int value);
+    MultiSetCount(Variable value);
 
-class Transition : public Base {};
+    bool is_int() const;
+    bool is_variable() const;
+    int get_int() const;
+    Variable get_variable() const;
+};
+
+class MultiSetElemPair : public Base {
+  public:
+    MultiSetCount count;
+    MultiSetTerm term;
+};
+
+class MultiSet : public Base {
+  public:
+    std::deque<MultiSetElemPair> elements;
+};
+
+class CondPair : public Base {
+  public:
+    Identifier place;
+    MultiSet edge_expression;
+};
+
+class PreCondPair : public Base {
+  public:
+    PreCondPair(const CondPair &);
+    Identifier place;
+    MultiSet edge_expression;
+};
+
+class Guard : public Base {
+  public:
+    Expressions expression;
+};
+
+class Action : public Base {
+  public:
+    std::deque<Identifier> temporaries;
+    Expression expression;
+};
+
+class PostCondPair : public Base {
+  public:
+    PostCondPair(const CondPair &);
+    Identifier place;
+    MultiSet edge_expression;
+};
+
+class Transition : public Base {
+  public:
+  Identifier name;
+  std::deque<PreCondPair> pre_conditions;
+  std::deque<CondPair> conditions;
+  std::deque<PostCondPair> post_conditions;
+  std::optional<Guard> guard;
+  std::optional<Action> action;
+};
 class Place : public Base {
   public:
     Identifier name;
+    std::optional<MultiSet> init_state;
+    std::optional<Action> init_action;
 };
 
 class Net : public Base {
@@ -73,7 +119,7 @@ class SynPort : public Base {
     std::deque<Identifier> arguments;
     std::deque<PreCondPair> pre_conds;
     std::deque<CondPair> conds;
-    std::deque<Guard> guard;
+    std::optional<Guard> guard;
     std::deque<PostCondPair> post_conds;
 };
 

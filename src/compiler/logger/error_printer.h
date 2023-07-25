@@ -40,6 +40,8 @@ class ErrorPrinter {
 
     void place_not_found(TokenStackIterator id);
 
+    void negative_count_in_multiset(TokenStackIterator it);
+
     void expression_primary_expected(TokenStackIterator begin, TokenStackIterator end);
 
     void expected_number(TokenStackIterator it);

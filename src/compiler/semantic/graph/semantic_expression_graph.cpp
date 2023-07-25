@@ -65,5 +65,4 @@ AbstractSemanticGraph::Bracket::Bracket(){};
 AbstractSemanticGraph::Bracket::Bracket(const Expression &_expr) : expr(_expr){};
 
 AbstractSemanticGraph::Literal::Literal(){};
-
-AbstractSemanticGraph::Literal::Literal(TokenPayload _val) : value(_val){};
+AbstractSemanticGraph::Literal::Literal(TokenPayload _val, TokenType _type) : value(_val), type(_type){};

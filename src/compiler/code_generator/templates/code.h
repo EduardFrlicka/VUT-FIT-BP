@@ -45,8 +45,12 @@ class CodeFiles {
     CodeFiles();
     CodeFiles(const std::map<std::string, Code> &);
     CodeFiles(const std::map<std::string, Code> &, const Code &);
+
+    // void remove_slot(const std::string&);
+
     void apply(const std::map<std::string, CodeFiles> &);
     void apply(const std::string &, const CodeFiles &);
+    void apply(const std::string &slot_key, const std::string &slot_value);
     void apply(const std::map<std::string, std::string> &);
     void print();
 };

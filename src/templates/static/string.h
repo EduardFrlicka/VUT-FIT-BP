@@ -3,19 +3,22 @@
 #include <iostream>
 #include <string>
 
-namespace PN {
+namespace PNtalk {
 
 class String : public ObjectBase {
   public:
     typedef ObjectBase super;
     typedef String self;
+
+    std::string _value;
     String();
+    String(std::string value);
 
-    std::map<std::string, Object (String::*)(const std::deque<Object> &)> message_translator;
+    MessageTranslator<String> message_translator;
 
-    Object message(const std::string &, const std::deque<Object> &);
+    virtual std::shared_ptr<Object> message(std::weak_ptr<Object> this_obj, const std::string &message_selector, MessageArguments arguments);
 
-    Object at(const std::deque<Object> &);
+    std::shared_ptr<Object> at(std::weak_ptr<Object> this_obj, MessageArguments arguments);
 };
 
-} // namespace PN
+} // namespace PNtalk

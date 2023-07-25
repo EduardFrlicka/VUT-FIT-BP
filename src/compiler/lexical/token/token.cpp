@@ -7,7 +7,7 @@ Token::Token(const FilePosition &_pos) : pos(_pos) {
 Token::~Token() {
 }
 
-bool Token::isspace() {
+bool Token::isspace() const {
     switch (type) {
     case tokenWhiteSpace:
     case tokenEOL:
@@ -18,7 +18,7 @@ bool Token::isspace() {
     }
 }
 
-bool Token::isliteral() {
+bool Token::isliteral() const {
     switch (type) {
 
     case tokenChar:

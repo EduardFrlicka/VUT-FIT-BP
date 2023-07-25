@@ -36,8 +36,8 @@ class Expression : public Base {
 
     std::shared_ptr<ExprVariant> value;
 
-    template <class T> T get();
-    template <class T> bool is_type();
+    template <class T> T get() const;
+    template <class T> bool is_type() const;
 };
 
 class Expressions : public Base {
@@ -76,8 +76,9 @@ class UnaryMessage : public Base {
 class Literal : public Base {
   public:
     Literal();
-    Literal(TokenPayload);
+    Literal(TokenPayload, TokenType);
     TokenPayload value;
+    TokenType type;
 };
 
 class Variable : public Base {
@@ -113,11 +114,11 @@ class ConstArray : public Base {
     std::deque<Literal> elements;
 };
 
-template <class T> inline T Expression::get() {
+template <class T> inline T Expression::get() const {
     return std::get<T>(*value);
 };
 
-template <class T> inline bool Expression::is_type() {
+template <class T> inline bool Expression::is_type() const {
     return std::holds_alternative<T>(*value);
 };
 

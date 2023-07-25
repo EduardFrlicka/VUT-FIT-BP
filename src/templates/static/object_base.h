@@ -2,27 +2,31 @@
 #include <atomic>
 #include <deque>
 #include <map>
+#include <memory>
 #include <string>
 
-namespace PN {
+namespace PNtalk {
 
 class Object;
 
-extern std::atomic<long> id_counter;
+// extern std::atomic<long> id_counter;
 
 class ObjectBase {
   protected:
-    long id;
-    std::map<std::string, Object (ObjectBase::*)(const std::deque<Object> &)> message_translator;
+    // long id;
+    typedef const std::deque<std::shared_ptr<Object>> &MessageArguments;
+    template <class T> using MessageTranslator = std::map<std::string, std::shared_ptr<Object> (T::*)(std::weak_ptr<Object>, MessageArguments)>;
+
+    MessageTranslator<ObjectBase> message_translator;
 
   public:
     ObjectBase();
-    virtual Object message(const std::string &, const std::deque<Object> &);
+    virtual std::shared_ptr<Object> message(std::weak_ptr<Object> this_obj, const std::string &message_selector, MessageArguments arguments);
 
-    virtual Object _eq_identity_(const std::deque<Object> &);
-    virtual Object _neq_identity_(const std::deque<Object> &);
+    virtual std::shared_ptr<Object> _eq_identity_(std::weak_ptr<Object> this_obj, MessageArguments arguments);
+    virtual std::shared_ptr<Object> _neq_identity_(std::weak_ptr<Object> this_obj, MessageArguments arguments);
 
     virtual ~ObjectBase(){};
 };
 
-} // namespace PN
+} // namespace PNtalk

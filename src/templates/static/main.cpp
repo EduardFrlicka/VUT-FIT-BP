@@ -4,7 +4,4 @@
 #include <thread>
 
 int main() {
-    auto s = PN::String();
-    s.message("at", {});
-    s.message("_eq_", {});
 }

@@ -1,7 +1,7 @@
 /*!file:__class_name__.h*/
 #include "net_place.h"
 /*!ignore*/
-using namespace PN;
+using namespace PNtalk;
 /*!ignore*/
 class foo {
     Place __place_name__;
