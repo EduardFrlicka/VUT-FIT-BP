@@ -20,6 +20,18 @@ bool NameSpace::search(const std::string &needle) {
     return false;
 }
 
+bool NameSpace::search_top(const Identifier &needle) {
+    return search_top(needle.id);
+}
+
+bool NameSpace::search_top(const BasicIdentifier &needle) {
+    return search_top(needle.name);
+}
+
+bool NameSpace::search_top(const std::string &needle) {
+    return stack.back().find(needle) != stack.back().end();
+}
+
 Identifier &NameSpace::get(const Identifier &needle) {
     return get(needle.id.name);
 }
@@ -34,6 +46,14 @@ Identifier &NameSpace::get(const std::string &needle) {
             return it->find(needle)->second;
     }
     return dummy;
+}
+
+std::deque<Identifier> NameSpace::get_frame() {
+    std::deque<Identifier> res;
+    for (auto &kv : stack.back())
+        res.push_back(kv.second);
+
+    return res;
 }
 
 void NameSpace::push(const Identifier &id) {

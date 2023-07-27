@@ -18,9 +18,9 @@ class Code {
     Code(const std::string &, const std::set<std::string> &);
     // ~Code();
 
-    Code apply(std::map<std::string, std::string>);
+    Code apply(const std::map<std::string, std::string> &);
 
-    std::string to_string();
+    std::string to_string() const;
 
     void apply(std::string, Code);
     void apply(std::regex, Code);
@@ -30,7 +30,7 @@ class Code {
     void append(Code);
     void append(std::vector<Code>);
 
-    bool isEmpty();
+    bool isEmpty() const;
 
   private:
 };
@@ -47,10 +47,12 @@ class CodeFiles {
     CodeFiles(const std::map<std::string, Code> &, const Code &);
 
     // void remove_slot(const std::string&);
+    const std::map<std::string, Code> &get_code_files() const;
 
     void apply(const std::map<std::string, CodeFiles> &);
     void apply(const std::string &, const CodeFiles &);
     void apply(const std::string &slot_key, const std::string &slot_value);
     void apply(const std::map<std::string, std::string> &);
+    void remove_optional_slots();
     void print();
 };

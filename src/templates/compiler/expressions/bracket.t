@@ -1,0 +1,2 @@
+/*!inline*/
+(__expression__)

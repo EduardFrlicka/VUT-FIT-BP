@@ -1,30 +1,45 @@
 #pragma once
 
-#include "object.h"
+#include "boolean.h"
+#include "integer.h"
+#include "net_PN.h"
+#include "object_base.h"
+
 #include <deque>
 #include <memory>
+#include <set>
 
 namespace PNtalk {
 
 class MultiSetItem;
 
 class MultiSetList {
-    std::deque<MultiSetItem> values;
+    std::deque<std::shared_ptr<Object>> values;
 };
 
 class MultiSetItem {
   public:
     Integer _count;
     std::shared_ptr<Object> _value;
-    MultiSetItem(std::shared_ptr<Object> value);
-    MultiSetItem(Integer count, std::shared_ptr<Object> value);
+
+    MultiSetItem(const std::shared_ptr<Object> &value);
+    MultiSetItem(const Integer &count, const std::shared_ptr<Object> &value);
 };
 
-typedef std::deque<MultiSetItem> MultiSet;
+class MultiSet : public std::deque<MultiSetItem> {};
+
 class PN::Place {
-    std::deque<std::shared_ptr<Object>> values;
+    std::deque<Object> values;
 
-    virtual void update();
+    bool match(std::weak_ptr<PN::Transition> trans, const MultiSet &edge_expr);
+    bool pop(std::weak_ptr<PN::Transition> trans, const MultiSet &edge_expr);
+    void push(const MultiSet &edge_expr);
+
+    void update();
+    void schedule(std::shared_ptr<PN::Transition> trans);
+
+  private:
+    std::set<std::weak_ptr<PN::Transition>> update_transitions;
 };
-
+  
 } // namespace PNtalk

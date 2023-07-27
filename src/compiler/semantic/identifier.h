@@ -23,14 +23,10 @@ class Identifier {
     void declare(TokenStackIterator);
     void define(TokenStackIterator);
     void declare_define(TokenStackIterator);
-  
+
     void declare(TokenStackIterator, TokenStackIterator);
     void define(TokenStackIterator, TokenStackIterator);
     void declare_define(TokenStackIterator, TokenStackIterator);
 
-    
-
-    Identifier operator+(const std::string &);
-    Identifier operator+(const BasicIdentifier &);
-    Identifier operator+(const Identifier &);
+    void add_keyword_identifier(const Identifier &other);
 };

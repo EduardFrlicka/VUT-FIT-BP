@@ -1,28 +1,32 @@
 #pragma once
-#include "integer.h"
-#include "string.h"
-#include "boolean.h"
-#include <atomic>
-#include <iostream>
-#include <memory>
-#include <variant>
-
 #include "net_PN.h"
 #include "net_place.h"
 #include "net_transition.h"
+#include "object_variant.h"
+#include <atomic>
+#include <iostream>
+#include <memory>
 
 namespace PNtalk {
 class Object : public std::enable_shared_from_this<Object> {
-    typedef std::variant<String, Bool /*?, __generated__*/> Variant;
 
   public:
-    std::shared_ptr<Variant> _value;
+    std::shared_ptr<ObjectVariant> _value;
 
     Object();
-    Object(String &&value);
     Object(Bool &&value);
+    Object(Integer &&value);
+    Object(Character &&value);
+    Object(String &&value);
+    Object(Symbol &&value);
+    Object(Array &&value);
+    Object(CodeBlock &&value);
+    Object(Transcript &&value);
+    /*?__generated__*/
 
-    std::shared_ptr<Object> message(const std::string &message_selector, const std::deque<std::shared_ptr<Object>> &arguments);
+    MessageResult message(const MessageSelector &message_selector, MessageArguments arguments);
+    bool empty();
+    void reset();
     template <class T> T &get();
     template <class T> bool is_type() const;
 };

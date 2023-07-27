@@ -1,0 +1,2 @@
+/*!inline*/
+__identifier__

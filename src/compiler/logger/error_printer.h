@@ -32,13 +32,17 @@ class ErrorPrinter {
 
     void undeclared_variable(TokenStackIterator id);
     void undefined_variable(Identifier id, TokenStackIterator it);
+    void undefined_variable_warn(Identifier id, TokenStackIterator it);
     void variable_redeclaration(Identifier declaration, TokenStackIterator redefined);
+    void implicit_declaration_variable(TokenStackIterator id);
 
     void message_redeclaration(Identifier declaration, TokenStackIterator redefined);
     void place_redeclaration(Identifier declaration, TokenStackIterator redefined);
     void transition_redeclaration(Identifier declaration, TokenStackIterator redefined);
+    void argument_redeclaration(Identifier declaration, TokenStackIterator redefined);
 
-    void place_not_found(TokenStackIterator id);
+    void undeclared_place(TokenStackIterator id);
+    void undeclared_return(TokenStackIterator id);
 
     void negative_count_in_multiset(TokenStackIterator it);
 

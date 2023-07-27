@@ -18,9 +18,16 @@ class NameSpace {
     bool search(const BasicIdentifier &);
     bool search(const std::string &);
 
+    bool search_top(const Identifier &);
+    bool search_top(const BasicIdentifier &);
+    bool search_top(const std::string &);
+
+
     Identifier &get(const Identifier &);
     Identifier &get(const BasicIdentifier &);
     Identifier &get(const std::string &);
+
+    std::deque<Identifier> get_frame();
 
     void push(const Identifier &);
     void push_frame();

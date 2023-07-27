@@ -8,6 +8,7 @@
 class CodeGenerator {
   public:
     CodeGenerator(const asg::Classes &);
+    void writeFiles();
 
   private:
     // CodeFiles static_files;
@@ -40,7 +41,7 @@ class CodeGenerator {
     CodeFiles generate(const asg::MultiSetList &node);
 
     CodeFiles generate_argument(const Identifier &id);
-    CodeFiles generate_temporary(const Identifier &id);
+    CodeFiles generate_variable_declaration(const Identifier &id);
 
     CodeFiles generate(const asg::Expression &node);
     CodeFiles generate(const asg::Expressions &node);

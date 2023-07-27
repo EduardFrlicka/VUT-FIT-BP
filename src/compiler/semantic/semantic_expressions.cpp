@@ -132,7 +132,7 @@ asg::Expression SemanticAnalyzer::analyze(const ast::CascadeKeyWord &node) {
     asg::Expression recv = analyze(node.recv);
 
     for (auto i : node.selector) {
-        selector = selector + i.payload.id;
+        selector.add_keyword_identifier(i.payload.id);
     }
 
     for (auto i : node.arguments) {
@@ -171,27 +171,25 @@ asg::Expression SemanticAnalyzer::analyze(const ast::ExpressionIdentifier &node)
     }
     /* is variable */
     if (!variables.search(node.value.payload.id)) {
-        res = ERR_SEMANTIC;
-        error.undeclared_variable(node.value.it);
-        return asg::Variable();
+        error.implicit_declaration_variable(node.value.it);
+        var = Identifier(node.value.payload.id);
+        var.declare(node.value.it);
+        variables.push(var);
+
+        return asg::Variable(var);
     }
 
     var = variables.get(node.value.payload.id);
 
     if (!var.defined) {
-        error.undefined_variable(var, node.value.it);
-        res = ERR_SEMANTIC;
+        error.undefined_variable_warn(var, node.value.it);
     }
 
     return asg::Variable(var);
 }
 
 asg::Expression SemanticAnalyzer::analyze(const ast::ExpressionValue &node) {
-    asg::Literal result_node;
-
-    result_node.value = node.value.payload;
-
-    return result_node;
+    return asg::Literal(node.value.payload, node.value.type);
 }
 
 asg::Expression SemanticAnalyzer::analyze(const ast::ExpressionUnary &node) {
@@ -218,7 +216,7 @@ asg::Expression SemanticAnalyzer::analyze(const ast::ExpressionKeyWord &node) {
     Identifier selector;
 
     for (auto i : node.selector) {
-        selector = selector + i.payload.id;
+        selector.add_keyword_identifier(i.payload.id);
     }
 
     for (auto i : node.arguments) {

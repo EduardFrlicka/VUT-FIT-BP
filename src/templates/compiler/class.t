@@ -1,7 +1,5 @@
-/*!file:__class_name__.h*/
-#include "object.h"
-/*!newline*/
-
+/*!file:__class_name__/header.h*/
+#include "net_PN.h"
 namespace PNtalk {
 
 class __class_name__ : public __base_class_name__ {
@@ -12,26 +10,44 @@ class __class_name__ : public __base_class_name__ {
     /*? __syn_port__*/
 
     MessageTranslator<__class_name__> message_translator;
-    virtual std::shared_ptr<Object> message(std::weak_ptr<Object> this_obj, const std::string &message_selector, const std::deque<Object> &arguments);
+    MessageResult message(ThisObj this_obj, const MessageSelector &message_selector, MessageArguments arguments);
+    MessageResult doesNotUnderstand_(ThisObj this_obj, MessageArguments arguments);
 };
-} // namespace PN
+} // namespace PNtalk
 
-
-/*!file:__class_name___init.cpp*/
-#include "__class_name__.h"
-PNtalk::__class_name__::__class_name__(){
+/*!file:__class_name__/init.cpp*/
+#include "header.h"
+PNtalk::__class_name__::__class_name__() {
     /*?__object__*/
 }
 
-/*!file:__class_name___message.cpp*/
-#include "__class_name__.h"
+/*!file:__class_name__/message.cpp*/
+#include "header.h"
+#include "object.h"
+using namespace PNtalk;
 
-std::shared_ptr<Object> ObjectBase::message(std::weak_ptr<Object> this_obj, const std::string &message_selector, const std::deque<Object> &arguments) {
+MessageResult Symbol::message(ThisObj this_obj, const MessageSelector &message_selector, MessageArguments arguments) {
     if (message_translator.find(message_selector) == message_translator.end()) {
-        std::cout << "FAILED " << message_selector << std::endl;
-        exit(1);
+        return super::message(this_obj, message_selector, arguments);
     }
 
     return (this->*(message_translator[message_selector]))(this_obj, arguments);
 }
 
+/*!file:__class_name__/doesNotUnderstand_.cpp*/
+#include "header.h"
+#include "object.h"
+using namespace PNtalk;
+
+MessageResult PNtalk::__class_name__::doesNotUnderstand_(ThisObj this_obj, MessageArguments arguments) {
+    std::cout << "Symbol does not understand message with selector: " << std::endl;
+    return MessageResult();
+}
+
+/*!file:object/object_variant.h*/
+#include "header.h"
+
+/*?__object__*/
+
+/*!inline*/
+, __class_name__ /*?__class__*/

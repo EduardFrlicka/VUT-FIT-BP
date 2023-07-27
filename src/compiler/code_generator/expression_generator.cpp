@@ -29,83 +29,220 @@ CodeFiles CodeGenerator::generate(const asg::Expression &node) {
 }
 
 CodeFiles CodeGenerator::generate(const asg::Expressions &node) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles elem;
+    CodeFiles res = template_manager.get("expressions");
     res.apply(names);
 
-    for (auto &expr : node.exprs)
-        res.apply("expression", generate(expr));
+    for (auto &expr : node.exprs) {
+        elem = template_manager.get("expressions_elem");
+        elem.apply(names);
+        elem.apply("value", generate(expr));
+
+        res.apply("expression", elem);
+    }
 
     return res;
 }
 
 CodeFiles CodeGenerator::generate(const asg::Assigment &node) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles res = template_manager.get("assigment");
     res.apply(names);
 
-    /* TODO variable declaration */
+    res.apply("target", node.target.toString());
+    res.apply("value", generate(node.value));
 
     return res;
 }
 
 CodeFiles CodeGenerator::generate(const asg::KeywordMessage &node) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles arg;
+    CodeFiles res = template_manager.get("keyword_message");
     res.apply(names);
+    res.apply("message_selector", node.selector.toString());
+    res.apply("reciever", generate(node.recv));
+
+    for (auto &argument : node.arguments) {
+        arg = template_manager.get("keyword_message_argument");
+        arg.apply(names);
+        arg.apply("expression", generate(argument));
+        res.apply("argument", arg);
+    }
 
     return res;
 }
 
 CodeFiles CodeGenerator::generate(const asg::BinaryMessage &node) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles res;
+    std::string template_name;
+
+    switch (node.selector) {
+    case tokenAdd:
+        template_name = "add";
+        break;
+    case tokenSub:
+        template_name = "sub";
+        break;
+    case tokenIDiv:
+        template_name = "idiv";
+        break;
+    case tokenMul:
+        template_name = "mul";
+        break;
+    case tokenEq:
+        template_name = "eq";
+        break;
+    case tokenNotEq:
+        template_name = "neq";
+        break;
+    case tokenEqIdentity:
+        template_name = "eq_identity";
+        break;
+    case tokenNotEqIdentity:
+        template_name = "neq_identity";
+        break;
+    case tokenLess:
+        template_name = "lt";
+        break;
+    case tokenGreater:
+        template_name = "gt";
+        break;
+    case tokenLessEq:
+        template_name = "lte";
+        break;
+    case tokenGreaterEq:
+        template_name = "gte";
+        break;
+    case tokenAnd:
+        template_name = "and";
+        break;
+    case tokenOr:
+        template_name = "or";
+        break;
+    case tokenMod:
+        template_name = "mod";
+        break;
+    case tokenDiv:
+        template_name = "div";
+        break;
+    default:
+        internal_error("Not implemented");
+    }
+
+    res = template_manager.get(template_name);
     res.apply(names);
+    res.apply({
+        {"reciever", generate(node.recv)},
+        {"argument", generate(node.argument)},
+    });
 
     return res;
 }
 
 CodeFiles CodeGenerator::generate(const asg::UnaryMessage &node) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles res = template_manager.get("unary_message");
     res.apply(names);
-
+    res.apply("message_selector", node.selector.toString());
+    res.apply("reciever", generate(node.recv));
     return res;
 }
 
 CodeFiles CodeGenerator::generate(const asg::Literal &node) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles res;
+    std::string template_name;
+    std::string value;
+
+    switch (node.type) {
+    case tokenChar:
+        template_name = "character";
+        /*TODO value*/
+        break;
+    case tokenFloat:
+        template_name = "float";
+        value = std::to_string(node.value.float_number.number);
+        break;
+    case tokenInteger:
+        template_name = "integer";
+        value = std::to_string(node.value.integer_number.number);
+        break;
+    case tokenSymbol:
+        template_name = "symbol";
+        /*TODO value*/
+        break;
+    case tokenString:
+        template_name = "string";
+        /*TODO value*/
+        break;
+    case tokenTrue:
+        template_name = "true";
+        break;
+    case tokenFalse:
+        template_name = "false";
+        break;
+    case tokenNil:
+        template_name = "nil";
+        break;
+
+    default:
+        internal_error("Not implemented %d", (int)node.type);
+    }
+
+    res = template_manager.get(template_name);
     res.apply(names);
+    res.apply("value", value);
 
     return res;
 }
 
 CodeFiles CodeGenerator::generate(const asg::Variable &node) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles res = template_manager.get("variable");
     res.apply(names);
+    res.apply("identifier", node.id.toString());
 
     return res;
 }
 
 CodeFiles CodeGenerator::generate(const asg::ClassRef &node) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles res = template_manager.get("class_ref");
     res.apply(names);
+    res.apply("identifier", node.id.toString());
 
     return res;
 }
 
 CodeFiles CodeGenerator::generate(const asg::Bracket &node) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles res = template_manager.get("bracket");
     res.apply(names);
+    res.apply("expression", generate(node.expr));
 
     return res;
 }
 
 CodeFiles CodeGenerator::generate(const asg::CodeBlock &node) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles res = template_manager.get("code_block");
     res.apply(names);
+
+    for (auto &temp : node.temps)
+        res.apply("temporary", generate_argument(temp));
+
+    for (auto &argument : node.arguments)
+        res.apply("argument", generate_argument(argument));
+
+    res.apply("expression", generate(node.expr));
 
     return res;
 }
 
 CodeFiles CodeGenerator::generate(const asg::ConstArray &node) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles elem;
+    CodeFiles res = template_manager.get("const_array");
     res.apply(names);
+
+    for (auto &element : node.elements) {
+        elem = template_manager.get("const_array_elem");
+        elem.apply(names);
+        elem.apply("expression", generate(element));
+        res.apply("element", elem);
+    }
 
     return res;
 }

@@ -30,7 +30,7 @@ CodeTemplateManager::CodeTemplateManager(const std::filesystem::path &dir_path) 
             continue;
         }
 
-        templ_name = template_name(file.path(), dir_path);
+        templ_name = file.path().filename().replace_extension("");
         templ = create_template(file);
 
         templates[templ_name] = templ;
@@ -51,13 +51,16 @@ void CodeTemplateManager::initialize(const std::filesystem::path &dir_path) {
 }
 
 CodeFiles CodeTemplateManager::create_template(std::istream &stream) {
+    CodeFiles res;
     std::map<std::string, Code> code_files;
+    std::map<std::string, std::string> substitutions;
     string line;
     string file_name;
     string file_code;
 
     regex empty_line(std::regex("^\\s*$"));
-    regex file_selector(regex_special("file:(.*)"));
+    regex file_selector(regex_special("file:\\s*([^\\s]*)\\s*"));
+    regex slot_substitution(regex_special("slot:\\s*(\\w+(?:_\\w+)*):\\s*([^\\s]*)\\s*"));
     regex ignore_line(regex_special("ignore"));
     regex no_newline(regex_special("inline"));
     regex newline(regex_special("newline"));
@@ -76,6 +79,11 @@ CodeFiles CodeTemplateManager::create_template(std::istream &stream) {
 
             file_name = match[1];
             file_code.clear();
+            continue;
+        }
+
+        if (regex_search(line, match, slot_substitution)) {
+            substitutions[match[1]] = match[2];
             continue;
         }
 
@@ -108,8 +116,12 @@ CodeFiles CodeTemplateManager::create_template(std::istream &stream) {
     }
 
     if (!file_code.empty())
-        code_files.insert(std::make_pair(file_name, Code(file_code)));
-    return CodeFiles(code_files);
+        code_files[file_name] = Code(file_code);
+
+    res = CodeFiles(code_files);
+    res.apply(substitutions);
+
+    return res;
 }
 
 CodeFiles CodeTemplateManager::create_template(const std::filesystem::path &path) {
@@ -117,20 +129,20 @@ CodeFiles CodeTemplateManager::create_template(const std::filesystem::path &path
     return create_template(file);
 }
 
-path CodeTemplateManager::template_name(const std::filesystem::path &template_path, const std::filesystem::path &root_path) {
-    path::iterator i;
-    path tmp;
+// path CodeTemplateManager::template_name(const std::filesystem::path &template_path, const std::filesystem::path &root_path) {
+//     path::iterator i;
+//     path tmp;
 
-    for (i = template_path.begin(); i != template_path.end() && tmp != root_path; i++)
-        tmp /= *i;
+//     for (i = template_path.begin(); i != template_path.end() && tmp != root_path; i++)
+//         tmp /= *i;
 
-    if (tmp != root_path)
-        internal_error("root path is not prefix of template path");
+//     if (tmp != root_path)
+//         internal_error("root path is not prefix of template path");
 
-    tmp = path();
+//     tmp = path();
 
-    for (; i != template_path.end(); i++)
-        tmp /= *i;
+//     for (; i != template_path.end(); i++)
+//         tmp /= *i;
 
-    return tmp.replace_extension("");
-}
+//     return tmp.replace_extension("");
+// }

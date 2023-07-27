@@ -14,11 +14,13 @@ Code::Code(const string &_code) {
     string tmp(_code);
 
     regex include_regex("#include\\s+((<[^>]+>)|(\"[^\"]+\"))\n?");
+    regex pragma_once_regex("#pragma once\n?");
     sregex_iterator i;
 
     for (i = sregex_iterator(tmp.begin(), tmp.end(), include_regex); i != sregex_iterator(); i++)
         include.insert((*i)[1].str());
 
+    tmp = regex_replace(tmp, pragma_once_regex, "");
     code = regex_replace(tmp, include_regex, "");
 }
 
@@ -47,12 +49,12 @@ void Code::apply(regex key, string value) {
 }
 
 void Code::apply(std::string key, Code value) {
-    include.merge(value.include);
-    code = regex_replace(code, regex_replacement(key), value.code);
+    apply(regex_replacement(key), value);
 }
 
 void Code::apply(regex key, Code value) {
-    include.merge(value.include);
+    if (regex_search(code, key))
+        include.merge(value.include);
     code = regex_replace(code, key, value.code);
 }
 
@@ -61,11 +63,11 @@ void Code::apply(std::string key, std::string value) {
 }
 
 void Code::uncomment(const std::string &key) {
-    regex re = regex_optional("(.*?__" + key + "__.*?)");
+    regex re = regex_optional("((?:(?!\\/\\*).)*?__" + key + "__.*?)");
     apply(re, "$1");
 }
 
-Code Code::apply(std::map<std::string, std::string> replacements) {
+Code Code::apply(const std::map<std::string, std::string> &replacements) {
     Code out(code, include);
 
     for (auto kv : replacements) {
@@ -88,11 +90,11 @@ void Code::append(std::vector<Code> to_append_vector) {
     }
 }
 
-bool Code::isEmpty() {
+bool Code::isEmpty() const {
     return code.empty() && include.empty();
 }
 
-string Code::to_string() {
+string Code::to_string() const {
     string res = "";
     for (string header : include) {
         res += "#include " + header + "\n";

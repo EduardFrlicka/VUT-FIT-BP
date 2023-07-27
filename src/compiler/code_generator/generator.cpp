@@ -3,15 +3,30 @@
 #include <iostream>
 
 CodeGenerator::CodeGenerator(const asg::Classes &root) : template_manager(args.compiler_templates_path) {
-    CodeFiles static_files;
-    CodeFiles result;
+    CodeFiles generated;
 
-    result = generate(root);
+    // result.print();
+    result = load_static_code_files(args.static_templates_path);
+    generated = generate(root);
 
-    // static_files = load_static_code_files(args.static_templates_path);
-    // result = static_files.combine({{"generated", result}});
+    result.apply("generated", generated);
+    result.remove_optional_slots();
+}
 
-    result.print();
+void CodeGenerator::writeFiles() {
+    std::filesystem::path filepath;
+
+    for (auto &kv : result.get_code_files()) {
+        filepath = args.target_dir;
+        filepath /= kv.first;
+        // std::cout << filepath << std::endl;
+        std::filesystem::create_directories(filepath.parent_path());
+        std::ofstream file(filepath);
+        if (filepath.extension() == ".h")
+            file << "#pragma once\n";
+        file << kv.second.to_string();
+        file.close();
+    }
 }
 
 CodeFiles CodeGenerator::generate(const asg::Classes &node) {
@@ -64,6 +79,7 @@ CodeFiles CodeGenerator::generate(const asg::Net &node) {
 CodeFiles CodeGenerator::generate(const asg::Method &node) {
     CodeFiles res = template_manager.get("method");
     names["method_name"] = node.selector.toString();
+    names["net_name"] = node.selector.toString();
     res.apply(names);
 
     for (auto &argument : node.arguments) {
@@ -72,6 +88,7 @@ CodeFiles CodeGenerator::generate(const asg::Method &node) {
 
     res.apply("net", generate(node.net));
 
+    names.erase("net_name");
     names.erase("method_name");
     return res;
 }
@@ -79,6 +96,7 @@ CodeFiles CodeGenerator::generate(const asg::Method &node) {
 CodeFiles CodeGenerator::generate(const asg::Constructor &node) {
     CodeFiles res = template_manager.get("constructor");
     names["method_name"] = node.selector.toString();
+    names["net_name"] = node.selector.toString();
     res.apply(names);
 
     for (auto &argument : node.arguments) {
@@ -87,14 +105,18 @@ CodeFiles CodeGenerator::generate(const asg::Constructor &node) {
 
     res.apply("net", generate(node.net));
 
+    names.erase("net_name");
     names.erase("method_name");
     return res;
 }
 
 CodeFiles CodeGenerator::generate(const asg::SynPort &node) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles res = template_manager.get("sync_port");
     names["syn_port_name"] = node.selector.toString();
     res.apply(names);
+
+    // for (auto &variable : node.variables)
+    //     res.apply("variable_declaration", generate_variable_declaration(variable));
 
     for (auto &argument : node.arguments)
         res.apply("argument", generate_argument(argument));
@@ -131,9 +153,12 @@ CodeFiles CodeGenerator::generate(const asg::Place &node) {
 }
 
 CodeFiles CodeGenerator::generate(const asg::Transition &node) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles res = template_manager.get("transition");
     names["transition_name"] = node.name.toString();
     res.apply(names);
+
+    for (auto &variable : node.variables)
+        res.apply("variable_declaration", generate_variable_declaration(variable));
 
     for (auto &pre_cond : node.pre_conditions)
         res.apply("pre_cond", generate(pre_cond));
@@ -155,40 +180,40 @@ CodeFiles CodeGenerator::generate(const asg::Transition &node) {
 }
 
 CodeFiles CodeGenerator::generate(const asg::PreCondPair &node) {
-    CodeFiles res = template_manager.get("");
-    names["place"] = node.place.toString();
+    CodeFiles res = template_manager.get("pre_cond_pair");
+    names["place_name"] = node.place.toString();
     res.apply(names);
 
     res.apply("multiset", generate(node.edge_expression));
 
-    names.erase("place");
+    names.erase("place_name");
     return res;
 }
 
 CodeFiles CodeGenerator::generate(const asg::PostCondPair &node) {
-    CodeFiles res = template_manager.get("");
-    names["place"] = node.place.toString();
+    CodeFiles res = template_manager.get("post_cond_pair");
+    names["place_name"] = node.place.toString();
     res.apply(names);
 
     res.apply("multiset", generate(node.edge_expression));
 
-    names.erase("place");
+    names.erase("place_name");
     return res;
 }
 
 CodeFiles CodeGenerator::generate(const asg::CondPair &node) {
-    CodeFiles res = template_manager.get("");
-    names["place"] = node.place.toString();
+    CodeFiles res = template_manager.get("cond_pair");
+    names["place_name"] = node.place.toString();
     res.apply(names);
 
     res.apply("multiset", generate(node.edge_expression));
 
-    names.erase("place");
+    names.erase("place_name");
     return res;
 }
 
 CodeFiles CodeGenerator::generate(const asg::Guard &node) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles res = template_manager.get("guard");
     res.apply(names);
 
     res.apply("expression", generate(node.expression));
@@ -197,11 +222,11 @@ CodeFiles CodeGenerator::generate(const asg::Guard &node) {
 }
 
 CodeFiles CodeGenerator::generate(const asg::Action &node) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles res = template_manager.get("action");
     res.apply(names);
 
-    for (auto &temp : node.temporaries)
-        res.apply("temp", generate_temporary(temp));
+    // for (auto &variable : node.variables)
+    //     res.apply("variable_declaration", generate_variable_declaration(variable));
 
     res.apply("expression", generate(node.expression));
 
@@ -209,7 +234,7 @@ CodeFiles CodeGenerator::generate(const asg::Action &node) {
 }
 
 CodeFiles CodeGenerator::generate(const asg::MultiSet &node) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles res = template_manager.get("multiset");
     res.apply(names);
 
     for (auto &elem : node.elements)
@@ -219,7 +244,7 @@ CodeFiles CodeGenerator::generate(const asg::MultiSet &node) {
 }
 
 CodeFiles CodeGenerator::generate(const asg::MultiSetElemPair &node) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles res = template_manager.get("multiset_elem_pair");
     res.apply(names);
 
     res.apply("count", generate(node.count));
@@ -234,7 +259,7 @@ CodeFiles CodeGenerator::generate(const asg::MultiSetCount &node) {
     if (node.is_variable())
         return generate(node.get_variable());
 
-    res = template_manager.get("");
+    res = template_manager.get("integer");
     res.apply(names);
     res.apply("value", std::to_string(node.get_int()));
     return res;
@@ -251,11 +276,16 @@ CodeFiles CodeGenerator::generate(const asg::MultiSetTerm &node) {
 }
 
 CodeFiles CodeGenerator::generate(const asg::MultiSetList &node) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles elem;
+    CodeFiles res = template_manager.get("multiset_list");
     res.apply(names);
 
-    for (auto &elem : node.elements)
-        res.apply("element", generate(elem));
+    for (auto &element : node.elements) {
+        elem = template_manager.get("multiset_list_elem");
+        elem.apply(names);
+        elem.apply("value", generate(element));
+        res.apply("element", elem);
+    }
 
     /*TODO prolog array ??*/
 
@@ -263,23 +293,22 @@ CodeFiles CodeGenerator::generate(const asg::MultiSetList &node) {
 }
 
 CodeFiles CodeGenerator::generate_argument(const Identifier &id) {
-    CodeFiles res = template_manager.get("");
+    CodeFiles res = template_manager.get("argument_extraction");
+    res.apply(names);
+
+    res.apply("argument_name", id.toString());
+
+    return res;
+}
+
+CodeFiles CodeGenerator::generate_variable_declaration(const Identifier &id) {
+    CodeFiles res = template_manager.get("variable_declaration");
     res.apply(names);
 
     res.apply("variable_name", id.toString());
 
     return res;
 }
-
-CodeFiles CodeGenerator::generate_temporary(const Identifier &id) {
-    CodeFiles res = template_manager.get("");
-    res.apply(names);
-
-    res.apply("variable_name", id.toString());
-
-    return res;
-}
-
 
 CodeFiles CodeGenerator::load_static_code_files(std::filesystem::path dirpath) {
     std::filesystem::path templ_name;
@@ -294,17 +323,17 @@ CodeFiles CodeGenerator::load_static_code_files(std::filesystem::path dirpath) {
         filepath = file.path();
 
         if (filepath.extension() == ".cpp" || filepath.extension() == ".cc") {
-            templ_name = filepath.filename();
+            templ_name = filepath.lexically_proximate(dirpath);
             map[templ_name] = Code(std::ifstream(filepath));
         }
 
         if (filepath.extension() == ".h") {
-            templ_name = filepath.filename();
+            templ_name = filepath.lexically_proximate(dirpath);
             map[templ_name] = Code(std::ifstream(filepath));
         }
 
         if (filepath.filename() == "Makefile") {
-            templ_name = filepath.filename();
+            templ_name = filepath.lexically_proximate(dirpath);
             map[templ_name] = Code(std::ifstream(filepath));
         }
     }

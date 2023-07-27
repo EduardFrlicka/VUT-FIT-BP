@@ -66,7 +66,7 @@ class Guard : public Base {
 
 class Action : public Base {
   public:
-    std::deque<Identifier> temporaries;
+    // std::deque<Identifier> variables;
     Expression expression;
 };
 
@@ -79,12 +79,13 @@ class PostCondPair : public Base {
 
 class Transition : public Base {
   public:
-  Identifier name;
-  std::deque<PreCondPair> pre_conditions;
-  std::deque<CondPair> conditions;
-  std::deque<PostCondPair> post_conditions;
-  std::optional<Guard> guard;
-  std::optional<Action> action;
+    Identifier name;
+    std::deque<Identifier> variables;
+    std::deque<PreCondPair> pre_conditions;
+    std::deque<CondPair> conditions;
+    std::deque<PostCondPair> post_conditions;
+    std::optional<Guard> guard;
+    std::optional<Action> action;
 };
 class Place : public Base {
   public:
@@ -116,6 +117,7 @@ class Constructor : public Base {
 class SynPort : public Base {
   public:
     Identifier selector;
+    std::deque<Identifier> variables;
     std::deque<Identifier> arguments;
     std::deque<PreCondPair> pre_conds;
     std::deque<CondPair> conds;

@@ -21,5 +21,5 @@ class CodeTemplateManager {
     CodeFiles create_template(std::istream &);
     CodeFiles create_template(const std::filesystem::path &);
 
-    std::filesystem::path template_name(const std::filesystem::path &, const std::filesystem::path &);
+    // std::filesystem::path template_name(const std::filesystem::path &, const std::filesystem::path &);
 };

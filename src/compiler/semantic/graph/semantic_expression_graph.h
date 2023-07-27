@@ -75,7 +75,6 @@ class UnaryMessage : public Base {
 
 class Literal : public Base {
   public:
-    Literal();
     Literal(TokenPayload, TokenType);
     TokenPayload value;
     TokenType type;

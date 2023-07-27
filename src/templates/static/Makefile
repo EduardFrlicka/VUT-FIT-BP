@@ -21,7 +21,7 @@ DEP:=$(OBJ)
 # Commands and Flags
 
 # Flags for compiling
-CFLAGS:=-std=c++20 -Wall -Wextra -pedantic -ggdb3
+CFLAGS:=-std=c++20 -Wall -Wextra -pedantic -ggdb3 -Wno-unused-parameter
 
 LFLAGS:=
 

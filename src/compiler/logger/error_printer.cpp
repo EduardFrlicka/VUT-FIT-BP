@@ -24,8 +24,15 @@ void ErrorPrinter::transition_redeclaration(Identifier defined, TokenStackIterat
     std::cerr << "transition_redeclaration" << std::endl;
 }
 
+void ErrorPrinter::argument_redeclaration(Identifier declaration, TokenStackIterator redefined) {
+    std::cerr << "argument_redeclaration" << std::endl;
+}
+
+void ErrorPrinter::implicit_declaration_variable(TokenStackIterator id) {
+    logger.c_warning(id, "Implicit declaration of variable");
+}
+
 void ErrorPrinter::undeclared_variable(TokenStackIterator id) {
-    // std::cerr << "undeclared_variable" << std::endl;
     logger.c_error(id, "Use of undeclared variable");
 }
 
@@ -34,12 +41,21 @@ void ErrorPrinter::undefined_variable(Identifier id, TokenStackIterator it) {
     logger.c_note(id.declaration_begin, "Variable declared:");
 }
 
+void ErrorPrinter::undefined_variable_warn(Identifier id, TokenStackIterator it) {
+    logger.c_warning(it, "Use of undefined variable");
+    logger.c_note(id.declaration_begin, "Variable declared:");
+}
+
 void ErrorPrinter::variable_redeclaration(Identifier declaration, TokenStackIterator redefined) {
     std::cerr << "variable_redeclaration" << std::endl;
 }
 
-void ErrorPrinter::place_not_found(TokenStackIterator id) {
-    std::cerr << "place_not_found" << std::endl;
+void ErrorPrinter::undeclared_place(TokenStackIterator id) {
+    std::cerr << "undeclared_place" << std::endl;
+}
+
+void ErrorPrinter::undeclared_return(TokenStackIterator id) {
+    std::cerr << "undeclared_place result" << std::endl;
 }
 
 void ErrorPrinter::negative_count_in_multiset(TokenStackIterator it) {

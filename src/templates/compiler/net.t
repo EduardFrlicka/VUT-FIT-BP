@@ -1,4 +1,4 @@
-/*!file:__class_name__.h*/
+/*!file:__class_name__/header.h*/
 
 /*!ignore*/
 class foo {
@@ -7,5 +7,9 @@ class foo {
     /*!ignore*/
 }
 
+/*!file:object/object_variant.h*/
+/*?__place__*/
+/*?__transition__*/
+
 /*!file:*/
-    /*?__place__*/
+/*?__place__*/

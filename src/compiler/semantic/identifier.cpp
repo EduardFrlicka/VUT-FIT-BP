@@ -46,22 +46,26 @@ void Identifier::declare_define(TokenStackIterator begin, TokenStackIterator end
     define(begin, end);
 }
 
-Identifier Identifier::operator+(const std::string &other) {
-    if (id.name == other)
-        return *this;
-
-    return Identifier(id.name + IDENTIFIER_DELIMITER + other);
+void Identifier::add_keyword_identifier(const Identifier &other) {
+    id.name += other.id.name + IDENTIFIER_DELIMITER;
 }
 
-Identifier Identifier::operator+(const BasicIdentifier &other) {
-    if (id.name == other.name)
-        return *this;
+// Identifier Identifier::operator+(const std::string &other) {
+//     if (id.name == other)
+//         return *this;
 
-    return Identifier(id.name + IDENTIFIER_DELIMITER + other.name);
-}
-Identifier Identifier::operator+(const Identifier &other) {
-    if (id.name == other.id.name)
-        return *this;
+//     return Identifier(id.name + IDENTIFIER_DELIMITER + other);
+// }
 
-    return Identifier(id.name + IDENTIFIER_DELIMITER + other.id.name);
-}
+// Identifier Identifier::operator+(const BasicIdentifier &other) {
+//     if (id.name == other.name)
+//         return *this;
+
+//     return Identifier(id.name + IDENTIFIER_DELIMITER + other.name);
+// }
+// Identifier Identifier::operator+(const Identifier &other) {
+//     if (id.name == other.id.name)
+//         return *this;
+
+//     return Identifier(id.name + IDENTIFIER_DELIMITER + other.id.name);
+// }

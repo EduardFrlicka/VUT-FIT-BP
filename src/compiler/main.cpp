@@ -29,6 +29,7 @@ int main(int argc, char *argv[]) {
 
     auto code_generator = CodeGenerator(sem_analyzer.root());
 
+    code_generator.writeFiles();
     // syn_analyzer.root().print();
 
     return SUCCESS;

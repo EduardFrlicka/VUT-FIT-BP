@@ -23,28 +23,31 @@ CodeFiles::CodeFiles(const std::map<std::string, Code> &input_map, const Code &_
 // void CodeFiles::remove_slot(const std::string &slot_name) {
 // }
 
+const std::map<std::string, Code> &CodeFiles::get_code_files() const {
+    return code_files;
+}
+
 void CodeFiles::apply(const std::map<std::string, CodeFiles> &replacements) {
     for (auto kv : replacements)
         apply(kv.first, kv.second);
 }
 
 void CodeFiles::apply(const std::string &key, const CodeFiles &replacement) {
-
     map<string, Code>::const_iterator file;
     bool free_code_used = false;
 
-    for (std::map<std::string, Code>::iterator kv = code_files.begin(); kv != code_files.end(); kv++) {
-        file = replacement.code_files.find(kv->first);
+    for (auto &kv : code_files) {
+        file = replacement.code_files.find(kv.first);
 
         if (file != replacement.code_files.end()) {
             /* uncommenting (optional replacements) and replacing corresponding code */
-            kv->second.uncomment(key);
-            kv->second.apply(key, file->second);
+            kv.second.uncomment(key);
+            kv.second.apply(key, file->second);
         } else {
             /* using free code */
             free_code_used = true;
-            kv->second.uncomment(key);
-            kv->second.apply(key, replacement.free_code);
+            kv.second.uncomment(key);
+            kv.second.apply(key, replacement.free_code);
         }
     }
 
@@ -52,10 +55,16 @@ void CodeFiles::apply(const std::string &key, const CodeFiles &replacement) {
         if (code_files.find(kv.first) == code_files.end())
             code_files.insert(kv);
 
-    if (!free_code_used) {
-        free_code.uncomment(key);
-        free_code.apply(key, replacement.free_code);
+    if (!free_code_used && !replacement.free_code.isEmpty()) {
+        if (free_code.isEmpty())
+            free_code = replacement.free_code;
+        else {
+            free_code.uncomment(key);
+            free_code.apply(key, replacement.free_code);
+        }
     }
+
+    // std::cout << "free code:\n" << replacement.free_code.to_string() << std::endl;
 }
 
 void CodeFiles::apply(const std::string &slot_key, const std::string &slot_value) {
@@ -69,10 +78,26 @@ void CodeFiles::apply(const std::map<std::string, std::string> &string_replaceme
 
     for (auto kv : code_files) {
         filename = kv.first;
-        for (auto replacement : string_replacements)
+        for (auto replacement : string_replacements) {
+            filename = std::regex_replace(filename, regex_optional("((?:(?!\\/\\*).)*?__" + replacement.first + "__.*?)"), "$1");
             filename = std::regex_replace(filename, regex_replacement(replacement.first), replacement.second);
+        }
+        new_code_files[filename] = kv.second.apply(string_replacements);
+    }
 
-        new_code_files.insert(std::pair<std::string, Code>(filename, kv.second.apply(string_replacements)));
+    code_files = new_code_files;
+}
+
+void CodeFiles::remove_optional_slots() {
+    std::map<std::string, Code> new_code_files;
+    std::string filename;
+    regex optional = regex_optional(".*?");
+    free_code.apply(optional, "");
+
+    for (auto kv : code_files) {
+        filename = std::regex_replace(kv.first, optional, "");
+        kv.second.apply(optional, "");
+        new_code_files[filename] = kv.second;
     }
 
     code_files = new_code_files;
@@ -86,4 +111,5 @@ void CodeFiles::print() {
     for (auto i : code_files) {
         std::cout << "File: " << i.first << "\n" << i.second.to_string() << std::endl;
     }
+    std::cout << "free code:\n" << free_code.to_string() << std::endl;
 }
