@@ -1,7 +1,8 @@
 /*!file:main.cpp*/
-#include "__main__.h"
+#include "__main__/header.h"
+#include "object.h"
 /*!ignore*/
-int main() {
-    PN::__main__ __main__();
+{
+    auto ___main__ = make_shared_obj(__main__())->message("new", {});
     /*!ignore*/
 }

@@ -16,6 +16,7 @@ class CodeGenerator {
     CodeTemplateManager template_manager;
     std::map<std::string, std::string> names;
 
+    void writeFile(const std::filesystem::path &filepath, const Code &code);
     CodeFiles load_static_code_files(std::filesystem::path);
 
     CodeFiles generate(const asg::Classes &node);
@@ -40,7 +41,8 @@ class CodeGenerator {
     CodeFiles generate(const asg::MultiSetTerm &node);
     CodeFiles generate(const asg::MultiSetList &node);
 
-    CodeFiles generate_argument(const Identifier &id);
+    CodeFiles generate_method_argument(const Identifier &id);
+    CodeFiles generate_sync_port_argument(const Identifier &id);
     CodeFiles generate_variable_declaration(const Identifier &id);
 
     CodeFiles generate(const asg::Expression &node);

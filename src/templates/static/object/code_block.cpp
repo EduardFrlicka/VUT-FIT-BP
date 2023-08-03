@@ -13,3 +13,6 @@ MessageResult PNtalk::CodeBlock::message(ThisObj this_obj, const MessageSelector
 MessageResult PNtalk::CodeBlock::doesNotUnderstand_(ThisObj this_obj, MessageArguments arguments) {
     return MessageResult();
 }
+
+CodeBlock::CodeBlock(std::function<std::shared_ptr<Object>(ThisObj, MessageArguments)> function) {
+}

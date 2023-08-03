@@ -45,33 +45,61 @@ MessageResult Integer::_mod_(ThisObj this_obj, MessageArguments arguments) {
 }
 
 MessageResult Integer::_eq_(ThisObj this_obj, MessageArguments arguments) {
-    return make_shared_obj(Integer(_value == arguments.front()->get<Integer>()._value));
+    return make_shared_obj(Bool(_value == arguments.front()->get<Integer>()._value));
 }
 
 MessageResult Integer::_neq_(ThisObj this_obj, MessageArguments arguments) {
-    return make_shared_obj(Integer(_value != arguments.front()->get<Integer>()._value));
+    return make_shared_obj(Bool(_value != arguments.front()->get<Integer>()._value));
 }
 
 MessageResult Integer::_lt_(ThisObj this_obj, MessageArguments arguments) {
-    return make_shared_obj(Integer(_value < arguments.front()->get<Integer>()._value));
+    return make_shared_obj(Bool(_value < arguments.front()->get<Integer>()._value));
 }
 
 MessageResult Integer::_gt_(ThisObj this_obj, MessageArguments arguments) {
-    return make_shared_obj(Integer(_value > arguments.front()->get<Integer>()._value));
+    return make_shared_obj(Bool(_value > arguments.front()->get<Integer>()._value));
 }
 
 MessageResult Integer::_gte_(ThisObj this_obj, MessageArguments arguments) {
-    return make_shared_obj(Integer(_value >= arguments.front()->get<Integer>()._value));
+    return make_shared_obj(Bool(_value >= arguments.front()->get<Integer>()._value));
 }
 
 MessageResult Integer::_lte_(ThisObj this_obj, MessageArguments arguments) {
-    return make_shared_obj(Integer(_value <= arguments.front()->get<Integer>()._value));
+    return make_shared_obj(Bool(_value <= arguments.front()->get<Integer>()._value));
+}
+
+MessageResult Integer::toString(ThisObj this_obj, MessageArguments arguments) {
+    return make_shared_obj(String(std::to_string(_value)));
 }
 
 MessageResult Integer::doesNotUnderstand_(ThisObj this_obj, MessageArguments arguments) {
-
-    return nullptr;
+    return MessageResult();
 }
+
+MessageResult PNtalk::Integer::allMask_(ThisObj this_obj, MessageArguments arguments) {
+    return make_shared_obj(Bool((_value & arguments.front()->get<Integer>()._value) == arguments.front()->get<Integer>()._value));
+};
+MessageResult PNtalk::Integer::anyMask_(ThisObj this_obj, MessageArguments arguments) {
+    return make_shared_obj(Bool(_value & arguments.front()->get<Integer>()._value));
+};
+MessageResult PNtalk::Integer::bitAt_(ThisObj this_obj, MessageArguments arguments) {
+    return make_shared_obj(Integer((_value >> (arguments.front()->get<Integer>()._value - 1)) & 1));
+};
+MessageResult PNtalk::Integer::bitAt_put_(ThisObj this_obj, MessageArguments arguments) {
+    return make_shared_obj(Integer((_value & (~1 << ((arguments[0]->get<Integer>()._value) - 1)) | (1 & arguments[1]->get<Integer>()._value) << (arguments[0]->get<Integer>()._value) - 1)));
+};
+MessageResult PNtalk::Integer::bitClear_(ThisObj this_obj, MessageArguments arguments) {
+    return make_shared_obj(Integer(_value & ~arguments.front()->get<Integer>()._value));
+};
+MessageResult PNtalk::Integer::bitInvert(ThisObj this_obj, MessageArguments arguments) {
+    return make_shared_obj(Integer(~_value));
+};
+MessageResult PNtalk::Integer::clearBit_(ThisObj this_obj, MessageArguments arguments) {
+    return make_shared_obj(Integer(_value & (~1 << ((arguments[0]->get<Integer>()._value) - 1))));
+};
+MessageResult PNtalk::Integer::setBit(ThisObj this_obj, MessageArguments arguments) {
+    return make_shared_obj(Integer(_value | (1 << ((arguments[0]->get<Integer>()._value) - 1))));
+};
 
 Integer::Integer() : ObjectBase() {
     message_translator["even"] = &Integer::even;
@@ -88,6 +116,17 @@ Integer::Integer() : ObjectBase() {
     message_translator["_gt_"] = &Integer::_gt_;
     message_translator["_gte_"] = &Integer::_gte_;
     message_translator["_lte_"] = &Integer::_lte_;
+
+    message_translator["allMask_"] = &Integer::allMask_;
+    message_translator["anyMask_"] = &Integer::anyMask_;
+    message_translator["bitAt_"] = &Integer::bitAt_;
+    message_translator["bitAt_put_"] = &Integer::bitAt_put_;
+    message_translator["bitClear_"] = &Integer::bitClear_;
+    message_translator["bitInvert"] = &Integer::bitInvert;
+    message_translator["clearBit_"] = &Integer::clearBit_;
+    message_translator["setBit"] = &Integer::setBit;
+
+    message_translator["toString"] = &Integer::toString;
     message_translator["doesNotUnderstand_"] = &Integer::doesNotUnderstand_;
 };
 Integer::Integer(int value) : Integer() {

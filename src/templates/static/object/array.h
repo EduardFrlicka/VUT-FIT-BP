@@ -32,7 +32,6 @@ class Array : public ObjectBase {
     MessageResult addAll_(ThisObj this_obj, MessageArguments arguments);
     MessageResult remove_(ThisObj this_obj, MessageArguments arguments);
     MessageResult removeAll_(ThisObj this_obj, MessageArguments arguments);
-    MessageResult remove_ifAbsent_(ThisObj this_obj, MessageArguments arguments);
 
     /* Enumerating */
     MessageResult do_(ThisObj this_obj, MessageArguments arguments);

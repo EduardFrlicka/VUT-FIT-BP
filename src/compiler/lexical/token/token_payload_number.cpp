@@ -34,7 +34,7 @@ void TokenPayloadInteger::convert() {
     number = std::stol(data, nullptr, radix);
 }
 
-std::string TokenPayloadInteger::toString() {
+std::string TokenPayloadInteger::toString() const {
     std::stringstream ss;
     ss << number;
     return ss.str();
@@ -50,7 +50,7 @@ void TokenPayloadFloat::convert() {
     std::string::size_type idx;
     std::string tmp = data;
     long decimal, integer, exponent;
-    
+
     integer = std::stol(tmp, &idx, radix);
     tmp = tmp.substr(idx);
 
@@ -72,7 +72,7 @@ void TokenPayloadFloat::convert() {
     }
 }
 
-std::string TokenPayloadFloat::toString() {
+std::string TokenPayloadFloat::toString() const {
     std::stringstream ss;
     ss << number;
     // if (decimal >= 0)

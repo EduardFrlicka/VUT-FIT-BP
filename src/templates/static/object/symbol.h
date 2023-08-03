@@ -20,7 +20,7 @@ class Symbol : public ObjectBase {
 
     MessageResult _eq_(ThisObj this_obj, MessageArguments arguments);
     MessageResult _neq_(ThisObj this_obj, MessageArguments arguments);
-    MessageResult toString(ThisObj this_obj, MessageArguments arguments);
+    MessageResult asString(ThisObj this_obj, MessageArguments arguments);
 
     MessageResult doesNotUnderstand_(ThisObj this_obj, MessageArguments arguments);
 };

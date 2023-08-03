@@ -97,6 +97,7 @@ class TokenPayloadInteger {
   protected:
     std::string data = "";
     int radix = 10;
+
   public:
     long number;
 
@@ -104,23 +105,45 @@ class TokenPayloadInteger {
     void append(int);
     void convertRadix();
     void convert();
-    std::string toString();
+    std::string toString() const;
 };
 
-class TokenPayloadFloat : public TokenPayloadInteger{
+class TokenPayloadFloat : public TokenPayloadInteger {
   public:
     TokenPayloadFloat();
     TokenPayloadFloat(TokenPayloadInteger);
     double number;
 
     void convert();
-    std::string toString();
+    std::string toString() const;
 };
 
+class TokenPayloadSymbol {
+  public:
+    std::string value;
+    void append(int);
+    std::string toString() const;
+};
+class TokenPayloadString {
+  public:
+    std::string value;
+    void append(int);
+    std::string toString() const;
+};
+class TokenPayloadCharacter {
+  public:
+    char value;
+
+    void set(int);
+    std::string toString() const;
+};
 
 struct TokenPayload {
     TokenPayloadFloat float_number;
     TokenPayloadInteger integer_number;
+    TokenPayloadSymbol symbol;
+    TokenPayloadString string;
+    TokenPayloadCharacter character;
     BasicIdentifier id;
 };
 

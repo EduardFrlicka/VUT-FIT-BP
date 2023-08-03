@@ -1,4 +1,4 @@
-//*!slot:transition_filename:__class_name__/*?/__net_name__*//__transition_name__*/
+//*!slot:transition_filename:__class_name__/*?/__net_name__*//*?/__transition_name__*/*/
 
 /*!file:__transition_filename__/execute.cpp*/
 

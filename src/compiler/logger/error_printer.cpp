@@ -17,7 +17,8 @@ void ErrorPrinter::message_redeclaration(Identifier defined, TokenStackIterator 
 }
 
 void ErrorPrinter::place_redeclaration(Identifier defined, TokenStackIterator redefined) {
-    std::cerr << "place_redeclaration" << std::endl;
+    logger.c_error(redefined, "Place %s redeclared:", redefined.it->text.c_str());
+    logger.c_note(defined.declaration_begin, "Previously declared here");
 }
 
 void ErrorPrinter::transition_redeclaration(Identifier defined, TokenStackIterator redefined) {

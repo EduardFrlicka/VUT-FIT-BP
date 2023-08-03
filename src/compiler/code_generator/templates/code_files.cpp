@@ -43,7 +43,7 @@ void CodeFiles::apply(const std::string &key, const CodeFiles &replacement) {
             /* uncommenting (optional replacements) and replacing corresponding code */
             kv.second.uncomment(key);
             kv.second.apply(key, file->second);
-        } else {
+        } else if (kv.second.contains_slot(key)) {
             /* using free code */
             free_code_used = true;
             kv.second.uncomment(key);
@@ -63,8 +63,6 @@ void CodeFiles::apply(const std::string &key, const CodeFiles &replacement) {
             free_code.apply(key, replacement.free_code);
         }
     }
-
-    // std::cout << "free code:\n" << replacement.free_code.to_string() << std::endl;
 }
 
 void CodeFiles::apply(const std::string &slot_key, const std::string &slot_value) {
@@ -97,6 +95,19 @@ void CodeFiles::remove_optional_slots() {
     for (auto kv : code_files) {
         filename = std::regex_replace(kv.first, optional, "");
         kv.second.apply(optional, "");
+        new_code_files[filename] = kv.second;
+    }
+
+    code_files = new_code_files;
+}
+
+void CodeFiles::remove_optional_slots_from_filenames() {
+    std::map<std::string, Code> new_code_files;
+    std::string filename;
+    regex optional = regex_optional(".*?");
+
+    for (auto kv : code_files) {
+        filename = std::regex_replace(kv.first, regex_optional("(?:(?!\\/\\*).)*?"), "");
         new_code_files[filename] = kv.second;
     }
 

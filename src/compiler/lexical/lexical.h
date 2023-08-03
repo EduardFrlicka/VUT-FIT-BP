@@ -46,6 +46,8 @@ class LexicalAnalyzer {
     int stateStringOpen(int);
     int stateString(int);
     int stateSymbol(int);
+    int stateSymbolOpen(int);
+    int stateSymbolClosed(int);
 
     /* brackets */
 

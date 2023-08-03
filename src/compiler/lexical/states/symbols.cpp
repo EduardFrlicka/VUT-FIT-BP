@@ -4,8 +4,12 @@
 int LexicalAnalyzer::stateHash(int c) {
     nextState = &LexicalAnalyzer::end;
     token.type = tokenHash;
-    if (isalpha(c))
+    if (isalpha(c)) {
+        token.payload.symbol.append(c);
         nextState = &LexicalAnalyzer::stateSymbol;
+    }
+    if (c == '\'')
+        nextState = &LexicalAnalyzer::stateSymbolOpen;
 
     return SUCCESS;
 }

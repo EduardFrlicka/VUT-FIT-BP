@@ -29,6 +29,16 @@ class Integer : public ObjectBase {
     MessageResult _gte_(ThisObj this_obj, MessageArguments arguments);
     MessageResult _lte_(ThisObj this_obj, MessageArguments arguments);
 
+    MessageResult allMask_(ThisObj this_obj, MessageArguments arguments);
+    MessageResult anyMask_(ThisObj this_obj, MessageArguments arguments);
+    MessageResult bitAt_(ThisObj this_obj, MessageArguments arguments);
+    MessageResult bitAt_put_(ThisObj this_obj, MessageArguments arguments);
+    MessageResult bitClear_(ThisObj this_obj, MessageArguments arguments);
+    MessageResult bitInvert(ThisObj this_obj, MessageArguments arguments);
+    MessageResult clearBit_(ThisObj this_obj, MessageArguments arguments);
+    MessageResult setBit(ThisObj this_obj, MessageArguments arguments);
+
+    MessageResult toString(ThisObj this_obj, MessageArguments arguments);
     MessageResult doesNotUnderstand_(ThisObj this_obj, MessageArguments arguments);
 };
 

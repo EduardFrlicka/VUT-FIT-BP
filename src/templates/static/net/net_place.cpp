@@ -1,48 +1,40 @@
 #include "net_place.h"
 #include "object.h"
+#include "scheduler.h"
+#include <syncstream>
 
-PNtalk::MultiSetItem::MultiSetItem(const std::shared_ptr<Object> &value) : _count(1), _value(value){};
-PNtalk::MultiSetItem::MultiSetItem(const Integer &count, const std::shared_ptr<Object> &value) : _count(count), _value(value){};
+PNtalk::Net::Place::Place(){};
+PNtalk::Net::Place::Place(Place &&other) : _values(other._values), m(){};
+PNtalk::Net::Place::Place(const MultiSet &init) : _values(init.values){};
 
 bool PNtalk::PN::Place::match(std::weak_ptr<PN::Transition> trans, const MultiSet &edge_expr) {
-    update_transitions.insert(trans);
+    std::lock_guard<std::mutex> lk(m);
+    link_to_transition(trans);
 
-    auto it = place.values.begin();
-    for (auto &item : edge_expr) {
-        for (int i = 0; i < item._count._value; i++) {
-            if (it == place.values.end())
-                return false;
+    auto left = _values.begin();
+    auto right = edge_expr.values.begin();
 
-            if (item._value->empty()) {
-                *item._value = *it;
-                continue;
-            }
+    for (; left != _values.end() && right != edge_expr.values.end(); left++, right++)
+        if (!left->match(*right))
+            return false;
 
-            if (it->message("_neq_", {item._value})->get<Bool>())
-                return false;
-        }
-    }
+    if (right != edge_expr.values.end())
+        return false;
+
     return true;
 }
 
 bool PNtalk::PN::Place::pop(std::weak_ptr<PN::Transition> trans, const MultiSet &edge_expr) {
-    update_transitions.insert(trans);
+    std::lock_guard<std::mutex> lk(m);
+    link_to_transition(trans);
 
-    for (auto &item : edge_expr) {
-        for (int i = 0; i < item._count._value; i++) {
-            if (place.values.empty())
-                return false;
+    auto left = _values.begin();
+    auto right = edge_expr.values.begin();
 
-            if (item._value->empty()) {
-                *item._value = place.values.front();
-                continue;
-            }
-
-            if (place.values.front().message("_neq_", {item._value})->get<Bool>())
-                return false;
-
-            place.values.pop_front();
-        }
+    for (; left != _values.end() && right != edge_expr.values.end(); right++) {
+        if (!left->match(*right))
+            return false;
+        left = _values.erase(left);
     }
 
     update();
@@ -50,6 +42,14 @@ bool PNtalk::PN::Place::pop(std::weak_ptr<PN::Transition> trans, const MultiSet 
 }
 
 void PNtalk::PN::Place::push(const MultiSet &edge_expr) {
+    {
+        std::lock_guard<std::mutex> lk(m);
+
+        for (auto &elem : edge_expr.values) {
+            _values.push_back(elem);
+        }
+    }
+    cv.notify_all();
 
     update();
 }
@@ -57,8 +57,11 @@ void PNtalk::PN::Place::push(const MultiSet &edge_expr) {
 void PNtalk::PN::Place::update() {
     std::deque<std::weak_ptr<PN::Transition>> expired;
     std::set<std::string> scheduled;
+    // std::osyncstream cout(std::cout);
 
-    for (auto trans : update_transitions) {
+    // cout << "link              checked " << _update_transitions.size() << " ";
+
+    for (auto trans : _update_transitions) {
         auto locked = trans.lock();
 
         if (trans.expired()) {
@@ -66,12 +69,40 @@ void PNtalk::PN::Place::update() {
             continue;
         }
 
-        if (scheduled.find(locked->name()) == scheduled.end())
-            scheduled.insert(locked->name());
+        if (scheduled.find(locked->name) != scheduled.end())
+            continue;
+        scheduled.insert(locked->name);
 
+        // cout << locked->name << " ";
         schedule(locked);
     }
+    // cout << std::endl;
 
+    // std::cout << "link              erased " << expired.size() << std::endl;
     for (auto trans : expired)
-        update_transitions.erase(trans);
+        _update_transitions.erase(trans);
+}
+
+/**
+ * @link https://stackoverflow.com/questions/32668742/a-set-of-weak-ptr
+ */
+bool PNtalk::Net::Place::transitions_compare::operator()(const std::weak_ptr<Net::Transition> &lhs, const std::weak_ptr<Net::Transition> &rhs) const {
+    auto lptr = lhs.lock(), rptr = rhs.lock();
+    if (!rptr)
+        return false; // nothing after expired pointer
+    if (!lptr)
+        return true;  // every not expired after expired pointer
+    return lptr.get() < rptr.get();
+}
+
+void PNtalk::Net::Place::schedule(std::shared_ptr<Net::Transition> trans) {
+    scheduler.schedule(trans->copy());
+}
+
+void PNtalk::Net::Place::link_to_transition(std::weak_ptr<Net::Transition> trans) {
+    auto locked = trans.lock();
+    if (!locked)
+        return;
+    // std::cout << "linking " << locked->name << std::endl;
+    _update_transitions.insert(locked->top_parent());
 }

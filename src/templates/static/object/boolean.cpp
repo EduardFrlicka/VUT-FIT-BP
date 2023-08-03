@@ -1,12 +1,12 @@
 #include "boolean.h"
-
+#include "object.h"
 
 using namespace PNtalk;
 
 PNtalk::Bool::Bool() {
 }
 
-PNtalk::Bool::Bool(bool value): _value(value) {
+PNtalk::Bool::Bool(bool value) : _value(value) {
 }
 
 PNtalk::Bool::operator bool() const {
@@ -33,4 +33,12 @@ MessageResult PNtalk::Bool::message(ThisObj this_obj, const MessageSelector &mes
 
 MessageResult PNtalk::Bool::doesNotUnderstand_(ThisObj this_obj, MessageArguments arguments) {
     return MessageResult();
+}
+
+MessageResult PNtalk::Bool::_eq_(ThisObj this_obj, MessageArguments arguments) {
+    return make_shared_obj(Bool(_value == arguments.front()->get<Bool>()._value));
+}
+
+MessageResult PNtalk::Bool::_neq_(ThisObj this_obj, MessageArguments arguments) {
+    return make_shared_obj(Bool(_value != arguments.front()->get<Bool>()._value));
 }

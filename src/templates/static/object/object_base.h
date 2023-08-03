@@ -13,7 +13,7 @@ typedef const std::deque<std::shared_ptr<Object>> &MessageArguments;
 typedef std::string MessageSelector;
 typedef std::shared_ptr<Object> MessageResult;
 typedef std::shared_ptr<Object> Variable;
-typedef const std::weak_ptr<Object> &ThisObj;
+typedef const std::shared_ptr<Object> &ThisObj;
 
 class ObjectBase {
   public:
@@ -29,7 +29,10 @@ class ObjectBase {
     MessageResult _eqi_(ThisObj this_obj, MessageArguments arguments);
     MessageResult _neqi_(ThisObj this_obj, MessageArguments arguments);
 
-    virtual MessageResult doesNotUnderstand_(ThisObj this_obj, MessageArguments arguments) = 0;
+    virtual MessageResult doesNotUnderstand_(ThisObj this_obj, MessageArguments arguments) {
+        return MessageResult();
+    };
+    MessageResult doesNotUnderstand_default(ThisObj this_obj, MessageArguments arguments);
 
     ~ObjectBase(){};
 };

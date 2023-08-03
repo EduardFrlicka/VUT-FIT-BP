@@ -12,9 +12,9 @@ SemanticAnalyzer::SemanticAnalyzer(const ast::Classes &__root) {
     id.declare_define(__root.begin);
     classes.push(id);
 
-    id = Identifier("self");
+    id = Identifier("this_obj.lock()");
     id.declare_define(__root.begin);
-    variables.push(id);
+    variables.push("self", id);
 
     id = Identifier("super");
     id.declare_define(__root.begin);
@@ -47,8 +47,14 @@ asg::Classes SemanticAnalyzer::analyze(const ast::Classes &node) {
         }
     }
 
+    if (!classes.search(node.main->payload.id)) {
+        error.undeclared_class(node.main->it);
+        res = ERR_SEMANTIC;
+    }
+
     for (auto i : node.classes)
         result_node.classes.push_back(analyze(i));
+    result_node.main = Identifier(node.main->payload.id);
 
     return result_node;
 }
@@ -57,6 +63,7 @@ asg::Class SemanticAnalyzer::analyze(const ast::Class &node) {
     asg::Class result_node;
 
     messages.push_frame();
+    places.push_frame();
 
     analyze(node.head);
     result_node.base = classes.get(node.head.base->payload.id);
@@ -72,6 +79,7 @@ asg::Class SemanticAnalyzer::analyze(const ast::Class &node) {
         result_node.syn_ports.push_back(analyze(i));
 
     messages.pop_frame();
+    places.pop_frame();
 
     return result_node;
 }
@@ -169,23 +177,22 @@ asg::SynPort SemanticAnalyzer::analyze(const ast::SynPort &node) {
 
     /* TODO check if has effect */
     if (node.conditions.has_value())
-        analyze(node.conditions.value());
+        result_node.conds = analyze(node.conditions.value());
     if (node.pre_conditions.has_value())
-        analyze(node.pre_conditions.value());
+        result_node.pre_conds = analyze(node.pre_conditions.value());
     if (node.guard.has_value())
-        analyze(node.guard.value());
+        result_node.guard = analyze(node.guard.value());
     if (node.post_contitions.has_value())
-        analyze(node.post_contitions.value());
+        result_node.post_conds = analyze(node.post_contitions.value());
 
     result_node.variables = variables.get_frame();
     variables.pop_frame();
     return result_node;
 }
 std::pair<Identifier, std::deque<Identifier>> SemanticAnalyzer::analyze(const ast::Message &node) {
-    BasicIdentifier id;
+    Identifier id;
     Identifier arg;
     NameSpace arguments;
-    Identifier message;
 
     if (node.unary.has_value()) {
         id = node.unary->payload.id;
@@ -209,7 +216,7 @@ std::pair<Identifier, std::deque<Identifier>> SemanticAnalyzer::analyze(const as
 
     if (node.keys.size() > 0) {
         for (auto kv : node.keys) {
-            id += kv.first->payload.id;
+            id.add_keyword_identifier(kv.first->payload.id);
 
             if (kv.second->payload.id.is_upper()) {
                 error.expected_lower(kv.second->it);
@@ -229,11 +236,10 @@ std::pair<Identifier, std::deque<Identifier>> SemanticAnalyzer::analyze(const as
         error.message_redeclaration(messages.get(id), node.begin);
     }
 
-    message = Identifier(id);
-    message.declare_define(node.begin, node.end);
-    messages.push(message);
+    id.declare_define(node.begin, node.end);
+    messages.push(id);
 
-    return std::make_pair(message, arguments.get_frame());
+    return std::make_pair(id, arguments.get_frame());
 }
 asg::Net SemanticAnalyzer::analyze(const ast::Net &node) {
     asg::Net result_node;
@@ -279,7 +285,7 @@ asg::Action SemanticAnalyzer::analyze(const ast::InitAction &node) {
     asg::Action result_node;
     Identifier var;
 
-    // variables.push_frame();
+    variables.push_frame();
 
     for (auto temp_var : node.temporaries) {
         if (temp_var.payload.id.is_upper()) {
@@ -299,8 +305,8 @@ asg::Action SemanticAnalyzer::analyze(const ast::InitAction &node) {
 
     result_node.expression = analyze(node.expr);
 
-    // result_node.variables = variables.get_frame();
-    // variables.pop_frame();
+    result_node.variables = variables.get_frame();
+    variables.pop_frame();
 
     return result_node;
 }

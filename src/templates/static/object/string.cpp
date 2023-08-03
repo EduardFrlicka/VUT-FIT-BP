@@ -18,7 +18,6 @@ PNtalk::String::String() : super() {
     message_translator["_gte_"] = &String::_gte_;
     message_translator["_lte_"] = &String::_lte_;
     message_translator["doesNotUnderstand_"] = &String::doesNotUnderstand_;
-
 }
 
 PNtalk::String::String(std::string value) : String() {

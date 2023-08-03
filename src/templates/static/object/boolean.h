@@ -16,9 +16,9 @@ class Bool : public ObjectBase {
 
     MessageResult message(ThisObj this_obj, const MessageSelector &message_selector, MessageArguments arguments);
 
-    // virtual Object message(const std::string &, const std::deque<Object> &);
-    // virtual Object _eq_(const std::deque<Object> &);
-    // virtual Object _neq_(const std::deque<Object> &);
+    MessageResult _eq_(ThisObj this_obj, MessageArguments arguments);
+    MessageResult _neq_(ThisObj this_obj, MessageArguments arguments);
+
     MessageResult doesNotUnderstand_(ThisObj this_obj, MessageArguments arguments);
 };
 } // namespace PNtalk

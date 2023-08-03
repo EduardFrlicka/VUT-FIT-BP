@@ -17,7 +17,6 @@ class CodeTemplateManager {
     CodeFiles get(const std::string);
 
   private:
-    void initialize(const std::filesystem::path &);
     CodeFiles create_template(std::istream &);
     CodeFiles create_template(const std::filesystem::path &);
 

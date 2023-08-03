@@ -1,37 +1,50 @@
-//*!slot:dirname:__class_name__//*?__net_name__/*/__place_name__*/
-//*!slot:type:__class_name__::/*?__net_name__::*/Place___place_name__*/
+//*!slot:dirname:__class_name__/*?/__net_name__*//__place_name__*/
+//*!slot:type:__class_name__::/*?__net_name__::*/__name__*/
+//*!slot:name:Place___place_name__*/
 
-/*!file:__class_name__/header.h*/
+//*!file:__class_name__/*?/__net_name__*//header.h*/
 /*!ignore*/
 class Net {
     /*!ignore*/
     void init();
-    class Place___place_name__;
-    std::shared_ptr<Place___place_name__> place___place_name__;
+    class __name__;
     /*?__place__*/
 
     /*!ignore*/
 };
 
-//*!file:__class_name__//*?__net_name__/*/init.cpp*/
+//*!file:__class_name__/*?/__net_name__*//init.cpp*/
+#include "__dirname__/header.h"
+#include "object.h"
 /*!ignore*/
-void Net::init() {
-    place___place_name__ = std::make_shared<Place___place_name__>();
-    _places["__place_name__"] = place___place_name__.
+{
+    add_place("__place_name__", std::make_shared<__type__>(__type__()));
     /*?__place__*/
     /*!ignore*/
 }
-/*!file:__dirname__/__place_name__.h*/
+/*!file:__dirname__/header.h*/
 #include "__class_name__/*?/__net_name__*//header.h"
 #include "net_place.h"
 
 namespace PNtalk {
-class __type__ : public PN::Place {
-    Place___place_name__();
-    void update();
+class __type__ : public Net::Place {
+  public:
+    __name__();
+    /*?__init_action__*/
 };
 } // namespace PNtalk
 
+/*!file:__dirname__/init.cpp*/
+#include "__dirname__/header.h"
+#include "object.h"
+
+using namespace PNtalk;
+__type__::__name__(){
+
+    /*?__init_action__*/
+    /*? _values = __init_state__.values;*/
+};
+
 /*!file:object/object_variant.h*/
-#include "__dirname__/__place_name__.h"
+#include "__dirname__/header.h"
 /*?__place__*/

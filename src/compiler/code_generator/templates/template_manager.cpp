@@ -47,9 +47,6 @@ CodeFiles CodeTemplateManager::get(const std::string name) {
     return (*it).second;
 }
 
-void CodeTemplateManager::initialize(const std::filesystem::path &dir_path) {
-}
-
 CodeFiles CodeTemplateManager::create_template(std::istream &stream) {
     CodeFiles res;
     std::map<std::string, Code> code_files;
@@ -74,8 +71,8 @@ CodeFiles CodeTemplateManager::create_template(std::istream &stream) {
             continue;
 
         if (regex_search(line, match, file_selector)) {
-            if (!file_code.empty())
-                code_files.insert(std::make_pair(file_name, Code(file_code)));
+            // if (!file_code.empty())
+            code_files.insert(std::make_pair(file_name, Code(file_code)));
 
             file_name = match[1];
             file_code.clear();
@@ -119,7 +116,13 @@ CodeFiles CodeTemplateManager::create_template(std::istream &stream) {
         code_files[file_name] = Code(file_code);
 
     res = CodeFiles(code_files);
+
+    // std::cout << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl;
+
+    // res.print();
     res.apply(substitutions);
+    res.apply(substitutions);
+    // res.print();
 
     return res;
 }

@@ -1,3 +1,5 @@
-#include "object.h"
+#include "net_multiset.h"
 
-PNtalk::MultiSet()
+PNtalk::MultiSet({
+    /*?__element_pair__*/
+    })

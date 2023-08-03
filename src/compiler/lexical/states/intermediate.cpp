@@ -5,7 +5,7 @@
 #define EOFCHECK(c)                                                                                                                                                                                    \
     do {                                                                                                                                                                                               \
         if ((c) == EOF) {                                                                                                                                                                              \
-            logger.c_error(file->getPos(), MSG_LEX_UNEXPECTED_EOF);                                                                                                                                      \
+            logger.c_error(file->getPos(), MSG_LEX_UNEXPECTED_EOF);                                                                                                                                    \
             return ERR_LEXICAL;                                                                                                                                                                        \
         }                                                                                                                                                                                              \
     } while (0)
@@ -13,7 +13,7 @@
 #define EOLCHECK(c)                                                                                                                                                                                    \
     do {                                                                                                                                                                                               \
         if ((c) == '\n') {                                                                                                                                                                             \
-            logger.c_error(file->getPos(), MSG_LEX_UNEXPECTED_EOL);                                                                                                                                      \
+            logger.c_error(file->getPos(), MSG_LEX_UNEXPECTED_EOL);                                                                                                                                    \
             return ERR_LEXICAL;                                                                                                                                                                        \
         }                                                                                                                                                                                              \
     } while (0)
@@ -49,18 +49,33 @@ int LexicalAnalyzer::stateDollar(int c) {
         logger.c_error(file->getPos(), MSG_LEX_UNEXPECTED_CHAR);
         return ERR_LEXICAL;
     }
+    token.payload.character.set(c);
     nextState = &LexicalAnalyzer::stateCharacter;
     return SUCCESS;
 }
-
-
 
 int LexicalAnalyzer::stateStringOpen(int c) {
     EOFCHECK(c);
     EOLCHECK(c);
     nextState = &LexicalAnalyzer::stateStringOpen;
-    if (c == '\'')
+    if (c == '\'') {
         nextState = &LexicalAnalyzer::stateString;
+        return SUCCESS;
+    }
+    token.payload.string.append(c);
+
+    return SUCCESS;
+}
+
+int LexicalAnalyzer::stateSymbolOpen(int c) {
+    EOFCHECK(c);
+    EOLCHECK(c);
+    nextState = &LexicalAnalyzer::stateSymbolOpen;
+    if (c == '\'') {
+        nextState = &LexicalAnalyzer::stateSymbolClosed;
+        return SUCCESS;
+    }
+    token.payload.string.append(c);
 
     return SUCCESS;
 }

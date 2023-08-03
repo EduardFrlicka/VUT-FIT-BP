@@ -59,7 +59,7 @@ int LexicalAnalyzer::stateNumberDot(int c) {
         if (token.payload.float_number.isdigit(c2)) {
             token.type = tokenFloat;
             token.payload.float_number = token.payload.integer_number;
-                nextState = &LexicalAnalyzer::stateNumberDot;
+            nextState = &LexicalAnalyzer::stateNumberDot;
         }
         return SUCCESS;
     }
@@ -108,15 +108,29 @@ int LexicalAnalyzer::stateIdentifier(int c) {
 int LexicalAnalyzer::stateString(int c) {
     nextState = &LexicalAnalyzer::end;
     token.type = tokenString;
-    if (c == '\'')
+    if (c == '\'') {
         nextState = &LexicalAnalyzer::stateStringOpen;
+        token.payload.string.append(c);
+    }
     return SUCCESS;
 }
 
 int LexicalAnalyzer::stateSymbol(int c) {
     nextState = &LexicalAnalyzer::end;
     token.type = tokenSymbol;
-    if (isalnum(c))
+    if (isalnum(c)) {
         nextState = &LexicalAnalyzer::stateSymbol;
+        token.payload.symbol.append(c);
+    }
+    return SUCCESS;
+}
+
+int LexicalAnalyzer::stateSymbolClosed(int c) {
+    nextState = &LexicalAnalyzer::end;
+    token.type = tokenSymbol;
+    if (c == '\'') {
+        nextState = &LexicalAnalyzer::stateSymbolOpen;
+        token.payload.symbol.append(c);
+    }
     return SUCCESS;
 }

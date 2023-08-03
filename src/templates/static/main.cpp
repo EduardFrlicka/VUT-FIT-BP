@@ -1,11 +1,11 @@
+#include "scheduler.h"
+
 #include "object.h"
-#include "string.h"
-#include <deque>
-#include <thread>
 
 using namespace PNtalk;
 
 int main() {
-    
+    /*?__generated__*/
 
+    scheduler.run();
 }

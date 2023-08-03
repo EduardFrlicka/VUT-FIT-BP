@@ -66,7 +66,7 @@ class Guard : public Base {
 
 class Action : public Base {
   public:
-    // std::deque<Identifier> variables;
+    std::deque<Identifier> variables;
     Expression expression;
 };
 

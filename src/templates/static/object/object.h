@@ -6,6 +6,7 @@
 #include <atomic>
 #include <iostream>
 #include <memory>
+#include <syncstream>
 
 namespace PNtalk {
 class Object : public std::enable_shared_from_this<Object> {
@@ -22,6 +23,7 @@ class Object : public std::enable_shared_from_this<Object> {
     Object(Array &&value);
     Object(CodeBlock &&value);
     Object(Transcript &&value);
+    Object(std::weak_ptr<Net::Transition> &&value);
     /*?__generated__*/
 
     MessageResult message(const MessageSelector &message_selector, MessageArguments arguments);
@@ -32,10 +34,18 @@ class Object : public std::enable_shared_from_this<Object> {
 };
 
 template <class T> inline T &Object::get() {
-    if (!std::holds_alternative<T>(*_value)) {
-        std::cerr << "Semantic error" << std::endl;
+    if (!_value) {
+        std::osyncstream(std::cerr) << "Semantic error: get on empty object" << std::endl;
         /* TODO SEMANTIC ERROR HANDLE */
-        exit(1);
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+
+        throw std::invalid_argument("Semantic error: get on empty object");
+    }
+    if (!std::holds_alternative<T>(*_value)) {
+        std::osyncstream(std::cerr) << "Semantic error: get wrong type " << typeid(T).name() << " and " << typeid(*_value).name() << std::endl;
+        /* TODO SEMANTIC ERROR HANDLE */
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        throw std::invalid_argument("Semantic error: get wrong type");
     }
     return std::get<T>(*_value);
 }

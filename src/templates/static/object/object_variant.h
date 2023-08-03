@@ -11,5 +11,5 @@
 #include <variant>
 
 namespace PNtalk {
-typedef std::variant<Nil, Bool, Integer, Character, String, Symbol, Array, CodeBlock, Transcript /*?__generated__*/> ObjectVariant;
+typedef std::variant<Nil, Bool, Integer, Character, String, Symbol, Array, CodeBlock, Transcript, std::weak_ptr<Net::Transition> /*?__generated__*/> ObjectVariant;
 }

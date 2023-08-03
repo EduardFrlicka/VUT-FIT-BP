@@ -10,6 +10,7 @@ PNtalk::Symbol::Symbol() {
     message_translator["_eqi_"] = &Symbol::_eq_;
     message_translator["_neq_"] = &Symbol::_neq_;
     message_translator["_neqi_"] = &Symbol::_neq_;
+    message_translator["asString"] = &Symbol::asString;
 }
 
 PNtalk::Symbol::Symbol(const std::string &value) : Symbol() {
@@ -38,7 +39,7 @@ MessageResult PNtalk::Symbol::_neq_(ThisObj this_obj, MessageArguments arguments
     return make_shared_obj(Bool(_it != arguments[0]->get<Symbol>()._it));
 }
 
-MessageResult PNtalk::Symbol::toString(ThisObj this_obj, MessageArguments arguments) {
+MessageResult PNtalk::Symbol::asString(ThisObj this_obj, MessageArguments arguments) {
     return make_shared_obj(String(_it->first));
 }
 

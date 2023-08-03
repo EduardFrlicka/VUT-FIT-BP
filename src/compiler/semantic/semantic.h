@@ -22,7 +22,6 @@ class NameSpace {
     bool search_top(const BasicIdentifier &);
     bool search_top(const std::string &);
 
-
     Identifier &get(const Identifier &);
     Identifier &get(const BasicIdentifier &);
     Identifier &get(const std::string &);
@@ -30,6 +29,7 @@ class NameSpace {
     std::deque<Identifier> get_frame();
 
     void push(const Identifier &);
+    void push(const std::string &, const Identifier &);
     void push_frame();
     void pop_frame();
 };

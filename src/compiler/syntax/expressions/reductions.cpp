@@ -113,7 +113,7 @@ void ExpressionSyntaxAnalyzer::reduce_keyword_message() {
         stack.pop();
     }
 
-    stack.push(Expression(CascadeKeyWord(recv, selector, arguments), recv.begin, arguments.back().end));
+    stack.push(Expression(ExpressionKeyWord(recv, selector, arguments), recv.begin, arguments.back().end));
 }
 
 /* id := E -> E        - assigment */

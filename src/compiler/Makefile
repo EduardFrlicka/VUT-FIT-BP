@@ -23,7 +23,7 @@ DEP=$(ROOT)/dep/compiler
 # Commands and Flags
 
 # Flags for compiling
-CXXFLAGS:=-std=c++20 -Wall -Wextra -pedantic -ggdb3 -Wno-unused-parameter -DDEBUG_PRINT
+CXXFLAGS:=-std=c++20 -Wall -Wextra -pedantic -ggdb3 -DDEBUG_PRINT
 
 LFLAGS:=
 

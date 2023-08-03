@@ -60,6 +60,10 @@ void NameSpace::push(const Identifier &id) {
     stack.back().insert(std::make_pair(id.id.name, id));
 }
 
+void NameSpace::push(const std::string &name, const Identifier &id) {
+    stack.back().insert(std::make_pair(name, id));
+}
+
 void NameSpace::push_frame() {
     stack.emplace_back();
 }

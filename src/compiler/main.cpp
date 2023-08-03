@@ -25,12 +25,13 @@ int main(int argc, char *argv[]) {
 
     auto syn_analyzer = SyntaxAnalyzer(lex_analyzer.begin());
 
+    // syn_analyzer.root().print();
+
     auto sem_analyzer = SemanticAnalyzer(syn_analyzer.root());
 
     auto code_generator = CodeGenerator(sem_analyzer.root());
 
     code_generator.writeFiles();
-    // syn_analyzer.root().print();
 
     return SUCCESS;
 }

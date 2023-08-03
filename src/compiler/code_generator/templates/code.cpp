@@ -45,7 +45,7 @@ void Code::apply(regex key, string value) {
         include.insert(change.second);
     }
 
-    code = regex_replace(code, key, value);
+    code = regex_replace(code, key, value, regex_constants::match_not_bol | regex_constants::match_not_eol);
 }
 
 void Code::apply(std::string key, Code value) {
@@ -63,7 +63,7 @@ void Code::apply(std::string key, std::string value) {
 }
 
 void Code::uncomment(const std::string &key) {
-    regex re = regex_optional("((?:(?!\\/\\*).)*?__" + key + "__.*?)");
+    regex re = regex_optional("((?:(?!\\/\\*|\\*\\/).)*?__" + key + "__(?:(?!\\*\\/).)*?)");
     apply(re, "$1");
 }
 
@@ -92,6 +92,10 @@ void Code::append(std::vector<Code> to_append_vector) {
 
 bool Code::isEmpty() const {
     return code.empty() && include.empty();
+}
+
+bool Code::contains_slot(const std::string &slot_name) const {
+    return std::regex_search(code, regex_replacement(slot_name));
 }
 
 string Code::to_string() const {

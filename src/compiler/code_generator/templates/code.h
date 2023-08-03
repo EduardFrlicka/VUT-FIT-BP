@@ -31,6 +31,7 @@ class Code {
     void append(std::vector<Code>);
 
     bool isEmpty() const;
+    bool contains_slot(const std::string &slot_name) const;
 
   private:
 };
@@ -54,5 +55,6 @@ class CodeFiles {
     void apply(const std::string &slot_key, const std::string &slot_value);
     void apply(const std::map<std::string, std::string> &);
     void remove_optional_slots();
+    void remove_optional_slots_from_filenames();
     void print();
 };

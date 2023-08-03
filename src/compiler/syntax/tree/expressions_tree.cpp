@@ -101,7 +101,7 @@ void AbstractSyntaxTree::Expression::print(int indent) const {
 AbstractSyntaxTree::ExpressionPair::ExpressionPair(const Expression &_first, const Expression &_second) : first(_first), second(_second) {
 }
 
-void AbstractSyntaxTree::ExpressionPair::print(int indent) {
+void AbstractSyntaxTree::ExpressionPair::print(int) {
     first.print();
     std::cout << ".";
     second.print();
@@ -110,7 +110,7 @@ void AbstractSyntaxTree::ExpressionPair::print(int indent) {
 AbstractSyntaxTree::CascadeUnary::CascadeUnary(const Expression &_recv, const Token &_selector) : recv(_recv), message_selector(_selector) {
 }
 
-void AbstractSyntaxTree::CascadeUnary::print(int indent) {
+void AbstractSyntaxTree::CascadeUnary::print(int) {
     recv.print();
     std::cout << "; " << message_selector.text;
 }
@@ -118,7 +118,7 @@ void AbstractSyntaxTree::CascadeUnary::print(int indent) {
 AbstractSyntaxTree::CascadeBinary::CascadeBinary(const Expression &_recv, const Token &_selector, const Expression &_argument) : recv(_recv), message_selector(_selector), argument(_argument) {
 }
 
-void AbstractSyntaxTree::CascadeBinary::print(int indent) {
+void AbstractSyntaxTree::CascadeBinary::print(int) {
     recv.print();
     std::cout << "; " << message_selector.text;
     argument.print();
@@ -128,7 +128,7 @@ AbstractSyntaxTree::CascadeKeyWord::CascadeKeyWord(const Expression &_recv, cons
     : recv(_recv), selector(_selector), arguments(_arguments) {
 }
 
-void AbstractSyntaxTree::CascadeKeyWord::print(int indent) {
+void AbstractSyntaxTree::CascadeKeyWord::print(int) {
     recv.print();
     for (auto i = 0ul; i < selector.size(); i++) {
         std::cout << "; " << selector[i].text << ":(";
@@ -140,20 +140,20 @@ void AbstractSyntaxTree::CascadeKeyWord::print(int indent) {
 AbstractSyntaxTree::ExpressionIdentifier::ExpressionIdentifier(const Token &_value) : value(_value) {
 }
 
-void AbstractSyntaxTree::ExpressionIdentifier::print(int indent) {
+void AbstractSyntaxTree::ExpressionIdentifier::print(int) {
     std::cout << value.text;
 }
 AbstractSyntaxTree::ExpressionValue::ExpressionValue(const Token &_value) : value(_value) {
 }
 
-void AbstractSyntaxTree::ExpressionValue::print(int indent) {
+void AbstractSyntaxTree::ExpressionValue::print(int) {
     std::cout << value.text;
 }
 
 AbstractSyntaxTree::ExpressionUnary::ExpressionUnary(const Expression &_recv, const Token &_selector) : recv(_recv), message_selector(_selector) {
 }
 
-void AbstractSyntaxTree::ExpressionUnary::print(int indent) {
+void AbstractSyntaxTree::ExpressionUnary::print(int) {
     recv.print();
     std::cout << " " << message_selector.text;
 }
@@ -161,7 +161,7 @@ void AbstractSyntaxTree::ExpressionUnary::print(int indent) {
 AbstractSyntaxTree::ExpressionBinary::ExpressionBinary(const Expression &_recv, const Token &_selector, const Expression &_argument) : recv(_recv), message_selector(_selector), argument(_argument) {
 }
 
-void AbstractSyntaxTree::ExpressionBinary::print(int indent) {
+void AbstractSyntaxTree::ExpressionBinary::print(int) {
     recv.print();
     std::cout << " " << message_selector.text;
     argument.print();
@@ -171,7 +171,7 @@ AbstractSyntaxTree::ExpressionKeyWord::ExpressionKeyWord(const Expression &_recv
     : recv(_recv), selector(_selector), arguments(_arguments) {
 }
 
-void AbstractSyntaxTree::ExpressionKeyWord::print(int indent) {
+void AbstractSyntaxTree::ExpressionKeyWord::print(int) {
     recv.print();
     for (auto i = 0ul; i < selector.size(); i++) {
         std::cout << " " << selector[i].text << ":(";
@@ -183,7 +183,7 @@ void AbstractSyntaxTree::ExpressionKeyWord::print(int indent) {
 AbstractSyntaxTree::Assgiment::Assgiment(const Token &_target, const Expression &_value) : target(_target), value(_value) {
 }
 
-void AbstractSyntaxTree::Assgiment::print(int indent) {
+void AbstractSyntaxTree::Assgiment::print(int) {
     std::cout << target.text << ":=";
     value.print();
 }
@@ -191,7 +191,7 @@ void AbstractSyntaxTree::Assgiment::print(int indent) {
 AbstractSyntaxTree::Bracket::Bracket(const Expression &_expr) : expr(_expr) {
 }
 
-void AbstractSyntaxTree::Bracket::print(int indent) {
+void AbstractSyntaxTree::Bracket::print(int) {
     std::cout << "(";
     expr.print();
     std::cout << ")";
@@ -200,7 +200,7 @@ void AbstractSyntaxTree::Bracket::print(int indent) {
 AbstractSyntaxTree::CodeBlock::CodeBlock(const std::deque<Token> &_arguments, const std::deque<Token> &_temps, const Expression &_expr) : arguments(_arguments), temps(_temps), expr(_expr) {
 }
 
-void AbstractSyntaxTree::CodeBlock::print(int indent) {
+void AbstractSyntaxTree::CodeBlock::print(int) {
     std::cout << "[";
 
     for (auto i : arguments)
@@ -218,7 +218,7 @@ void AbstractSyntaxTree::CodeBlock::print(int indent) {
 AbstractSyntaxTree::ConstArray::ConstArray(const std::deque<Token> &_values) : elements(_values) {
 }
 
-void AbstractSyntaxTree::ConstArray::print(int indent) {
+void AbstractSyntaxTree::ConstArray::print(int) {
     std::cout << "#(";
 
     for (auto i : elements)

@@ -1,6 +1,6 @@
-//*!slot:dirname:__class_name__/*?/__net_name__*//*?/__transition_name__*/*/
+//*!slot:dirname:__class_name__/*?/__net_name__*//*?/__place_name__*//*?/__transition_name__*/*/
 
-//*!file:__dirname__/*?/__transition_name__*/.h*/
+//*!file:__dirname__/header.h*/
 #include "object_base.h"
 
 std::shared_ptr<PNtalk::Object> __variable_name__;
