@@ -5,6 +5,7 @@ PNtalk::PN::SyncPort::SyncPort(Places places) : Transition(places){};
 PNtalk::PN::SyncPort::SyncPort(const std::set<std::weak_ptr<Net::Transition>, transitions_compare> &update_transitions, std::weak_ptr<Net::Transition> parent) : Transition({}, parent) {
     _update_transitions = update_transitions;
 };
+PNtalk::PN::SyncPort::SyncPort(const SyncPort &other) : Transition(other), Place(other){};
 
 bool PNtalk::PN::SyncPort::scheduler_execute() {
     update();

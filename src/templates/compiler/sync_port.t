@@ -38,11 +38,11 @@ class __type__ : public PNtalk::PN::SyncPort {
 #include "__dirname__/header.h"
 
 __type__::__sync_port_name__(const Places &places) : SyncPort(places) {
-    name = "/*?__net_name__/*/__sync_port_name__";
+    name = "__class_name__/__sync_port_name__";
     /*?__variable_declaration__*/
 };
 __type__::__sync_port_name__(const std::set<std::weak_ptr<Net::Transition>, transitions_compare> &update_transitions, std::weak_ptr<Net::Transition> parent) : SyncPort(update_transitions, parent) {
-    name = "/*?__net_name__/*/__sync_port_name__";
+    name = "__class_name__/__sync_port_name__";
 };
 
 /*!file:__class_name__/init.cpp*/
@@ -106,7 +106,9 @@ bool __type__::check() {
 
 using namespace PNtalk;
 std::shared_ptr<Net::Transition> __type__::copy() {
-    return std::make_shared<__type__>(__type__(_update_transitions, top_parent()));
+    auto res = std::make_shared<__type__>(__type__(_update_transitions, top_parent()));
+
+    return res;
 };
 
 /*!file: __dirname__/execute.cpp */

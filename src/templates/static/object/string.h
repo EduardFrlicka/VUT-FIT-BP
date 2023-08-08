@@ -25,6 +25,8 @@ class String : public ObjectBase {
     MessageResult _gte_(ThisObj this_obj, MessageArguments arguments);
     MessageResult _lte_(ThisObj this_obj, MessageArguments arguments);
 
+    MessageResult toString(ThisObj this_obj, MessageArguments arguments);
+
     MessageResult doesNotUnderstand_(ThisObj this_obj, MessageArguments arguments);
 };
 

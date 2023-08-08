@@ -7,6 +7,7 @@ namespace PNtalk {
 
 class PN::SyncPort : public PN::Transition, public PN::Place {
   public:
+    SyncPort(const SyncPort &other);
     SyncPort(Places places);
     SyncPort(const std::set<std::weak_ptr<Net::Transition>, transitions_compare> &update_transitions, std::weak_ptr<Net::Transition> parent);
 

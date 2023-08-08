@@ -4,7 +4,7 @@
 #include <syncstream>
 
 PNtalk::Net::Place::Place(){};
-PNtalk::Net::Place::Place(Place &&other) : _values(other._values), m(){};
+PNtalk::Net::Place::Place(const Place &other) : _values(other._values), m(), _update_transitions(other._update_transitions){};
 PNtalk::Net::Place::Place(const MultiSet &init) : _values(init.values){};
 
 bool PNtalk::PN::Place::match(std::weak_ptr<PN::Transition> trans, const MultiSet &edge_expr) {
@@ -104,5 +104,8 @@ void PNtalk::Net::Place::link_to_transition(std::weak_ptr<Net::Transition> trans
     if (!locked)
         return;
     // std::cout << "linking " << locked->name << std::endl;
+    if (_update_transitions.find(locked->top_parent()) != _update_transitions.end())
+        return;
+
     _update_transitions.insert(locked->top_parent());
 }

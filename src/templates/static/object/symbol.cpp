@@ -11,6 +11,7 @@ PNtalk::Symbol::Symbol() {
     message_translator["_neq_"] = &Symbol::_neq_;
     message_translator["_neqi_"] = &Symbol::_neq_;
     message_translator["asString"] = &Symbol::asString;
+    message_translator["toString"] = &Symbol::asString;
 }
 
 PNtalk::Symbol::Symbol(const std::string &value) : Symbol() {
@@ -42,6 +43,7 @@ MessageResult PNtalk::Symbol::_neq_(ThisObj this_obj, MessageArguments arguments
 MessageResult PNtalk::Symbol::asString(ThisObj this_obj, MessageArguments arguments) {
     return make_shared_obj(String(_it->first));
 }
+
 
 MessageResult PNtalk::Symbol::doesNotUnderstand_(ThisObj this_obj, MessageArguments arguments) {
     std::cout << "Symbol does not understand message with selector: " << std::endl;

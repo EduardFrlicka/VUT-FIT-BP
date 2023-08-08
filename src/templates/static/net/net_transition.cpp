@@ -12,6 +12,7 @@ bool PNtalk::Net::Transition::match(const std::string &place, const MultiSet &mu
     auto locked = _places[place].lock();
     if (_places[place].expired())
         return false;
+    // std::cout << "match " << name << " with " << place << std::endl;
 
     return locked->match(weak_from_this(), multiset);
 }
@@ -24,6 +25,7 @@ bool PNtalk::Net::Transition::pop(const std::string &place, const MultiSet &mult
     if (_places[place].expired())
         return false;
 
+    // std::cout << "pop " << name << " with " << place << std::endl;
     return locked->pop(weak_from_this(), multiset);
 }
 
@@ -35,6 +37,7 @@ void PNtalk::Net::Transition::push(const std::string &place, const MultiSet &mul
     if (_places[place].expired())
         return;
 
+    // std::cout << "push " << name << " with " << place << std::endl;
     locked->push(multiset);
 }
 

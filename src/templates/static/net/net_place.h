@@ -18,7 +18,7 @@ class Net::Place {
     std::deque<MultiSetItem> _values;
     Place();
     Place(const MultiSet &init);
-    Place(Place &&other);
+    Place(const Place &other);
     std::mutex m;
     std::condition_variable cv;
 

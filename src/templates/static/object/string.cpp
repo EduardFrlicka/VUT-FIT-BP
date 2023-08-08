@@ -17,6 +17,7 @@ PNtalk::String::String() : super() {
     message_translator["_gt_"] = &String::_gt_;
     message_translator["_gte_"] = &String::_gte_;
     message_translator["_lte_"] = &String::_lte_;
+    message_translator["toString"] = &String::toString;
     message_translator["doesNotUnderstand_"] = &String::doesNotUnderstand_;
 }
 
@@ -58,4 +59,8 @@ MessageResult PNtalk::String::_lte_(ThisObj this_obj, MessageArguments arguments
 
 MessageResult PNtalk::String::doesNotUnderstand_(ThisObj this_obj, MessageArguments arguments) {
     return MessageResult();
+}
+
+MessageResult PNtalk::String::toString(ThisObj this_obj, MessageArguments arguments) {
+    return make_shared_obj(String(_value));
 }

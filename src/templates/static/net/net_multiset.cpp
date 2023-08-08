@@ -45,7 +45,7 @@ bool PNtalk::MultiSetList::match(const PNtalk::MultiSetList &other) const {
         auto left = _values.begin();
         auto right = other._values.begin();
         for (; left != _values.end(); left++, right++) {
-            if (left->match(*right))
+            if (!left->match(*right))
                 return false;
         }
     }
@@ -87,6 +87,7 @@ bool PNtalk::MultiSetItem::match(const PNtalk::MultiSetItem &other) const {
     if (std::holds_alternative<MultiSetList>(other._value) && std::holds_alternative<MultiSetList>(_value)) {
         auto &left = std::get<MultiSetList>(other._value);
         auto &right = std::get<MultiSetList>(_value);
+        // std::cout<<"list to list "<<left.match(right)<<std::endl;
         return left.match(right);
     }
 

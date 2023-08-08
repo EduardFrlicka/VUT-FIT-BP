@@ -17,7 +17,8 @@ bool PNtalk::Scheduler::TransitionThread::try_join() {
 void PNtalk::Scheduler::TransitionThread::run() {
     thread = std::thread([&] {
         // std::osyncstream(std::cout) << "    Started: " << _transition->name << std::endl;
-        _transition->scheduler_execute();
+        if(_transition->scheduler_check())
+            _transition->scheduler_execute();
         // std::osyncstream(std::cout) << "    Finished: " << _transition->name << std::endl;
         _transition.reset();
         finished.store(true);

@@ -54,10 +54,7 @@ void PNtalk::Scheduler::run() {
 
             if (!threads.empty())
                 join_threads();
-
-            // std::osyncstream(std::cout)<<"loop threads: "<<threads.size()<<std::endl;
         }
-
     } catch (std::exception &e) {
         while (!threads.empty())
             join_threads();
@@ -78,7 +75,7 @@ void PNtalk::Scheduler::print_schedule() {
     std::lock_guard<std::mutex> lk(m);
     std::osyncstream cout(std::cerr);
     if (_plan.size()) {
-        cout << "Schedule: ";
+        cout << "Threads: " << threads.size() << " Schedule: ";
         for (auto &i : _plan)
             cout << i->name << " ";
         cout << std::endl;
@@ -98,8 +95,8 @@ void PNtalk::Scheduler::process_transition() {
     auto transition = pop();
 
     // std::osyncstream(std::cout) << "Trans: " << transition.use_count() << std::endl;
-    if (!transition->scheduler_check())
-        return;
+    // if (!transition->scheduler_check())
+    //     return;
 
     // std::osyncstream(std::cout) << "Executing: " << transition->name << std::endl;
     threads.push_back(std::move(TransitionThread(transition)));
